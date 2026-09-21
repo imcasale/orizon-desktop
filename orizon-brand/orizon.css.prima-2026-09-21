@@ -1,0 +1,744 @@
+.mx_AuthPage {
+  background: #1A0AAF !important;
+}
+.mx_AuthPage_modalBlur {
+  display: none !important;
+}
+.mx_AuthPage_modal,
+.mx_AuthPage_modalContent,
+.mx_AuthHeader,
+.mx_AuthBody {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.mx_AuthHeaderLogo img {
+  filter: brightness(0) invert(1) !important;
+}
+.mx_AuthFooter {
+  display: none !important;
+}
+
+.mx_AuthPage h1,
+.mx_AuthPage h2,
+.mx_AuthBody,
+.mx_AuthBody h2,
+.mx_AuthBody a,
+.mx_AuthBody label,
+.mx_ServerPicker_server,
+.mx_ServerPicker_desc,
+.mx_ServerPicker_change,
+.mx_AuthBody_changeFlow,
+.mx_LanguageDropdown,
+.mx_LanguageDropdown .mx_Dropdown_input {
+  color: #fff !important;
+}
+
+.mx_AuthPage input[type="text"],
+.mx_AuthPage input[type="password"] {
+  background: rgba(255,255,255,.1) !important;
+  border-color: rgba(255,255,255,.4) !important;
+  color: #fff !important;
+}
+.mx_AuthPage input::placeholder {
+  color: rgba(255,255,255,.6) !important;
+}
+.mx_AuthPage .mx_Field label {
+  background: #1A0AAF !important;
+  color: rgba(255,255,255,.85) !important;
+}
+
+.mx_AuthPage .mx_AccessibleButton_kind_primary {
+  background: #fff !important;
+  color: #1A0AAF !important;
+}
+
+.mx_AuthPage .mx_Dropdown_menu,
+.mx_LanguageDropdown .mx_Dropdown_menu {
+  background: #12089A !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+  border-radius: 10px !important;
+  max-height: 280px !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,.4) !important;
+}
+.mx_AuthPage .mx_Dropdown_menu *,
+.mx_AuthPage .mx_Dropdown_option {
+  background: transparent !important;
+  color: #fff !important;
+}
+.mx_AuthPage .mx_Dropdown_option:hover,
+.mx_AuthPage .mx_Dropdown_option_highlight {
+  background: rgba(255,255,255,.18) !important;
+  border-radius: 6px !important;
+}
+.mx_AuthPage .mx_Dropdown_input {
+  border-radius: 8px !important;
+}
+
+.mx_AuthBody_changeFlow,
+.mx_AuthBody_changeFlow a,
+.mx_AuthPage a {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+/* pulsante Accedi */
+.mx_AuthPage .mx_AccessibleButton_kind_primary,
+.mx_AuthPage input[type="submit"],
+.mx_AuthBody .mx_AccessibleButton_kind_primary {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #1A0AAF !important;
+  border: 0 !important;
+}
+
+/* password dimenticata */
+.mx_AuthBody .mx_AccessibleButton_kind_link,
+.mx_AuthBody .mx_AccessibleButton_kind_link_inline,
+.mx_AuthBody_forgot,
+.mx_Login_forgot {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+/* etichette dei campi */
+.mx_AuthPage .mx_Field label {
+  background: transparent !important;
+  color: rgba(255,255,255,.75) !important;
+}
+.mx_AuthPage .mx_Field input:placeholder-shown + label {
+  opacity: 0 !important;
+}
+.mx_AuthPage .mx_Field input:focus + label,
+.mx_AuthPage .mx_Field input:not(:placeholder-shown) + label {
+  opacity: 1 !important;
+  background: #1A0AAF !important;
+  padding: 0 4px !important;
+}
+
+.mx_AuthBody form button,
+.mx_AuthBody button[type="submit"],
+.mx_AuthPage button[type="submit"],
+.mx_AuthPage form input[type="submit"] {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #1A0AAF !important;
+  border: 0 !important;
+}
+.mx_AuthBody form button *,
+.mx_AuthPage button[type="submit"] * {
+  color: #1A0AAF !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  padding-bottom: 60px !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 150px !important;
+  height: auto !important;
+  max-width: none !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  padding-bottom: 110px !important;
+  padding-left: 40px !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 190px !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  padding-bottom: 170px !important;
+  padding-left: 0 !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 190px !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 0 0 -30px !important;
+}
+
+.mx_AuthHeaderLogo {
+  padding-bottom: 215px !important;
+}
+
+.mx_AuthBody_language,
+.mx_LanguageDropdown {
+  position: relative !important;
+  bottom: 60px !important;
+}
+
+.mx_AuthPage_modalContent {
+  position: relative !important;
+}
+.mx_AuthBody_language,
+.mx_AuthPage .mx_LanguageDropdown {
+  position: absolute !important;
+  bottom: auto !important;
+  top: 340px !important;
+  left: 40px !important;
+  margin: 0 !important;
+  width: 180px !important;
+}
+
+/* Accento Orizon */
+:root,
+.cpd-theme-dark,
+.cpd-theme-light,
+body {
+  --cpd-color-green-100: #14103A;
+  --cpd-color-green-200: #191352;
+  --cpd-color-green-300: #1F1770;
+  --cpd-color-green-400: #1A0AAF;
+  --cpd-color-green-500: #2415C9;
+  --cpd-color-green-600: #2C1CD6;
+  --cpd-color-green-700: #4B3BE8;
+  --cpd-color-green-800: #6E5BF5;
+  --cpd-color-green-900: #8A7AFF;
+  --cpd-color-green-1000: #A79BFF;
+  --cpd-color-green-1100: #C0B8FF;
+  --cpd-color-green-1200: #DAD6FF;
+  --cpd-color-bg-accent-rest: #1A0AAF;
+  --cpd-color-bg-accent-hovered: #2415C9;
+  --cpd-color-bg-accent-pressed: #12086E;
+}
+
+.mx_HomePage_default_buttons .mx_AccessibleButton {
+  background-color: #1A0AAF !important;
+}
+.mx_HomePage_default_buttons .mx_AccessibleButton:hover {
+  background-color: #2415C9 !important;
+}
+
+.mx_HomePage_default_buttons { display: none !important; }
+
+/* Superfici Orizon */
+.cpd-theme-dark,
+body.cpd-theme-dark {
+  --cpd-color-bg-canvas-default: #08080B;
+  --cpd-color-bg-canvas-disabled: #101014;
+  --cpd-color-bg-subtle-primary: #16161C;
+  --cpd-color-bg-subtle-secondary: #101014;
+  --cpd-color-bg-action-secondary-rest: #16161C;
+  --cpd-color-bg-action-secondary-hovered: #1E1E26;
+  --cpd-color-bg-action-secondary-pressed: #26262F;
+  --cpd-color-gray-100: #101014;
+  --cpd-color-gray-200: #16161C;
+  --cpd-color-gray-300: #1E1E26;
+  --cpd-color-gray-400: #26262F;
+  --cpd-color-gray-500: #33333E;
+  --cpd-color-gray-600: #4A4A57;
+  --cpd-color-gray-700: #6B6B78;
+  --cpd-color-gray-800: #8E8E9A;
+  --cpd-color-gray-900: #A9A9B4;
+  --cpd-color-gray-1000: #C4C4CD;
+  --cpd-color-gray-1100: #9C9AAE;
+  --cpd-color-gray-1200: #E8E8EE;
+  --cpd-color-gray-1300: #F5F5F8;
+  --cpd-color-gray-1400: #FFFFFF;
+}
+
+/* ================================================================
+   ORIZON — TEMA COMPLETO DELL'INTERFACCIA
+   Da aggiungere in coda a orizon.css.
+   Linguaggio visivo ripreso dal sito 4orizon.eu.
+   ================================================================ */
+
+/* ---------------------------------------------------------------
+   1. TAVOLOZZA
+   --------------------------------------------------------------- */
+:root,
+body,
+.cpd-theme-dark,
+.cpd-theme-light {
+  /* marchio */
+  --or-blu:            #1A0AAF;
+  --or-blu-chiaro:     #4B3BE8;
+  --or-blu-vivo:       #7A6BFF;
+  --or-blu-tenue:      #A79BFF;
+
+  /* superfici */
+  --or-fondo:          #07070B;
+  --or-fondo-2:        #0B0B12;
+  --or-superficie:     #12121A;
+  --or-superficie-2:   #181823;
+  --or-superficie-3:   #1F1F2C;
+
+  /* linee e testi */
+  --or-linea:          rgba(122,107,255,.13);
+  --or-linea-forte:    rgba(122,107,255,.26);
+  --or-testo:          #F2F1F7;
+  --or-testo-2:        #9C9AAE;
+  --or-testo-3:        #6E6C7E;
+
+  /* forme */
+  --or-r-s:  10px;
+  --or-r-m:  14px;
+  --or-r-l:  18px;
+  --or-r-xl: 24px;
+
+  --or-ombra:      0 6px 24px rgba(0,0,0,.35);
+  --or-ombra-alta: 0 18px 48px rgba(0,0,0,.55);
+  --or-tempo:      .18s cubic-bezier(.4,0,.2,1);
+
+  /* accento di Compound */
+  --cpd-color-text-decorative-1: #8A7AFF;
+  --cpd-color-text-decorative-2: #5B8CFF;
+  --cpd-color-text-decorative-3: #3BB0E8;
+  --cpd-color-text-decorative-4: #A79BFF;
+  --cpd-color-text-decorative-5: #6E5BF5;
+  --cpd-color-text-decorative-6: #C0B8FF;
+}
+
+/* ---------------------------------------------------------------
+   2. CARATTERE
+   --------------------------------------------------------------- */
+body,
+.mx_MatrixChat,
+.mx_BasicMessageComposer_input,
+button, input, textarea, select {
+  font-family: "Space Grotesk", Inter, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+.mx_RoomHeader_heading,
+.mx_RoomTile_title,
+.mx_Dialog_title,
+h1, h2, h3 {
+  letter-spacing: -.3px !important;
+  font-weight: 600 !important;
+}
+
+/* ---------------------------------------------------------------
+   3. SFONDO D'AMBIENTE
+   --------------------------------------------------------------- */
+.mx_MatrixChat {
+  background:
+    radial-gradient(1100px 620px at 8% -8%,  rgba(26,10,175,.28) 0%, transparent 62%),
+    radial-gradient(900px 520px at 102% 108%, rgba(75,59,232,.16) 0%, transparent 60%),
+    var(--or-fondo) !important;
+}
+
+/* ---------------------------------------------------------------
+   4. COLONNA DEGLI SPAZI
+   --------------------------------------------------------------- */
+.mx_SpacePanel {
+  background: linear-gradient(180deg, #14103A 0%, #0B0917 60%, var(--or-fondo) 100%) !important;
+  border-right: 1px solid var(--or-linea) !important;
+  padding: 10px 6px !important;
+}
+.mx_SpaceButton_avatarWrapper .mx_BaseAvatar,
+.mx_SpaceItem .mx_SpaceButton {
+  border-radius: var(--or-r-m) !important;
+  transition: transform var(--or-tempo), box-shadow var(--or-tempo) !important;
+}
+.mx_SpaceItem .mx_SpaceButton:hover { transform: translateY(-1px); }
+.mx_SpaceButton_active .mx_BaseAvatar,
+.mx_SpaceItem_active .mx_SpaceButton {
+  box-shadow: 0 0 0 2px var(--or-blu-vivo), 0 6px 18px rgba(122,107,255,.32) !important;
+}
+
+/* ---------------------------------------------------------------
+   5. PANNELLO DI SINISTRA
+   --------------------------------------------------------------- */
+.mx_LeftPanel {
+  background: linear-gradient(180deg, #100D2E 0%, var(--or-fondo-2) 55%, var(--or-fondo) 100%) !important;
+  border-right: 1px solid var(--or-linea) !important;
+}
+.mx_LeftPanel_roomListContainer { background: transparent !important; }
+
+/* ricerca */
+.mx_RoomSearch, .mx_SearchBox, .mx_RoomListSearch,
+.mx_RoomListHeader_search {
+  border-radius: var(--or-r-m) !important;
+  background: rgba(255,255,255,.045) !important;
+  border: 1px solid var(--or-linea) !important;
+  transition: border-color var(--or-tempo), background var(--or-tempo) !important;
+}
+.mx_RoomSearch:focus-within, .mx_SearchBox:focus-within {
+  border-color: var(--or-linea-forte) !important;
+  background: rgba(255,255,255,.07) !important;
+}
+
+/* filtri */
+.mx_FilterTabGroup label, .mx_RoomListFilter, .mx_FilterButton {
+  border-radius: 999px !important;
+  border: 1px solid var(--or-linea) !important;
+  transition: all var(--or-tempo) !important;
+}
+.mx_FilterTabGroup input:checked + label,
+.mx_FilterButton[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--or-blu) 0%, var(--or-blu-chiaro) 100%) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+/* voci della lista */
+.mx_RoomTile {
+  border-radius: var(--or-r-m) !important;
+  margin: 2px 8px !important;
+  padding: 7px 10px !important;
+  transition: background var(--or-tempo), box-shadow var(--or-tempo) !important;
+}
+.mx_RoomTile:hover { background: rgba(122,107,255,.10) !important; }
+.mx_RoomTile_selected,
+.mx_RoomTile[aria-selected="true"] {
+  background: linear-gradient(90deg, rgba(75,59,232,.30) 0%, rgba(75,59,232,.08) 100%) !important;
+  box-shadow: inset 3px 0 0 var(--or-blu-vivo) !important;
+}
+.mx_RoomTile_title { font-weight: 600 !important; }
+.mx_RoomTile_subtitle { color: var(--or-testo-2) !important; }
+
+/* pallini dei non letti */
+.mx_NotificationBadge, .mx_UnreadCounter {
+  background: linear-gradient(135deg, var(--or-blu-chiaro) 0%, var(--or-blu-vivo) 100%) !important;
+  box-shadow: 0 2px 10px rgba(122,107,255,.45) !important;
+  border-radius: 999px !important;
+}
+
+/* ---------------------------------------------------------------
+   6. INTESTAZIONE DELLA CONVERSAZIONE
+   --------------------------------------------------------------- */
+.mx_RoomHeader {
+  background: linear-gradient(180deg, rgba(26,10,175,.22) 0%, rgba(7,7,11,0) 100%) !important;
+  border-bottom: 1px solid var(--or-linea) !important;
+  backdrop-filter: blur(10px);
+  padding: 10px 16px !important;
+}
+.mx_RoomHeader_name, .mx_RoomHeader_heading { font-size: 1.05rem !important; }
+.mx_RoomHeader .mx_AccessibleButton {
+  border-radius: var(--or-r-s) !important;
+  transition: background var(--or-tempo) !important;
+}
+.mx_RoomHeader .mx_AccessibleButton:hover { background: rgba(122,107,255,.14) !important; }
+
+/* ---------------------------------------------------------------
+   7. CRONOLOGIA E MESSAGGI
+   --------------------------------------------------------------- */
+.mx_RoomView_body, .mx_RoomView_timeline { background: transparent !important; }
+
+/* separatori di data */
+.mx_DateSeparator {
+  color: var(--or-testo-3) !important;
+  font-size: .78rem !important;
+  letter-spacing: .4px !important;
+  text-transform: uppercase !important;
+}
+.mx_DateSeparator hr, .mx_DateSeparator_line {
+  border-color: var(--or-linea) !important;
+}
+
+/* bolle */
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
+  border-radius: var(--or-r-l) !important;
+  padding: 9px 14px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.22) !important;
+  transition: transform var(--or-tempo) !important;
+}
+.mx_EventTile[data-layout="bubble"][data-self="false"] .mx_EventTile_line {
+  background: var(--or-superficie-2) !important;
+  border: 1px solid var(--or-linea) !important;
+  border-bottom-left-radius: 6px !important;
+}
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line {
+  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
+  border: 0 !important;
+  border-bottom-right-radius: 6px !important;
+  box-shadow: 0 4px 18px rgba(75,59,232,.30) !important;
+}
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line,
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line * { color: #fff !important; }
+
+/* messaggio evidenziato */
+.mx_EventTile_highlight .mx_EventTile_line {
+  box-shadow: inset 3px 0 0 var(--or-blu-vivo) !important;
+  background: rgba(122,107,255,.12) !important;
+}
+
+/* risposte citate */
+.mx_ReplyChain, .mx_ReplyTile {
+  border-left: 3px solid var(--or-blu-vivo) !important;
+  border-radius: var(--or-r-s) !important;
+  background: rgba(122,107,255,.07) !important;
+  padding: 6px 10px !important;
+}
+
+/* reazioni */
+.mx_ReactionsRowButton {
+  border-radius: 999px !important;
+  border: 1px solid var(--or-linea) !important;
+  background: var(--or-superficie) !important;
+  transition: all var(--or-tempo) !important;
+}
+.mx_ReactionsRowButton:hover { border-color: var(--or-linea-forte) !important; }
+.mx_ReactionsRowButton_selected {
+  background: rgba(75,59,232,.26) !important;
+  border-color: var(--or-blu-vivo) !important;
+}
+
+/* codice */
+.mx_EventTile_content code, pre {
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid var(--or-linea) !important;
+  border-radius: var(--or-r-s) !important;
+}
+
+/* immagini e allegati */
+.mx_MImageBody_thumbnail, .mx_MVideoBody video, .mx_MFileBody_info {
+  border-radius: var(--or-r-m) !important;
+}
+
+/* messaggi vocali */
+.mx_VoiceMessagePrimaryContainer, .mx_SeekBar {
+  border-radius: 999px !important;
+}
+.mx_VoiceMessagePrimaryContainer { background: rgba(122,107,255,.12) !important; }
+
+/* barra delle azioni sul messaggio */
+.mx_MessageActionBar {
+  border-radius: 999px !important;
+  border: 1px solid var(--or-linea) !important;
+  background: var(--or-superficie-2) !important;
+  box-shadow: var(--or-ombra) !important;
+  overflow: hidden !important;
+}
+
+/* chi sta scrivendo */
+.mx_TypingDot { background: var(--or-blu-vivo) !important; }
+
+/* ---------------------------------------------------------------
+   8. COMPOSITORE
+   --------------------------------------------------------------- */
+.mx_MessageComposer {
+  margin: 0 16px 14px 16px !important;
+  border-radius: var(--or-r-l) !important;
+  background: var(--or-superficie) !important;
+  border: 1px solid var(--or-linea) !important;
+  box-shadow: var(--or-ombra) !important;
+  transition: border-color var(--or-tempo), box-shadow var(--or-tempo) !important;
+}
+.mx_MessageComposer:focus-within {
+  border-color: var(--or-linea-forte) !important;
+  box-shadow: 0 8px 30px rgba(75,59,232,.24) !important;
+}
+.mx_MessageComposer_wrapper { border-top: 0 !important; }
+.mx_MessageComposer_button {
+  border-radius: var(--or-r-s) !important;
+  transition: background var(--or-tempo) !important;
+}
+.mx_MessageComposer_button:hover { background: rgba(122,107,255,.16) !important; }
+.mx_MessageComposer_sendMessage {
+  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
+  border-radius: 999px !important;
+}
+
+/* ---------------------------------------------------------------
+   9. PANNELLO DI DESTRA
+   --------------------------------------------------------------- */
+.mx_RightPanel {
+  background: linear-gradient(180deg, var(--or-fondo-2) 0%, var(--or-fondo) 100%) !important;
+  border-left: 1px solid var(--or-linea) !important;
+}
+.mx_BaseCard, .mx_UserInfo {
+  background: transparent !important;
+  border-radius: var(--or-r-l) !important;
+}
+.mx_BaseCard_Button, .mx_UserInfo_field {
+  border-radius: var(--or-r-m) !important;
+  transition: background var(--or-tempo) !important;
+}
+.mx_BaseCard_Button:hover { background: rgba(122,107,255,.12) !important; }
+
+/* ---------------------------------------------------------------
+   10. FINESTRE, MENU, IMPOSTAZIONI
+   --------------------------------------------------------------- */
+.mx_Dialog {
+  border-radius: var(--or-r-xl) !important;
+  border: 1px solid var(--or-linea) !important;
+  background: var(--or-superficie) !important;
+  box-shadow: var(--or-ombra-alta) !important;
+}
+.mx_Dialog_background { backdrop-filter: blur(6px); background: rgba(4,4,8,.62) !important; }
+.mx_ContextualMenu, .mx_GenericDropdownMenu_menu, .mx_Dropdown_menu {
+  border-radius: var(--or-r-l) !important;
+  border: 1px solid var(--or-linea) !important;
+  background: var(--or-superficie-2) !important;
+  box-shadow: var(--or-ombra-alta) !important;
+  padding: 6px !important;
+}
+.mx_IconizedContextMenu_item, .mx_Dropdown_option {
+  border-radius: var(--or-r-s) !important;
+  transition: background var(--or-tempo) !important;
+}
+.mx_IconizedContextMenu_item:hover, .mx_Dropdown_option:hover {
+  background: rgba(122,107,255,.16) !important;
+}
+.mx_SettingsDialog .mx_TabbedView_tabLabel {
+  border-radius: var(--or-r-m) !important;
+  transition: background var(--or-tempo) !important;
+}
+.mx_TabbedView_tabLabel_active {
+  background: linear-gradient(90deg, rgba(75,59,232,.30) 0%, rgba(75,59,232,.08) 100%) !important;
+}
+.mx_SettingsSubsection, .mx_SettingsTab_section {
+  border-radius: var(--or-r-l) !important;
+  border: 1px solid var(--or-linea) !important;
+  background: rgba(255,255,255,.02) !important;
+  padding: 14px 16px !important;
+  margin-bottom: 14px !important;
+}
+
+/* ---------------------------------------------------------------
+   11. CONTROLLI
+   --------------------------------------------------------------- */
+.mx_AccessibleButton_kind_primary, .cpd-btn-primary {
+  border-radius: var(--or-r-m) !important;
+  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
+  border: 0 !important;
+  font-weight: 600 !important;
+  transition: filter var(--or-tempo), transform .12s ease !important;
+}
+.mx_AccessibleButton_kind_primary:hover, .cpd-btn-primary:hover { filter: brightness(1.14) !important; }
+.mx_AccessibleButton_kind_primary:active { transform: translateY(1px) !important; }
+.mx_AccessibleButton_kind_secondary, .cpd-btn-secondary {
+  border-radius: var(--or-r-m) !important;
+  border: 1px solid var(--or-linea-forte) !important;
+  background: transparent !important;
+}
+.mx_Field input, .mx_Field select, .mx_Field textarea {
+  border-radius: var(--or-r-m) !important;
+  border: 1px solid var(--or-linea) !important;
+  background: rgba(255,255,255,.04) !important;
+  transition: border-color var(--or-tempo) !important;
+}
+.mx_Field input:focus { border-color: var(--or-blu-vivo) !important; }
+.mx_ToggleSwitch_on { background: var(--or-blu-chiaro) !important; }
+.mx_BaseAvatar { border-radius: var(--or-r-m) !important; overflow: hidden !important; }
+.mx_Tooltip, .cpd-tooltip {
+  border-radius: var(--or-r-s) !important;
+  background: var(--or-superficie-3) !important;
+  border: 1px solid var(--or-linea) !important;
+  box-shadow: var(--or-ombra) !important;
+}
+
+/* ---------------------------------------------------------------
+   12. BARRE DI SCORRIMENTO
+   --------------------------------------------------------------- */
+* { scrollbar-width: thin; scrollbar-color: rgba(122,107,255,.34) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(122,107,255,.30);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(122,107,255,.56); background-clip: content-box; }
+
+/* ---------------------------------------------------------------
+   13. DETTAGLI
+   --------------------------------------------------------------- */
+.mx_EventTile_e2eIcon { opacity: .42 !important; transition: opacity var(--or-tempo) !important; }
+.mx_EventTile_e2eIcon:hover { opacity: 1 !important; }
+.mx_AccessibleButton:focus-visible,
+.mx_Field input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--or-blu-vivo) !important;
+  outline-offset: 2px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ================================================================
+   ORIZON — CORREZIONI
+   ================================================================ */
+
+/* ---- 1. TEMA CHIARO: superfici e testi leggibili ---- */
+.cpd-theme-light,
+body.cpd-theme-light,
+.cpd-theme-light :root {
+  --or-fondo:        #FFFFFF;
+  --or-fondo-2:      #F7F6FD;
+  --or-superficie:   #FFFFFF;
+  --or-superficie-2: #F2F1FA;
+  --or-superficie-3: #E9E7F7;
+  --or-linea:        rgba(26,10,175,.13);
+  --or-linea-forte:  rgba(26,10,175,.30);
+  --or-testo:        #14121F;
+  --or-testo-2:      #55536B;
+  --or-testo-3:      #7A7889;
+  --or-ombra:        0 6px 20px rgba(26,10,175,.10);
+  --or-ombra-alta:   0 18px 44px rgba(26,10,175,.16);
+}
+.cpd-theme-light .mx_MatrixChat {
+  background:
+    radial-gradient(1100px 620px at 8% -8%, rgba(26,10,175,.10) 0%, transparent 62%),
+    radial-gradient(900px 520px at 102% 108%, rgba(75,59,232,.07) 0%, transparent 60%),
+    #FFFFFF !important;
+}
+.cpd-theme-light .mx_LeftPanel {
+  background: linear-gradient(180deg, #EEECFB 0%, #F8F7FD 55%, #FFFFFF 100%) !important;
+}
+.cpd-theme-light .mx_SpacePanel {
+  background: linear-gradient(180deg, #E3DFFA 0%, #F1EFFC 100%) !important;
+}
+.cpd-theme-light .mx_RightPanel {
+  background: linear-gradient(180deg, #F8F7FD 0%, #FFFFFF 100%) !important;
+}
+.cpd-theme-light .mx_RoomHeader {
+  background: linear-gradient(180deg, rgba(26,10,175,.09) 0%, rgba(255,255,255,0) 100%) !important;
+}
+.cpd-theme-light .mx_EventTile[data-layout="bubble"][data-self="false"] .mx_EventTile_line {
+  background: #F1F0FA !important;
+  border-color: rgba(26,10,175,.10) !important;
+}
+.cpd-theme-light .mx_MessageComposer,
+.cpd-theme-light .mx_Dialog,
+.cpd-theme-light .mx_ContextualMenu,
+.cpd-theme-light .mx_Dropdown_menu,
+.cpd-theme-light .mx_Tooltip {
+  background: #FFFFFF !important;
+}
+.cpd-theme-light .mx_RoomTile:hover { background: rgba(26,10,175,.07) !important; }
+.cpd-theme-light .mx_RoomSearch,
+.cpd-theme-light .mx_SearchBox,
+.cpd-theme-light .mx_Field input {
+  background: rgba(26,10,175,.04) !important;
+}
+.cpd-theme-light .mx_EventTile_content code,
+.cpd-theme-light pre { background: rgba(26,10,175,.05) !important; }
+.cpd-theme-light .mx_ReactionsRowButton { background: #F7F6FD !important; }
+.cpd-theme-light * { scrollbar-color: rgba(26,10,175,.28) transparent; }
+.cpd-theme-light *::-webkit-scrollbar-thumb { background: rgba(26,10,175,.24); background-clip: content-box; }
+.cpd-theme-light *::-webkit-scrollbar-thumb:hover { background: rgba(26,10,175,.45); background-clip: content-box; }
+
+/* ---- 2. BOLLE: più larghe, meno spazio sprecato ---- */
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
+  max-width: 88% !important;
+}
+.mx_EventTile[data-layout="bubble"] .mx_MImageBody,
+.mx_EventTile[data-layout="bubble"] .mx_MVideoBody { max-width: 100% !important; }
+.mx_RoomView_MessageList { padding-inline: 12px !important; }
+
+/* ---- 3. COMPOSITORE: niente fascia scura sotto ---- */
+.mx_RoomView_body,
+.mx_RoomView_timeline,
+.mx_RoomView_statusArea,
+.mx_MessageComposer_wrapper,
+.mx_RoomView_messagePanel,
+.mx_MainSplit > .mx_RoomView_body {
+  background: transparent !important;
+}
+.mx_MessageComposer {
+  margin: 0 14px 12px 14px !important;
+  overflow: hidden !important;
+}

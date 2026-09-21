@@ -1,0 +1,248 @@
+.mx_AuthPage {
+  background: #1A0AAF !important;
+}
+.mx_AuthPage_modalBlur {
+  display: none !important;
+}
+.mx_AuthPage_modal,
+.mx_AuthPage_modalContent,
+.mx_AuthHeader,
+.mx_AuthBody {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.mx_AuthHeaderLogo img {
+  filter: brightness(0) invert(1) !important;
+}
+.mx_AuthFooter {
+  display: none !important;
+}
+
+.mx_AuthPage h1,
+.mx_AuthPage h2,
+.mx_AuthBody,
+.mx_AuthBody h2,
+.mx_AuthBody a,
+.mx_AuthBody label,
+.mx_ServerPicker_server,
+.mx_ServerPicker_desc,
+.mx_ServerPicker_change,
+.mx_AuthBody_changeFlow,
+.mx_LanguageDropdown,
+.mx_LanguageDropdown .mx_Dropdown_input {
+  color: #fff !important;
+}
+
+.mx_AuthPage input[type="text"],
+.mx_AuthPage input[type="password"] {
+  background: rgba(255,255,255,.1) !important;
+  border-color: rgba(255,255,255,.4) !important;
+  color: #fff !important;
+}
+.mx_AuthPage input::placeholder {
+  color: rgba(255,255,255,.6) !important;
+}
+.mx_AuthPage .mx_Field label {
+  background: #1A0AAF !important;
+  color: rgba(255,255,255,.85) !important;
+}
+
+.mx_AuthPage .mx_AccessibleButton_kind_primary {
+  background: #fff !important;
+  color: #1A0AAF !important;
+}
+
+.mx_AuthPage .mx_Dropdown_menu,
+.mx_LanguageDropdown .mx_Dropdown_menu {
+  background: #12089A !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+  border-radius: 10px !important;
+  max-height: 280px !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,.4) !important;
+}
+.mx_AuthPage .mx_Dropdown_menu *,
+.mx_AuthPage .mx_Dropdown_option {
+  background: transparent !important;
+  color: #fff !important;
+}
+.mx_AuthPage .mx_Dropdown_option:hover,
+.mx_AuthPage .mx_Dropdown_option_highlight {
+  background: rgba(255,255,255,.18) !important;
+  border-radius: 6px !important;
+}
+.mx_AuthPage .mx_Dropdown_input {
+  border-radius: 8px !important;
+}
+
+.mx_AuthBody_changeFlow,
+.mx_AuthBody_changeFlow a,
+.mx_AuthPage a {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+/* pulsante Accedi */
+.mx_AuthPage .mx_AccessibleButton_kind_primary,
+.mx_AuthPage input[type="submit"],
+.mx_AuthBody .mx_AccessibleButton_kind_primary {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #1A0AAF !important;
+  border: 0 !important;
+}
+
+/* password dimenticata */
+.mx_AuthBody .mx_AccessibleButton_kind_link,
+.mx_AuthBody .mx_AccessibleButton_kind_link_inline,
+.mx_AuthBody_forgot,
+.mx_Login_forgot {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+/* etichette dei campi */
+.mx_AuthPage .mx_Field label {
+  background: transparent !important;
+  color: rgba(255,255,255,.75) !important;
+}
+.mx_AuthPage .mx_Field input:placeholder-shown + label {
+  opacity: 0 !important;
+}
+.mx_AuthPage .mx_Field input:focus + label,
+.mx_AuthPage .mx_Field input:not(:placeholder-shown) + label {
+  opacity: 1 !important;
+  background: #1A0AAF !important;
+  padding: 0 4px !important;
+}
+
+.mx_AuthBody form button,
+.mx_AuthBody button[type="submit"],
+.mx_AuthPage button[type="submit"],
+.mx_AuthPage form input[type="submit"] {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #1A0AAF !important;
+  border: 0 !important;
+}
+.mx_AuthBody form button *,
+.mx_AuthPage button[type="submit"] * {
+  color: #1A0AAF !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  padding-bottom: 60px !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 150px !important;
+  height: auto !important;
+  max-width: none !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  padding-bottom: 110px !important;
+  padding-left: 40px !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 190px !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.mx_AuthHeaderLogo {
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  padding-bottom: 170px !important;
+  padding-left: 0 !important;
+}
+.mx_AuthHeaderLogo img {
+  width: 190px !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 0 0 -30px !important;
+}
+
+.mx_AuthHeaderLogo {
+  padding-bottom: 215px !important;
+}
+
+.mx_AuthBody_language,
+.mx_LanguageDropdown {
+  position: relative !important;
+  bottom: 60px !important;
+}
+
+.mx_AuthPage_modalContent {
+  position: relative !important;
+}
+.mx_AuthBody_language,
+.mx_AuthPage .mx_LanguageDropdown {
+  position: absolute !important;
+  bottom: auto !important;
+  top: 340px !important;
+  left: 40px !important;
+  margin: 0 !important;
+  width: 180px !important;
+}
+
+/* Accento Orizon */
+:root,
+.cpd-theme-dark,
+.cpd-theme-light,
+body {
+  --cpd-color-green-100: #14103A;
+  --cpd-color-green-200: #191352;
+  --cpd-color-green-300: #1F1770;
+  --cpd-color-green-400: #1A0AAF;
+  --cpd-color-green-500: #2415C9;
+  --cpd-color-green-600: #2C1CD6;
+  --cpd-color-green-700: #4B3BE8;
+  --cpd-color-green-800: #6E5BF5;
+  --cpd-color-green-900: #8A7AFF;
+  --cpd-color-green-1000: #A79BFF;
+  --cpd-color-green-1100: #C0B8FF;
+  --cpd-color-green-1200: #DAD6FF;
+  --cpd-color-bg-accent-rest: #1A0AAF;
+  --cpd-color-bg-accent-hovered: #2415C9;
+  --cpd-color-bg-accent-pressed: #12086E;
+}
+
+.mx_HomePage_default_buttons .mx_AccessibleButton {
+  background-color: #1A0AAF !important;
+}
+.mx_HomePage_default_buttons .mx_AccessibleButton:hover {
+  background-color: #2415C9 !important;
+}
+
+.mx_HomePage_default_buttons { display: none !important; }
+
+/* Superfici Orizon */
+.cpd-theme-dark,
+body.cpd-theme-dark {
+  --cpd-color-bg-canvas-default: #08080B;
+  --cpd-color-bg-canvas-disabled: #101014;
+  --cpd-color-bg-subtle-primary: #16161C;
+  --cpd-color-bg-subtle-secondary: #101014;
+  --cpd-color-bg-action-secondary-rest: #16161C;
+  --cpd-color-bg-action-secondary-hovered: #1E1E26;
+  --cpd-color-bg-action-secondary-pressed: #26262F;
+  --cpd-color-gray-100: #101014;
+  --cpd-color-gray-200: #16161C;
+  --cpd-color-gray-300: #1E1E26;
+  --cpd-color-gray-400: #26262F;
+  --cpd-color-gray-500: #33333E;
+  --cpd-color-gray-600: #4A4A57;
+  --cpd-color-gray-700: #6B6B78;
+  --cpd-color-gray-800: #8E8E9A;
+  --cpd-color-gray-900: #A9A9B4;
+  --cpd-color-gray-1000: #C4C4CD;
+  --cpd-color-gray-1100: #9C9AAE;
+  --cpd-color-gray-1200: #E8E8EE;
+  --cpd-color-gray-1300: #F5F5F8;
+  --cpd-color-gray-1400: #FFFFFF;
+}

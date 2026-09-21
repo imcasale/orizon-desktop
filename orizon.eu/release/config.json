@@ -1,0 +1,73 @@
+{
+    "default_server_config": {
+        "m.homeserver": {
+            "base_url": "https://chat.4orizon.eu",
+            "server_name": "4orizon.eu"
+        }
+    },
+    "brand": "Orizon",
+    "default_country_code": "IT",
+    "disable_custom_urls": true,
+    "disable_guests": true,
+    "disable_3pid_login": true,
+    "show_labs_settings": false,
+    "default_theme": "custom-Orizon",
+    "room_directory": {
+        "servers": []
+    },
+    "setting_defaults": {
+        "UIFeature.feedback": false,
+        "UIFeature.shareSocial": false,
+        "UIFeature.identityServer": false,
+        "layout": "bubble"
+    },
+    "features": {},
+    "custom_themes": [
+        {
+            "name": "Orizon",
+            "is_dark": true,
+            "colors": {
+                "accent-color": "#4B3BE8",
+                "primary-color": "#4B3BE8",
+                "warning-color": "#FF5B55",
+                "alert": "#FF5B55",
+                "sidebar-color": "#0B0B12",
+                "roomlist-background-color": "#101019",
+                "roomlist-text-color": "#F2F1F7",
+                "roomlist-text-secondary-color": "#9C9AAE",
+                "roomlist-highlights-color": "#1C1B2A",
+                "roomlist-separator-color": "#26253A",
+                "timeline-background-color": "#08080B",
+                "timeline-text-color": "#F2F1F7",
+                "secondary-content": "#9C9AAE",
+                "tertiary-content": "#7A7889",
+                "timeline-text-secondary-color": "#9C9AAE",
+                "timeline-highlights-color": "#14131F",
+                "reaction-row-button-selected-bg-color": "#4B3BE8",
+                "menu-selected-color": "#1C1B2A",
+                "focus-bg-color": "#1C1B2A",
+                "room-highlight-color": "#1C1B2A",
+                "togglesw-off-color": "#35344A",
+                "other-user-pill-bg-color": "#4B3BE8",
+                "username-colors": [
+                    "#4B3BE8",
+                    "#7A6BFF",
+                    "#A79BFF",
+                    "#5B8CFF",
+                    "#3BB0E8",
+                    "#3BE8C4",
+                    "#8BE83B",
+                    "#E8C43B"
+                ]
+            }
+        }
+    ],
+    "default_server_name": "4orizon.eu",
+    "embedded_pages": {},
+    "oidc_static_client_uri": "https://4orizon.eu/",
+    "oidc_metadata": {
+        "client_uri": "https://4orizon.eu/",
+        "logo_uri": "https://4orizon.eu/icona.png",
+        "client_name": "Orizon"
+    }
+}

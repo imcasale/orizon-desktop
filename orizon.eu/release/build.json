@@ -1,0 +1,10 @@
+{
+    "appId": "eu.orizon.desktop",
+    "name": "orizon-desktop",
+    "productName": "Orizon",
+    "description": "Orizon: la messaggistica che guarda lontano",
+    "protocols": [
+        "eu.4orizon.desktop",
+        "orizon"
+    ]
+}

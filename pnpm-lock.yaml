@@ -35,6 +35,9 @@ importers:
       electron-window-state:
         specifier: ^5.0.3
         version: 5.0.3
+      matrix-seshat:
+        specifier: link:.hak/hakModules/matrix-seshat
+        version: link:.hak/hakModules/matrix-seshat
       minimist:
         specifier: ^1.2.6
         version: 1.2.8

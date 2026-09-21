@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orizon</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 40px;
+    position: relative;
+  }
+
+  .left { background: #1A0AAF; color: #fff; text-align: center; }
+  .lockup { display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .left svg.mark { width: 108px; height: 108px; flex: none; margin: 0 -14px 0 -20px; }
+  .left h1 { font-size: 52px; font-weight: 600; letter-spacing: -1.4px; line-height: 1; }
+  .left .tag { font-size: 15px; color: #C9C4F5; margin-top: 18px; line-height: 1.6; max-width: 320px; min-height: 48px; }
+  .left .dom { position: absolute; bottom: 26px; font-size: 12px; }
+  .left .dom a { color: #8E86E0; text-decoration: none; }
+
+  .right { background: #fff; color: #16151C; }
+  .right h2 { font-size: 22px; font-weight: 600; min-height: 27px; }
+  .right .sub { font-size: 14px; color: #6B6A75; margin: 8px 0 32px; line-height: 1.5; max-width: 290px; min-height: 42px; text-align: center; }
+
+  .btn {
+    display: block;
+    width: 240px;
+    padding: 13px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 10px;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  .primary { background: #1A0AAF; color: #fff; }
+  .secondary { background: transparent; color: #1A0AAF; border: 1px solid #D5D2E8; }
+
+  .topbar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    z-index: 20;
+  }
+
+  .glass {
+    background: rgba(22, 21, 28, .045);
+    border: 1px solid rgba(22, 21, 28, .07);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    color: #45444F;
+    border-radius: 11px;
+    font: inherit;
+    cursor: pointer;
+    transition: background .18s, border-color .18s, color .18s;
+  }
+  .glass:hover { background: rgba(22, 21, 28, .085); color: #16151C; }
+  .glass:focus-visible { outline: 2px solid #1A0AAF; outline-offset: 2px; }
+
+  .lang-btn { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; font-size: 13px; font-weight: 500; }
+  .lang-btn .globe { width: 15px; height: 15px; opacity: .75; }
+  .lang-btn .caret { width: 11px; height: 11px; opacity: .5; transition: transform .2s; }
+  .lang-btn[aria-expanded="true"] .caret { transform: rotate(180deg); }
+
+  .theme-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; }
+  .theme-btn svg { width: 18px; height: 18px; }
+
+  .lang-wrap { position: relative; }
+  .lang-menu {
+    position: absolute;
+    top: calc(100% + 9px);
+    right: 0;
+    width: 196px;
+    padding: 6px;
+    max-height: 296px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, .74);
+    border: 1px solid rgba(22, 21, 28, .09);
+    -webkit-backdrop-filter: blur(26px) saturate(1.7);
+    backdrop-filter: blur(26px) saturate(1.7);
+    border-radius: 14px;
+    box-shadow: 0 18px 44px rgba(18, 16, 40, .16);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .17s, transform .17s;
+  }
+  .lang-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .lang-menu button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 8px 9px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #3A3945;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background .13s;
+  }
+  .lang-menu button:hover { background: rgba(22, 21, 28, .06); }
+  .lang-menu .code {
+    flex: none;
+    width: 26px;
+    padding: 2px 0;
+    border-radius: 5px;
+    background: rgba(22, 21, 28, .07);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-align: center;
+    text-transform: uppercase;
+    opacity: .7;
+  }
+  .lang-menu button[aria-selected="true"] { background: #1A0AAF; color: #fff; font-weight: 600; }
+  .lang-menu button[aria-selected="true"]:hover { background: #1A0AAF; }
+  .lang-menu button[aria-selected="true"] .code { background: rgba(255, 255, 255, .22); color: #fff; opacity: 1; }
+  .lang-menu::-webkit-scrollbar { width: 8px; }
+  .lang-menu::-webkit-scrollbar-thumb { background: rgba(22, 21, 28, .16); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+
+  body.dark .right { background: #08080B; color: #F2F1F7; }
+  body.dark .right .sub { color: #9C9AAE; }
+  body.dark .secondary { color: #fff; border-color: #35344A; }
+  body.dark .glass { background: rgba(255, 255, 255, .07); border-color: rgba(255, 255, 255, .1); color: #C9C7D6; }
+  body.dark .glass:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+  body.dark .glass:focus-visible { outline-color: #A79BFF; }
+  body.dark .lang-menu { background: rgba(16, 16, 20, .8); border-color: rgba(255, 255, 255, .1); box-shadow: 0 18px 44px rgba(0, 0, 0, .45); }
+  body.dark .lang-menu button { color: #C9C7D6; }
+  body.dark .lang-menu button:hover { background: rgba(255, 255, 255, .07); }
+  body.dark .lang-menu .code { background: rgba(255, 255, 255, .1); }
+  body.dark .lang-menu button[aria-selected="true"] { background: #2415C9; color: #fff; }
+  body.dark .lang-menu button[aria-selected="true"]:hover { background: #2415C9; }
+  body.dark .lang-menu button[aria-selected="true"] .code { background: rgba(255, 255, 255, .24); color: #fff; }
+  body.dark .lang-menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); background-clip: content-box; }
+
+  @media (max-width: 760px) {
+    body { flex-direction: column; }
+    .side { flex: none; padding: 40px 28px; }
+    .left { padding: 52px 28px 44px; }
+    .left svg.mark { width: 84px; height: 84px; margin: 0 -11px 0 -16px; }
+    .left h1 { font-size: 40px; }
+    .left .dom { display: none; }
+    .right { flex: 1; padding-top: 78px; }
+    .lang-menu { max-height: 252px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="side left">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Orizon">
+        <path d="M24.5 38.5 L79 41 L28.5 71.5 L43.5 50.5 Z" fill="#fff"/>
+      </svg>
+      <h1>Orizon</h1>
+    </div>
+    <div class="tag"><span id="tag1"></span><br><span id="tag2"></span></div>
+    <div class="dom"><a href="https://4orizon.eu">4orizon.eu</a></div>
+  </div>
+
+  <div class="side right">
+
+    <div class="topbar">
+      <div class="lang-wrap">
+        <button class="glass lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+          <svg class="globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/>
+          </svg>
+          <span id="langLabel"></span>
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="lang-menu" id="langMenu" role="listbox"></div>
+      </div>
+      <button class="glass theme-btn" id="theme" aria-label="Tema"></button>
+    </div>
+
+    <h2 id="title"></h2>
+    <div class="sub" id="sub"></div>
+
+    <a href="#/login" class="btn primary mx_ButtonSignIn" id="login"></a>
+    <a href="#/register" class="btn secondary mx_ButtonCreateAccount" id="register"></a>
+
+  </div>
+
+<script>
+var L = {
+  it:{n:"Italiano",t1:"Messaggistica cifrata end-to-end.",t2:"Le tue conversazioni restano tue.",w:"Benvenuto",s:"Accedi al tuo account o creane uno nuovo.",i:"Accedi",r:"Registrati"},
+  en:{n:"English",t1:"End-to-end encrypted messaging.",t2:"Your conversations stay yours.",w:"Welcome",s:"Sign in to your account or create a new one.",i:"Sign in",r:"Register"},
+  de:{n:"Deutsch",t1:"Ende-zu-Ende-verschlüsselte Nachrichten.",t2:"Deine Gespräche bleiben deine.",w:"Willkommen",s:"Melde dich an oder erstelle ein neues Konto.",i:"Anmelden",r:"Registrieren"},
+  fr:{n:"Français",t1:"Messagerie chiffrée de bout en bout.",t2:"Vos conversations restent les vôtres.",w:"Bienvenue",s:"Connectez-vous à votre compte ou créez-en un.",i:"Se connecter",r:"S'inscrire"},
+  es:{n:"Español",t1:"Mensajería cifrada de extremo a extremo.",t2:"Tus conversaciones siguen siendo tuyas.",w:"Bienvenido",s:"Inicia sesión o crea una cuenta nueva.",i:"Iniciar sesión",r:"Registrarse"},
+  pt:{n:"Português",t1:"Mensagens cifradas ponta a ponta.",t2:"As tuas conversas continuam tuas.",w:"Bem-vindo",s:"Inicia sessão ou cria uma conta nova.",i:"Iniciar sessão",r:"Registar"},
+  nl:{n:"Nederlands",t1:"End-to-end versleutelde berichten.",t2:"Je gesprekken blijven van jou.",w:"Welkom",s:"Log in of maak een nieuw account aan.",i:"Inloggen",r:"Registreren"},
+  pl:{n:"Polski",t1:"Wiadomości szyfrowane end-to-end.",t2:"Twoje rozmowy pozostają twoje.",w:"Witaj",s:"Zaloguj się lub załóż nowe konto.",i:"Zaloguj się",r:"Zarejestruj się"},
+  sv:{n:"Svenska",t1:"Totalsträckskrypterade meddelanden.",t2:"Dina samtal förblir dina.",w:"Välkommen",s:"Logga in eller skapa ett nytt konto.",i:"Logga in",r:"Registrera dig"},
+  da:{n:"Dansk",t1:"End-to-end-krypterede beskeder.",t2:"Dine samtaler forbliver dine.",w:"Velkommen",s:"Log ind, eller opret en ny konto.",i:"Log ind",r:"Opret konto"},
+  fi:{n:"Suomi",t1:"Päästä päähän salatut viestit.",t2:"Keskustelusi pysyvät sinun.",w:"Tervetuloa",s:"Kirjaudu sisään tai luo uusi tili.",i:"Kirjaudu sisään",r:"Rekisteröidy"},
+  cs:{n:"Čeština",t1:"Zprávy šifrované end-to-end.",t2:"Vaše konverzace zůstávají vaše.",w:"Vítejte",s:"Přihlaste se nebo si vytvořte nový účet.",i:"Přihlásit se",r:"Registrovat se"},
+  sk:{n:"Slovenčina",t1:"Správy šifrované end-to-end.",t2:"Vaše konverzácie zostávajú vaše.",w:"Vitajte",s:"Prihláste sa alebo si vytvorte nový účet.",i:"Prihlásiť sa",r:"Registrovať sa"},
+  hu:{n:"Magyar",t1:"Végpontok közti titkosított üzenetküldés.",t2:"A beszélgetéseid a tieid maradnak.",w:"Üdvözlünk",s:"Jelentkezz be, vagy hozz létre új fiókot.",i:"Bejelentkezés",r:"Regisztráció"},
+  ro:{n:"Română",t1:"Mesagerie criptată end-to-end.",t2:"Conversațiile tale rămân ale tale.",w:"Bun venit",s:"Conectează-te sau creează un cont nou.",i:"Conectare",r:"Înregistrare"},
+  bg:{n:"Български",t1:"Съобщения с криптиране от край до край.",t2:"Разговорите ви остават ваши.",w:"Добре дошли",s:"Влезте в профила си или създайте нов.",i:"Вход",r:"Регистрация"},
+  el:{n:"Ελληνικά",t1:"Μηνύματα με κρυπτογράφηση από άκρο σε άκρο.",t2:"Οι συνομιλίες σας παραμένουν δικές σας.",w:"Καλώς ήρθατε",s:"Συνδεθείτε ή δημιουργήστε νέο λογαριασμό.",i:"Σύνδεση",r:"Εγγραφή"},
+  hr:{n:"Hrvatski",t1:"Poruke šifrirane s kraja na kraj.",t2:"Vaši razgovori ostaju vaši.",w:"Dobro došli",s:"Prijavite se ili otvorite novi račun.",i:"Prijava",r:"Registracija"},
+  sl:{n:"Slovenščina",t1:"Sporočila s šifriranjem od konca do konca.",t2:"Vaši pogovori ostanejo vaši.",w:"Dobrodošli",s:"Prijavite se ali ustvarite nov račun.",i:"Prijava",r:"Registracija"},
+  et:{n:"Eesti",t1:"Läbiva krüpteeringuga sõnumid.",t2:"Sinu vestlused jäävad sinu omaks.",w:"Tere tulemast",s:"Logi sisse või loo uus konto.",i:"Logi sisse",r:"Registreeru"},
+  lv:{n:"Latviešu",t1:"Pilnībā šifrēta ziņapmaiņa.",t2:"Tavas sarunas paliek tavas.",w:"Laipni lūdzam",s:"Piesakies vai izveido jaunu kontu.",i:"Pieteikties",r:"Reģistrēties"},
+  lt:{n:"Lietuvių",t1:"Ištisai šifruoti pranešimai.",t2:"Tavo pokalbiai lieka tavo.",w:"Sveiki",s:"Prisijunk arba sukurk naują paskyrą.",i:"Prisijungti",r:"Registruotis"},
+  uk:{n:"Українська",t1:"Наскрізно зашифровані повідомлення.",t2:"Ваші розмови залишаються вашими.",w:"Вітаємо",s:"Увійдіть в обліковий запис або створіть новий.",i:"Увійти",r:"Зареєструватися"}
+};
+
+var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.1M12 19.5v2.1M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.4 12h2.1M19.5 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>';
+var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/></svg>';
+var SWAP = 110;
+var GLYPHS = '!<>-_\\/[]{}=+*^?#$%&@~;:';
+
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function store(k, v) {
+  try {
+    if (v === undefined) return localStorage.getItem(k);
+    localStorage.setItem(k, v);
+  } catch (e) { return null; }
+}
+
+function scramble(el, text, dur) {
+  if (reduced) dur = dur * 0.6;
+  if (el._raf) cancelAnimationFrame(el._raf);
+  var chars = Array.from(text);
+  var plan = chars.map(function () {
+    return {
+      to: dur * 0.45 + Math.random() * dur * 0.55,
+      glyph: GLYPHS[(Math.random() * GLYPHS.length) | 0],
+      next: Math.random() * SWAP
+    };
+  });
+  var start = performance.now();
+  function frame(now) {
+    var t = now - start, out = '', done = 0;
+    for (var i = 0; i < chars.length; i++) {
+      if (chars[i] === ' ') { out += ' '; done++; continue; }
+      if (t >= plan[i].to) { out += chars[i]; done++; continue; }
+      if (t >= plan[i].next) {
+        plan[i].glyph = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+        plan[i].next = t + SWAP * (0.7 + Math.random() * 0.6);
+      }
+      out += plan[i].glyph;
+    }
+    el.textContent = out;
+    if (done < chars.length) el._raf = requestAnimationFrame(frame);
+    else { el.textContent = text; el._raf = null; }
+  }
+  el._raf = requestAnimationFrame(frame);
+}
+
+var lang = store('orizon.lang') || (navigator.language || 'it').slice(0, 2).toLowerCase();
+if (!L[lang]) lang = 'en';
+var first = false;
+
+function closeMenu() {
+  document.getElementById('langMenu').classList.remove('open');
+  document.getElementById('langBtn').setAttribute('aria-expanded', 'false');
+}
+
+function setText(id, text) {
+  var el = document.getElementById(id);
+  if (first) el.textContent = text;
+  else scramble(el, text, 1500);
+}
+
+function render() {
+  var d = L[lang];
+  document.documentElement.lang = lang;
+  setText('tag1', d.t1);
+  setText('tag2', d.t2);
+  setText('title', d.w);
+  setText('sub', d.s);
+  setText('login', d.i);
+  setText('register', d.r);
+  setText('langLabel', d.n);
+
+  var m = document.getElementById('langMenu');
+  m.innerHTML = '';
+  Object.keys(L).sort(function (a, b) { return L[a].n.localeCompare(L[b].n); }).forEach(function (k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'option');
+    b.setAttribute('aria-selected', k === lang ? 'true' : 'false');
+    b.innerHTML = '<span class="code">' + k + '</span><span class="nm"></span>';
+    b.querySelector('.nm').textContent = L[k].n;
+    b.onclick = function () { if (k === lang) { closeMenu(); return; } lang = k; store('orizon.lang', k); closeMenu(); render(); };
+    m.appendChild(b);
+  });
+}
+
+document.getElementById('langBtn').onclick = function (e) {
+  e.stopPropagation();
+  var m = document.getElementById('langMenu');
+  var open = m.classList.toggle('open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) {
+    var sel = m.querySelector('[aria-selected="true"]');
+    if (sel) m.scrollTop = Math.max(0, sel.offsetTop - 90);
+  }
+};
+document.getElementById('langMenu').onclick = function (e) { e.stopPropagation(); };
+document.addEventListener('click', closeMenu);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+
+var themeBtn = document.getElementById('theme');
+function applyTheme(dark) {
+  document.body.classList.toggle('dark', dark);
+  themeBtn.innerHTML = dark ? SUN : MOON;
+  store('orizon.theme', dark ? 'dark' : 'light');
+}
+var saved = store('orizon.theme');
+applyTheme(saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+themeBtn.onclick = function () { applyTheme(!document.body.classList.contains('dark')); };
+
+render();
+
+document.querySelectorAll('a[href^="#/"]').forEach(function (a) {
+  a.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (window.top !== window) { window.top.location.hash = a.getAttribute('href').slice(1); }
+    else { location.hash = a.getAttribute('href').slice(1); }
+  });
+});
+</script>
+</body>
+</html>
