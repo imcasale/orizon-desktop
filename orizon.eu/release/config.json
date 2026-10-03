@@ -21,7 +21,9 @@
         "UIFeature.identityServer": false,
         "layout": "bubble"
     },
-    "features": {},
+    "features": {
+        "feature_group_calls": true
+    },
     "custom_themes": [
         {
             "name": "Orizon",
@@ -69,5 +71,11 @@
         "client_uri": "https://4orizon.eu/",
         "logo_uri": "https://4orizon.eu/icona.png",
         "client_name": "Orizon"
-    }
+    },
+    "element_call": {
+        "use_exclusively": true
+    },
+    "integrations_ui_url": "",
+    "integrations_rest_url": "",
+    "integrations_widgets_urls": []
 }

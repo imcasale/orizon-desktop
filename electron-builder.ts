@@ -127,7 +127,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         electron_protocol: variant.protocols[0],
     },
     linux: {
-        target: ["tar.gz", "deb"],
+        target: ["tar.gz", "deb", "rpm", "pacman"],
         category: "Network;InstantMessaging;Chat",
         icon: "icon.png",
         executableName: variant.name, // element-desktop or element-desktop-nightly
@@ -147,8 +147,27 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "libasound2",
             "libgbm1",
         ],
-        recommends: ["libsqlcipher0", "element-io-archive-keyring"],
-        fpm: ["--deb-pre-depends", "libc6 (>= 2.31)"],
+        recommends: ["libsqlcipher0"],
+        fpm: ["--deb-pre-depends", "libc6 (>= 2.34)", "--iteration", "2"],
+    },
+    rpm: {
+        fpm: ["--iteration", "2"],
+    },
+    pacman: {
+        depends: [
+            "gtk3",
+            "libnotify",
+            "nss",
+            "libxss",
+            "libxtst",
+            "xdg-utils",
+            "at-spi2-core",
+            "util-linux-libs",
+            "libsecret",
+            "alsa-lib",
+            "mesa",
+        ],
+        fpm: ["--iteration", "2"],
     },
     mac: {
         target: ["dmg", "zip"],

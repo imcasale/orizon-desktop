@@ -3,5 +3,9 @@
         "check": "check.ts",
         "build": "build.ts"
     },
-    "copy": "index.node"
+    "copy": [
+        "index.node",
+        "index.js",
+        "package.json"
+    ]
 }
