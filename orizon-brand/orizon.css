@@ -917,3 +917,32 @@ body.cpd-theme-light,
 header[aria-label="Opzioni stanza"] {
   display: none !important;
 }
+
+/* ===== Foto profilo sul sito (Element 1.12.20 e successive) =====
+   Qui la colonna degli spazi sta fuori dalla colonna di sinistra,
+   quindi la foto si aggancia direttamente alla barra di ricerca. */
+@supports (anchor-name: --a) {
+  [data-testid="room-list-search"] {
+    anchor-name: --orizon-ricerca;
+  }
+  .mx_SpacePanel:not(.mx_LeftPanel_wrapper *) .mx_UserMenu {
+    position: fixed !important;
+    position-anchor: --orizon-ricerca;
+    top: anchor(center) !important;
+    left: calc(anchor(right) - 64px) !important;
+    right: auto !important;
+    translate: 0 -50%;
+  }
+}
+
+/* Browser senza ancoraggio CSS: la foto va in basso a sinistra,
+   così non copre le icone della stanza. */
+@supports not (anchor-name: --a) {
+  .mx_SpacePanel:not(.mx_LeftPanel_wrapper *) .mx_UserMenu {
+    position: fixed !important;
+    top: auto !important;
+    right: auto !important;
+    left: 12px !important;
+    bottom: 12px !important;
+  }
+}
