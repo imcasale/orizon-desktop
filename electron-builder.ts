@@ -118,7 +118,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         },
         "lib/**",
     ],
-    extraResources: ["build/icon.*", "webapp.asar"],
+    extraResources: ["build/icon.*", "webapp.asar", { from: "orizon.eu/repo/orizon.asc", to: "orizon.asc" }],
     extraMetadata: {
         name: variant.name,
         productName: variant.productName,
@@ -149,9 +149,11 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         ],
         recommends: ["libsqlcipher0"],
         fpm: ["--deb-pre-depends", "libc6 (>= 2.34)", "--iteration", "1"],
+        afterInstall: "build/linux/after-install.tpl",
     },
     rpm: {
         fpm: ["--iteration", "1"],
+        afterInstall: "build/linux/after-install.tpl",
     },
     pacman: {
         depends: [
