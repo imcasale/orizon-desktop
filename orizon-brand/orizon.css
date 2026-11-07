@@ -1,5 +1,9 @@
+/*orizon-rosso*/
 .mx_AuthPage {
-  background: #1A0AAF !important;
+  background: #B8141C !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage {
+  background: #8B1A2B !important;
 }
 .mx_AuthPage_modalBlur {
   display: none !important;
@@ -45,22 +49,32 @@
   color: rgba(255,255,255,.6) !important;
 }
 .mx_AuthPage .mx_Field label {
-  background: #1A0AAF !important;
+  background: #B8141C !important;
   color: rgba(255,255,255,.85) !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage .mx_Field label {
+  background: #8B1A2B !important;
 }
 
 .mx_AuthPage .mx_AccessibleButton_kind_primary {
   background: #fff !important;
-  color: #1A0AAF !important;
+  color: #B8141C !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage .mx_AccessibleButton_kind_primary {
+  color: #8B1A2B !important;
 }
 
 .mx_AuthPage .mx_Dropdown_menu,
 .mx_LanguageDropdown .mx_Dropdown_menu {
-  background: #12089A !important;
+  background: #7C0A10 !important;
   border: 1px solid rgba(255,255,255,.25) !important;
   border-radius: 10px !important;
   max-height: 280px !important;
   box-shadow: 0 14px 40px rgba(0,0,0,.4) !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage .mx_Dropdown_menu,
+:where(.cpd-theme-light) .mx_LanguageDropdown .mx_Dropdown_menu {
+  background: #5E0F1B !important;
 }
 .mx_AuthPage .mx_Dropdown_menu *,
 .mx_AuthPage .mx_Dropdown_option {
@@ -89,8 +103,13 @@
 .mx_AuthBody .mx_AccessibleButton_kind_primary {
   background: #fff !important;
   background-color: #fff !important;
-  color: #1A0AAF !important;
+  color: #B8141C !important;
   border: 0 !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage .mx_AccessibleButton_kind_primary,
+:where(.cpd-theme-light) .mx_AuthPage input[type="submit"],
+:where(.cpd-theme-light) .mx_AuthBody .mx_AccessibleButton_kind_primary {
+  color: #8B1A2B !important;
 }
 
 /* password dimenticata */
@@ -113,8 +132,12 @@
 .mx_AuthPage .mx_Field input:focus + label,
 .mx_AuthPage .mx_Field input:not(:placeholder-shown) + label {
   opacity: 1 !important;
-  background: #1A0AAF !important;
+  background: #B8141C !important;
   padding: 0 4px !important;
+}
+:where(.cpd-theme-light) .mx_AuthPage .mx_Field input:focus + label,
+:where(.cpd-theme-light) .mx_AuthPage .mx_Field input:not(:placeholder-shown) + label {
+  background: #8B1A2B !important;
 }
 
 .mx_AuthBody form button,
@@ -123,12 +146,22 @@
 .mx_AuthPage form input[type="submit"] {
   background: #fff !important;
   background-color: #fff !important;
-  color: #1A0AAF !important;
+  color: #B8141C !important;
   border: 0 !important;
+}
+:where(.cpd-theme-light) .mx_AuthBody form button,
+:where(.cpd-theme-light) .mx_AuthBody button[type="submit"],
+:where(.cpd-theme-light) .mx_AuthPage button[type="submit"],
+:where(.cpd-theme-light) .mx_AuthPage form input[type="submit"] {
+  color: #8B1A2B !important;
 }
 .mx_AuthBody form button *,
 .mx_AuthPage button[type="submit"] * {
-  color: #1A0AAF !important;
+  color: #B8141C !important;
+}
+:where(.cpd-theme-light) .mx_AuthBody form button *,
+:where(.cpd-theme-light) .mx_AuthPage button[type="submit"] * {
+  color: #8B1A2B !important;
 }
 
 .mx_AuthHeaderLogo {
@@ -195,28 +228,51 @@
 .cpd-theme-dark,
 .cpd-theme-light,
 body {
-  --cpd-color-green-100: #14103A;
-  --cpd-color-green-200: #191352;
-  --cpd-color-green-300: #1F1770;
-  --cpd-color-green-400: #1A0AAF;
-  --cpd-color-green-500: #2415C9;
-  --cpd-color-green-600: #2C1CD6;
-  --cpd-color-green-700: #4B3BE8;
-  --cpd-color-green-800: #6E5BF5;
-  --cpd-color-green-900: #8A7AFF;
-  --cpd-color-green-1000: #A79BFF;
-  --cpd-color-green-1100: #C0B8FF;
-  --cpd-color-green-1200: #DAD6FF;
-  --cpd-color-bg-accent-rest: #1A0AAF;
-  --cpd-color-bg-accent-hovered: #2415C9;
-  --cpd-color-bg-accent-pressed: #12086E;
+  --cpd-color-green-100: #1F0A0C;
+  --cpd-color-green-200: #2E0B0F;
+  --cpd-color-green-300: #4A0B11;
+  --cpd-color-green-400: #EE2229;
+  --cpd-color-green-500: #F0383E;
+  --cpd-color-green-600: #F24B50;
+  --cpd-color-green-700: #F35D62;
+  --cpd-color-green-800: #F67479;
+  --cpd-color-green-900: #F88A8E;
+  --cpd-color-green-1000: #FAA3A6;
+  --cpd-color-green-1100: #FCBEC0;
+  --cpd-color-green-1200: #FDD8D9;
+  --cpd-color-bg-accent-rest: #EE2229;
+  --cpd-color-bg-accent-hovered: #F0383E;
+  --cpd-color-bg-accent-pressed: #7C0A10;
+}
+.cpd-theme-light {
+  --cpd-color-green-100: #2A0A10;
+  --cpd-color-green-200: #3A0D15;
+  --cpd-color-green-300: #4E111C;
+  --cpd-color-green-400: #8B1A2B;
+  --cpd-color-green-500: #A0263A;
+  --cpd-color-green-600: #A92F43;
+  --cpd-color-green-700: #B23A4E;
+  --cpd-color-green-800: #C25A6B;
+  --cpd-color-green-900: #CF7987;
+  --cpd-color-green-1000: #DB99A4;
+  --cpd-color-green-1100: #E6B6BE;
+  --cpd-color-green-1200: #F1D6DA;
+  --cpd-color-bg-accent-rest: #8B1A2B;
+  --cpd-color-bg-accent-hovered: #A0263A;
+  --cpd-color-bg-accent-pressed: #5E0F1B;
 }
 
 .mx_HomePage_default_buttons .mx_AccessibleButton {
-  background-color: #1A0AAF !important;
+  background-color: #EE2229 !important;
+}
+:where(.cpd-theme-light) .mx_HomePage_default_buttons .mx_AccessibleButton {
+  background-color: #8B1A2B !important;
 }
 .mx_HomePage_default_buttons .mx_AccessibleButton:hover {
-  background-color: #2415C9 !important;
+  background-color: #F0383E !important;
+}
+:where(.cpd-theme-light) .mx_HomePage_default_buttons .mx_AccessibleButton:hover {
+  background-color: #A0263A !important;
 }
 
 .mx_HomePage_default_buttons { display: none !important; }
@@ -247,702 +303,1836 @@ body.cpd-theme-dark {
   --cpd-color-gray-1400: #FFFFFF;
 }
 
+
 /* ================================================================
-   ORIZON — TEMA COMPLETO DELL'INTERFACCIA
-   Da aggiungere in coda a orizon.css.
-   Linguaggio visivo ripreso dal sito 4orizon.eu.
+   ORIZON 2 — interfaccia come l'app Android
+   Disposizione A (pannelli attaccati, pillole di vetro), lista 1,
+   bolle grigie, barra per scrivere 1, impostazioni con le sezioni
+   in una pillola in alto, movimento "liquido".
+   Il comportamento (titolo, pillole, movimenti) sta in orizon.js.
    ================================================================ */
 
-/* ---------------------------------------------------------------
-   1. TAVOLOZZA
-   --------------------------------------------------------------- */
-:root,
-body,
-.cpd-theme-dark,
-.cpd-theme-light {
-  /* marchio */
-  --or-blu:            #1A0AAF;
-  --or-blu-chiaro:     #4B3BE8;
-  --or-blu-vivo:       #7A6BFF;
-  --or-blu-tenue:      #A79BFF;
-
-  /* superfici */
-  --or-fondo:          #07070B;
-  --or-fondo-2:        #0B0B12;
-  --or-superficie:     #12121A;
-  --or-superficie-2:   #181823;
-  --or-superficie-3:   #1F1F2C;
-
-  /* linee e testi */
-  --or-linea:          rgba(122,107,255,.13);
-  --or-linea-forte:    rgba(122,107,255,.26);
-  --or-testo:          #F2F1F7;
-  --or-testo-2:        #9C9AAE;
-  --or-testo-3:        #6E6C7E;
-
-  /* forme */
-  --or-r-s:  10px;
-  --or-r-m:  14px;
-  --or-r-l:  18px;
-  --or-r-xl: 24px;
-
-  --or-ombra:      0 6px 24px rgba(0,0,0,.35);
-  --or-ombra-alta: 0 18px 48px rgba(0,0,0,.55);
-  --or-tempo:      .18s cubic-bezier(.4,0,.2,1);
-
-  /* accento di Compound */
-  --cpd-color-text-decorative-1: #8A7AFF;
-  --cpd-color-text-decorative-2: #5B8CFF;
-  --cpd-color-text-decorative-3: #3BB0E8;
-  --cpd-color-text-decorative-4: #A79BFF;
-  --cpd-color-text-decorative-5: #6E5BF5;
-  --cpd-color-text-decorative-6: #C0B8FF;
+/* ---------- 1. Tavolozza ---------- */
+body.cpd-theme-dark {
+  --o-bg: #000000;
+  --o-panel: #0C0C0F;
+  --o-raised: #16161B;
+  --o-line: rgba(255, 255, 255, .07);
+  --o-text: #F2F1F7;
+  --o-text-2: #A3A1B3;
+  --o-text-3: #6E6C7E;
+  --o-hl: rgba(255, 255, 255, .07);
+  --o-hl-2: rgba(255, 255, 255, .12);
+  --o-glass: rgba(26, 26, 32, .62);
+  --o-glass-strong: rgba(28, 28, 34, .92);
+  --o-edge-1: rgba(255, 255, 255, .36);
+  --o-edge-2: rgba(255, 255, 255, .05);
+  --o-edge-3: rgba(255, 255, 255, .12);
+  --o-shadow: 0 10px 30px rgba(0, 0, 0, .45), 0 1px 4px rgba(0, 0, 0, .3);
+  --o-shadow-big: 0 24px 70px rgba(0, 0, 0, .65);
+  --o-bubble-in: #1C1C22;
+  --o-bubble-out: #2A2A31;
+  --o-accent: #EE2229;
+  --o-accent-2: #F0383E;
+  --o-island: rgba(255, 255, 255, .045);
+  --o-info-bg: #0C0C0F;
+  --o-info-card: #17171C;
+  --o-info-line: rgba(255, 255, 255, .07);
+  --o-danger: #FF6B6F;
+  --o-danger-bg: rgba(255, 90, 90, .10);
+  --o-field: rgba(255, 255, 255, .05);
+  --o-field-solid: #121216;
+  --o-field-line: rgba(255, 255, 255, .11);
+  --o-scrim: rgba(0, 0, 0, .6);
+}
+body.cpd-theme-light {
+  --o-bg: #FFFFFF;
+  --o-panel: #F7F7F9;
+  --o-raised: #FFFFFF;
+  --o-line: rgba(20, 18, 31, .08);
+  --o-text: #14121F;
+  --o-text-2: #6A6878;
+  --o-text-3: #9896A6;
+  --o-hl: rgba(20, 18, 31, .055);
+  --o-hl-2: rgba(20, 18, 31, .09);
+  --o-glass: rgba(255, 255, 255, .7);
+  --o-glass-strong: rgba(255, 255, 255, .95);
+  --o-edge-1: rgba(255, 255, 255, .95);
+  --o-edge-2: rgba(20, 18, 31, .05);
+  --o-edge-3: rgba(20, 18, 31, .11);
+  --o-shadow: 0 8px 26px rgba(20, 18, 31, .10), 0 1px 4px rgba(20, 18, 31, .06);
+  --o-shadow-big: 0 24px 70px rgba(20, 18, 31, .22);
+  --o-bubble-in: #F2F2F5;
+  --o-bubble-out: #E4E4EA;
+  --o-accent: #8B1A2B;
+  --o-accent-2: #A0263A;
+  --o-island: rgba(20, 18, 31, .035);
+  --o-info-bg: #F2F2F5;
+  --o-info-card: #FFFFFF;
+  --o-info-line: rgba(20, 18, 31, .08);
+  --o-danger: #B4232F;
+  --o-danger-bg: rgba(255, 90, 90, .08);
+  --o-field: rgba(20, 18, 31, .045);
+  --o-field-solid: #FFFFFF;
+  --o-field-line: rgba(20, 18, 31, .13);
+  --o-scrim: rgba(243, 243, 246, .6);
 }
 
-/* ---------------------------------------------------------------
-   2. CARATTERE
-   --------------------------------------------------------------- */
+/* i colori di base di Element seguono la tavolozza */
+body.cpd-theme-dark,
+body.cpd-theme-light {
+  --cpd-color-bg-canvas-default: var(--o-bg);
+  --cpd-color-bg-subtle-secondary: var(--o-panel);
+  --cpd-color-text-primary: var(--o-text);
+  --cpd-color-text-secondary: var(--o-text-2);
+  --cpd-color-bg-accent-rest: var(--o-accent);
+  --cpd-color-bg-accent-hovered: var(--o-accent-2);
+  --cpd-color-text-action-accent: var(--o-accent);
+  --cpd-color-icon-accent-primary: var(--o-accent);
+  --cpd-color-border-focused: var(--o-accent);
+}
+
 body,
 .mx_MatrixChat,
-.mx_BasicMessageComposer_input,
 button, input, textarea, select {
-  font-family: "Space Grotesk", Inter, -apple-system, "Segoe UI", Roboto, sans-serif !important;
-  -webkit-font-smoothing: antialiased;
+  font-family: Inter, -apple-system, "Segoe UI", Roboto, system-ui, sans-serif !important;
 }
-.mx_RoomHeader_heading,
-.mx_RoomTile_title,
-.mx_Dialog_title,
-h1, h2, h3 {
-  letter-spacing: -.3px !important;
-  font-weight: 600 !important;
-}
-
-/* ---------------------------------------------------------------
-   3. SFONDO D'AMBIENTE
-   --------------------------------------------------------------- */
+.mx_MatrixChat_wrapper,
 .mx_MatrixChat {
-  background:
-    radial-gradient(1100px 620px at 8% -8%,  rgba(26,10,175,.28) 0%, transparent 62%),
-    radial-gradient(900px 520px at 102% 108%, rgba(75,59,232,.16) 0%, transparent 60%),
-    var(--or-fondo) !important;
+  background: var(--o-bg) !important;
 }
 
-/* ---------------------------------------------------------------
-   4. COLONNA DEGLI SPAZI
-   --------------------------------------------------------------- */
+/* vetro (pillole e isole che galleggiano) */
+.orizon-vetro,
+.mx_RoomHeader_infoWrapper,
+.mx_TimelineSeparator > [class*="_content_"],
+.mx_MessageComposer_row::before,
+.mx_MessageComposer_buttonMenu {
+  background: var(--o-glass) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), inset 0 1px 0 var(--o-edge-2), var(--o-shadow) !important;
+}
+body.cpd-theme-dark .orizon-vetro,
+body.cpd-theme-dark .mx_RoomHeader_infoWrapper,
+body.cpd-theme-dark .mx_MessageComposer_row::before,
+body.cpd-theme-dark .mx_MessageComposer_buttonMenu {
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), inset 1px 1px 0 rgba(255, 255, 255, .10), var(--o-shadow) !important;
+}
+/* vetro liquido (dove il browser lo supporta: Chrome, Edge, Vivaldi e l'app desktop) */
+.orizon-vetro.liquid {
+  background: color-mix(in srgb, var(--o-glass) 70%, transparent) !important;
+  box-shadow: inset 0 0 2px 1px var(--o-edge-3), inset 0 0 10px 4px var(--o-edge-2), var(--o-shadow) !important;
+}
+
+/* ---------- 2. Colonna di sinistra ---------- */
+.mx_LeftPanel,
+.mx_LeftPanel_wrapper,
+.mx_LeftPanel_outerWrapper,
+.mx_LeftPanel_roomListContainer,
+.mx_RoomListPanel,
+[data-testid="left-panel"] {
+  background: var(--o-panel) !important;
+  background-image: none !important;
+}
+.mx_RoomListPanel {
+  position: relative !important;
+}
+.mx_Separator,
+[class*="_separator_"][role="separator"] {
+  background: var(--o-line) !important;
+}
+
+/* la colonna degli spazi e il menu utente di Element non si vedono:
+   al loro posto ci sono la pillola in alto e quella in basso */
 .mx_SpacePanel {
-  background: linear-gradient(180deg, #14103A 0%, #0B0917 60%, var(--or-fondo) 100%) !important;
-  border-right: 1px solid var(--or-linea) !important;
-  padding: 10px 6px !important;
+  display: none !important;
 }
-.mx_SpaceButton_avatarWrapper .mx_BaseAvatar,
-.mx_SpaceItem .mx_SpaceButton {
-  border-radius: var(--or-r-m) !important;
-  transition: transform var(--or-tempo), box-shadow var(--or-tempo) !important;
+.mx_UserMenu {
+  display: none !important;
 }
-.mx_SpaceItem .mx_SpaceButton:hover { transform: translateY(-1px); }
-.mx_SpaceButton_active .mx_BaseAvatar,
-.mx_SpaceItem_active .mx_SpaceButton {
-  box-shadow: 0 0 0 2px var(--or-blu-vivo), 0 6px 18px rgba(122,107,255,.32) !important;
+[data-testid="room-list-search"],
+[data-testid="room-list-header"] {
+  display: none !important;
 }
 
-/* ---------------------------------------------------------------
-   5. PANNELLO DI SINISTRA
-   --------------------------------------------------------------- */
-.mx_LeftPanel {
-  background: linear-gradient(180deg, #100D2E 0%, var(--or-fondo-2) 55%, var(--or-fondo) 100%) !important;
-  border-right: 1px solid var(--or-linea) !important;
+/* titolo e pillola (foto + cerca) */
+#orizon-testa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 16px 10px 22px;
+  flex: none;
 }
-.mx_LeftPanel_roomListContainer { background: transparent !important; }
-
-/* ricerca */
-.mx_RoomSearch, .mx_SearchBox, .mx_RoomListSearch,
-.mx_RoomListHeader_search {
-  border-radius: var(--or-r-m) !important;
-  background: rgba(255,255,255,.045) !important;
-  border: 1px solid var(--or-linea) !important;
-  transition: border-color var(--or-tempo), background var(--or-tempo) !important;
+#orizon-testa h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  color: var(--o-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
 }
-.mx_RoomSearch:focus-within, .mx_SearchBox:focus-within {
-  border-color: var(--or-linea-forte) !important;
-  background: rgba(255,255,255,.07) !important;
-}
-
-/* filtri */
-.mx_FilterTabGroup label, .mx_RoomListFilter, .mx_FilterButton {
-  border-radius: 999px !important;
-  border: 1px solid var(--or-linea) !important;
-  transition: all var(--or-tempo) !important;
-}
-.mx_FilterTabGroup input:checked + label,
-.mx_FilterButton[aria-pressed="true"] {
-  background: linear-gradient(135deg, var(--or-blu) 0%, var(--or-blu-chiaro) 100%) !important;
-  border-color: transparent !important;
-  color: #fff !important;
-}
-
-/* voci della lista */
-.mx_RoomTile {
-  border-radius: var(--or-r-m) !important;
-  margin: 2px 8px !important;
-  padding: 7px 10px !important;
-  transition: background var(--or-tempo), box-shadow var(--or-tempo) !important;
-}
-.mx_RoomTile:hover { background: rgba(122,107,255,.10) !important; }
-.mx_RoomTile_selected,
-.mx_RoomTile[aria-selected="true"] {
-  background: linear-gradient(90deg, rgba(75,59,232,.30) 0%, rgba(75,59,232,.08) 100%) !important;
-  box-shadow: inset 3px 0 0 var(--or-blu-vivo) !important;
-}
-.mx_RoomTile_title { font-weight: 600 !important; }
-.mx_RoomTile_subtitle { color: var(--or-testo-2) !important; }
-
-/* pallini dei non letti */
-.mx_NotificationBadge, .mx_UnreadCounter {
-  background: linear-gradient(135deg, var(--or-blu-chiaro) 0%, var(--or-blu-vivo) 100%) !important;
-  box-shadow: 0 2px 10px rgba(122,107,255,.45) !important;
-  border-radius: 999px !important;
-}
-
-/* ---------------------------------------------------------------
-   6. INTESTAZIONE DELLA CONVERSAZIONE
-   --------------------------------------------------------------- */
-.mx_RoomHeader {
-  background: linear-gradient(180deg, rgba(26,10,175,.22) 0%, rgba(7,7,11,0) 100%) !important;
-  border-bottom: 1px solid var(--or-linea) !important;
-  backdrop-filter: blur(10px);
-  padding: 10px 16px !important;
-}
-.mx_RoomHeader_name, .mx_RoomHeader_heading { font-size: 1.05rem !important; }
-.mx_RoomHeader .mx_AccessibleButton {
-  border-radius: var(--or-r-s) !important;
-  transition: background var(--or-tempo) !important;
-}
-.mx_RoomHeader .mx_AccessibleButton:hover { background: rgba(122,107,255,.14) !important; }
-
-/* ---------------------------------------------------------------
-   7. CRONOLOGIA E MESSAGGI
-   --------------------------------------------------------------- */
-.mx_RoomView_body, .mx_RoomView_timeline { background: transparent !important; }
-
-/* separatori di data */
-.mx_DateSeparator {
-  color: var(--or-testo-3) !important;
-  font-size: .78rem !important;
-  letter-spacing: .4px !important;
-  text-transform: uppercase !important;
-}
-.mx_DateSeparator hr, .mx_DateSeparator_line {
-  border-color: var(--or-linea) !important;
-}
-
-/* bolle */
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
-  border-radius: var(--or-r-l) !important;
-  padding: 9px 14px !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,.22) !important;
-  transition: transform var(--or-tempo) !important;
-}
-.mx_EventTile[data-layout="bubble"][data-self="false"] .mx_EventTile_line {
-  background: var(--or-superficie-2) !important;
-  border: 1px solid var(--or-linea) !important;
-  border-bottom-left-radius: 6px !important;
-}
-.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line {
-  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
-  border: 0 !important;
-  border-bottom-right-radius: 6px !important;
-  box-shadow: 0 4px 18px rgba(75,59,232,.30) !important;
-}
-.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line,
-.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line * { color: #fff !important; }
-
-/* messaggio evidenziato */
-.mx_EventTile_highlight .mx_EventTile_line {
-  box-shadow: inset 3px 0 0 var(--or-blu-vivo) !important;
-  background: rgba(122,107,255,.12) !important;
-}
-
-/* risposte citate */
-.mx_ReplyChain, .mx_ReplyTile {
-  border-left: 3px solid var(--or-blu-vivo) !important;
-  border-radius: var(--or-r-s) !important;
-  background: rgba(122,107,255,.07) !important;
-  padding: 6px 10px !important;
-}
-
-/* reazioni */
-.mx_ReactionsRowButton {
-  border-radius: 999px !important;
-  border: 1px solid var(--or-linea) !important;
-  background: var(--or-superficie) !important;
-  transition: all var(--or-tempo) !important;
-}
-.mx_ReactionsRowButton:hover { border-color: var(--or-linea-forte) !important; }
-.mx_ReactionsRowButton_selected {
-  background: rgba(75,59,232,.26) !important;
-  border-color: var(--or-blu-vivo) !important;
-}
-
-/* codice */
-.mx_EventTile_content code, pre {
-  background: rgba(255,255,255,.05) !important;
-  border: 1px solid var(--or-linea) !important;
-  border-radius: var(--or-r-s) !important;
-}
-
-/* immagini e allegati */
-.mx_MImageBody_thumbnail, .mx_MVideoBody video, .mx_MFileBody_info {
-  border-radius: var(--or-r-m) !important;
-}
-
-/* messaggi vocali */
-.mx_VoiceMessagePrimaryContainer, .mx_SeekBar {
-  border-radius: 999px !important;
-}
-.mx_VoiceMessagePrimaryContainer { background: rgba(122,107,255,.12) !important; }
-
-/* barra delle azioni sul messaggio */
-.mx_MessageActionBar {
-  border-radius: 999px !important;
-  border: 1px solid var(--or-linea) !important;
-  background: var(--or-superficie-2) !important;
-  box-shadow: var(--or-ombra) !important;
-  overflow: hidden !important;
-}
-
-/* chi sta scrivendo */
-.mx_TypingDot { background: var(--or-blu-vivo) !important; }
-
-/* ---------------------------------------------------------------
-   8. COMPOSITORE
-   --------------------------------------------------------------- */
-.mx_MessageComposer {
-  margin: 0 16px 14px 16px !important;
-  border-radius: var(--or-r-l) !important;
-  background: var(--or-superficie) !important;
-  border: 1px solid var(--or-linea) !important;
-  box-shadow: var(--or-ombra) !important;
-  transition: border-color var(--or-tempo), box-shadow var(--or-tempo) !important;
-}
-.mx_MessageComposer:focus-within {
-  border-color: var(--or-linea-forte) !important;
-  box-shadow: 0 8px 30px rgba(75,59,232,.24) !important;
-}
-.mx_MessageComposer_wrapper { border-top: 0 !important; }
-.mx_MessageComposer_button {
-  border-radius: var(--or-r-s) !important;
-  transition: background var(--or-tempo) !important;
-}
-.mx_MessageComposer_button:hover { background: rgba(122,107,255,.16) !important; }
-.mx_MessageComposer_sendMessage {
-  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
-  border-radius: 999px !important;
-}
-
-/* ---------------------------------------------------------------
-   9. PANNELLO DI DESTRA
-   --------------------------------------------------------------- */
-.mx_RightPanel {
-  background: linear-gradient(180deg, var(--or-fondo-2) 0%, var(--or-fondo) 100%) !important;
-  border-left: 1px solid var(--or-linea) !important;
-}
-.mx_BaseCard, .mx_UserInfo {
-  background: transparent !important;
-  border-radius: var(--or-r-l) !important;
-}
-.mx_BaseCard_Button, .mx_UserInfo_field {
-  border-radius: var(--or-r-m) !important;
-  transition: background var(--or-tempo) !important;
-}
-.mx_BaseCard_Button:hover { background: rgba(122,107,255,.12) !important; }
-
-/* ---------------------------------------------------------------
-   10. FINESTRE, MENU, IMPOSTAZIONI
-   --------------------------------------------------------------- */
-.mx_Dialog {
-  border-radius: var(--or-r-xl) !important;
-  border: 1px solid var(--or-linea) !important;
-  background: var(--or-superficie) !important;
-  box-shadow: var(--or-ombra-alta) !important;
-}
-.mx_Dialog_background { backdrop-filter: blur(6px); background: rgba(4,4,8,.62) !important; }
-.mx_ContextualMenu, .mx_GenericDropdownMenu_menu, .mx_Dropdown_menu {
-  border-radius: var(--or-r-l) !important;
-  border: 1px solid var(--or-linea) !important;
-  background: var(--or-superficie-2) !important;
-  box-shadow: var(--or-ombra-alta) !important;
-  padding: 6px !important;
-}
-.mx_IconizedContextMenu_item, .mx_Dropdown_option {
-  border-radius: var(--or-r-s) !important;
-  transition: background var(--or-tempo) !important;
-}
-.mx_IconizedContextMenu_item:hover, .mx_Dropdown_option:hover {
-  background: rgba(122,107,255,.16) !important;
-}
-.mx_SettingsDialog .mx_TabbedView_tabLabel {
-  border-radius: var(--or-r-m) !important;
-  transition: background var(--or-tempo) !important;
-}
-.mx_TabbedView_tabLabel_active {
-  background: linear-gradient(90deg, rgba(75,59,232,.30) 0%, rgba(75,59,232,.08) 100%) !important;
-}
-.mx_SettingsSubsection, .mx_SettingsTab_section {
-  border-radius: var(--or-r-l) !important;
-  border: 1px solid var(--or-linea) !important;
-  background: rgba(255,255,255,.02) !important;
-  padding: 14px 16px !important;
-  margin-bottom: 14px !important;
-}
-
-/* ---------------------------------------------------------------
-   11. CONTROLLI
-   --------------------------------------------------------------- */
-.mx_AccessibleButton_kind_primary, .cpd-btn-primary {
-  border-radius: var(--or-r-m) !important;
-  background: linear-gradient(135deg, #2C1CD6 0%, var(--or-blu-chiaro) 100%) !important;
-  border: 0 !important;
-  font-weight: 600 !important;
-  transition: filter var(--or-tempo), transform .12s ease !important;
-}
-.mx_AccessibleButton_kind_primary:hover, .cpd-btn-primary:hover { filter: brightness(1.14) !important; }
-.mx_AccessibleButton_kind_primary:active { transform: translateY(1px) !important; }
-.mx_AccessibleButton_kind_secondary, .cpd-btn-secondary {
-  border-radius: var(--or-r-m) !important;
-  border: 1px solid var(--or-linea-forte) !important;
-  background: transparent !important;
-}
-.mx_Field input, .mx_Field select, .mx_Field textarea {
-  border-radius: var(--or-r-m) !important;
-  border: 1px solid var(--or-linea) !important;
-  background: rgba(255,255,255,.04) !important;
-  transition: border-color var(--or-tempo) !important;
-}
-.mx_Field input:focus { border-color: var(--or-blu-vivo) !important; }
-.mx_ToggleSwitch_on { background: var(--or-blu-chiaro) !important; }
-.mx_BaseAvatar { border-radius: var(--or-r-m) !important; overflow: hidden !important; }
-.mx_Tooltip, .cpd-tooltip {
-  border-radius: var(--or-r-s) !important;
-  background: var(--or-superficie-3) !important;
-  border: 1px solid var(--or-linea) !important;
-  box-shadow: var(--or-ombra) !important;
-}
-
-/* ---------------------------------------------------------------
-   12. BARRE DI SCORRIMENTO
-   --------------------------------------------------------------- */
-* { scrollbar-width: thin; scrollbar-color: rgba(122,107,255,.34) transparent; }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb {
-  background: rgba(122,107,255,.30);
+#orizon-testa h1.cliccabile { cursor: pointer; }
+.orizon-pillola {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
   border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: content-box;
+  flex: none;
 }
-*::-webkit-scrollbar-thumb:hover { background: rgba(122,107,255,.56); background-clip: content-box; }
+.orizon-tasto {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--o-text);
+  cursor: pointer;
+  padding: 0;
+  transition: background .15s;
+}
+.orizon-tasto:hover { background: var(--o-hl); }
+.orizon-tasto svg { width: 20px; height: 20px; }
+.orizon-tasto:focus-visible,
+.orizon-tab:focus-visible,
+.orizon-piu:focus-visible { outline: 2px solid var(--o-accent); outline-offset: 2px; }
+.orizon-foto {
+  width: 34px;
+  height: 34px;
+  margin: 2px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.orizon-foto > *,
+.orizon-foto img {
+  width: 34px !important;
+  height: 34px !important;
+  --cpd-avatar-size: 34px !important;
+  font-size: 14px !important;
+  border-radius: 999px;
+  object-fit: cover;
+}
 
-/* ---------------------------------------------------------------
-   13. DETTAGLI
-   --------------------------------------------------------------- */
-.mx_EventTile_e2eIcon { opacity: .42 !important; transition: opacity var(--or-tempo) !important; }
-.mx_EventTile_e2eIcon:hover { opacity: 1 !important; }
-.mx_AccessibleButton:focus-visible,
-.mx_Field input:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--or-blu-vivo) !important;
-  outline-offset: 2px !important;
+/* filtri: una sola pillola che scorre */
+[data-testid="primary-filters"] {
+  position: relative;
+  padding: 2px 14px 8px !important;
+  margin: 0 !important;
 }
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; }
+/* se orizon.js non ha ancora messo il fondo (per esempio una versione vecchia rimasta nel browser), la pillola la disegna la lista */
+[data-testid="primary-filters"]:not(:has(> .orizon-filtri-fondo)) [role="listbox"] {
+  background: var(--o-glass) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), inset 0 1px 0 var(--o-edge-2), var(--o-shadow) !important;
+}
+.orizon-filtri-fondo {
+  position: absolute;
+  top: 2px;
+  bottom: 8px;
+  left: 14px;
+  right: 14px;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-testid="primary-filters"] > button[class*="_iconButton_"] {
+  display: none !important;
+}
+[data-testid="primary-filters"] [role="listbox"] {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto !important;
+  min-width: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none;
+  gap: 2px !important;
+  padding: 4px !important;
+  border-radius: 999px !important;
+  max-width: 100%;
+}
+/* sfumatura ai lati solo se da quella parte ci sono altri filtri */
+[data-testid="primary-filters"] [role="listbox"].o-dx {
+  -webkit-mask: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+  mask: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+}
+[data-testid="primary-filters"] [role="listbox"].o-sx {
+  -webkit-mask: linear-gradient(90deg, transparent, #000 30px);
+  mask: linear-gradient(90deg, transparent, #000 30px);
+}
+[data-testid="primary-filters"] [role="listbox"].o-sx.o-dx {
+  -webkit-mask: linear-gradient(90deg, transparent, #000 30px, #000 calc(100% - 30px), transparent);
+  mask: linear-gradient(90deg, transparent, #000 30px, #000 calc(100% - 30px), transparent);
+}
+[data-testid="primary-filters"] [role="listbox"]::-webkit-scrollbar { display: none; }
+[data-testid="primary-filters"] [role="listbox"]::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: var(--orizon-hl-x, 4px);
+  width: var(--orizon-hl-w, 0px);
+  border-radius: 999px;
+  background: var(--o-hl-2);
+  pointer-events: none;
+}
+[data-testid="primary-filters"] [role="option"],
+.orizon-tutte {
+  position: relative;
+  z-index: 1;
+  flex: none !important;
+  height: 32px !important;
+  padding: 0 13px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--o-text-2) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-testid="primary-filters"] [role="option"][aria-selected="true"],
+.orizon-tutte[aria-selected="true"] {
+  color: var(--o-text) !important;
+  font-weight: 600 !important;
+}
+[data-testid="primary-filters"] [role="option"] svg {
+  display: none !important;
 }
 
-/* ================================================================
-   ORIZON — CORREZIONI
-   ================================================================ */
-
-/* ---- 1. TEMA CHIARO: superfici e testi leggibili ---- */
-.cpd-theme-light,
-body.cpd-theme-light,
-.cpd-theme-light :root {
-  --or-fondo:        #FFFFFF;
-  --or-fondo-2:      #F7F6FD;
-  --or-superficie:   #FFFFFF;
-  --or-superficie-2: #F2F1FA;
-  --or-superficie-3: #E9E7F7;
-  --or-linea:        rgba(26,10,175,.13);
-  --or-linea-forte:  rgba(26,10,175,.30);
-  --or-testo:        #14121F;
-  --or-testo-2:      #55536B;
-  --or-testo-3:      #7A7889;
-  --or-ombra:        0 6px 20px rgba(26,10,175,.10);
-  --or-ombra-alta:   0 18px 44px rgba(26,10,175,.16);
-}
-.cpd-theme-light .mx_MatrixChat {
-  background:
-    radial-gradient(1100px 620px at 8% -8%, rgba(26,10,175,.10) 0%, transparent 62%),
-    radial-gradient(900px 520px at 102% 108%, rgba(75,59,232,.07) 0%, transparent 60%),
-    #FFFFFF !important;
-}
-.cpd-theme-light .mx_LeftPanel {
-  background: linear-gradient(180deg, #EEECFB 0%, #F8F7FD 55%, #FFFFFF 100%) !important;
-}
-.cpd-theme-light .mx_SpacePanel {
-  background: linear-gradient(180deg, #E3DFFA 0%, #F1EFFC 100%) !important;
-}
-.cpd-theme-light .mx_RightPanel {
-  background: linear-gradient(180deg, #F8F7FD 0%, #FFFFFF 100%) !important;
-}
-.cpd-theme-light .mx_RoomHeader {
-  background: linear-gradient(180deg, rgba(26,10,175,.09) 0%, rgba(255,255,255,0) 100%) !important;
-}
-.cpd-theme-light .mx_EventTile[data-layout="bubble"][data-self="false"] .mx_EventTile_line {
-  background: #F1F0FA !important;
-  border-color: rgba(26,10,175,.10) !important;
-}
-.cpd-theme-light .mx_MessageComposer,
-.cpd-theme-light .mx_Dialog,
-.cpd-theme-light .mx_ContextualMenu,
-.cpd-theme-light .mx_Dropdown_menu,
-.cpd-theme-light .mx_Tooltip {
-  background: #FFFFFF !important;
-}
-.cpd-theme-light .mx_RoomTile:hover { background: rgba(26,10,175,.07) !important; }
-.cpd-theme-light .mx_RoomSearch,
-.cpd-theme-light .mx_SearchBox,
-.cpd-theme-light .mx_Field input {
-  background: rgba(26,10,175,.04) !important;
-}
-.cpd-theme-light .mx_EventTile_content code,
-.cpd-theme-light pre { background: rgba(26,10,175,.05) !important; }
-.cpd-theme-light .mx_ReactionsRowButton { background: #F7F6FD !important; }
-.cpd-theme-light * { scrollbar-color: rgba(26,10,175,.28) transparent; }
-.cpd-theme-light *::-webkit-scrollbar-thumb { background: rgba(26,10,175,.24); background-clip: content-box; }
-.cpd-theme-light *::-webkit-scrollbar-thumb:hover { background: rgba(26,10,175,.45); background-clip: content-box; }
-
-/* ---- 2. BOLLE: più larghe, meno spazio sprecato ---- */
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
-  max-width: 88% !important;
-}
-.mx_EventTile[data-layout="bubble"] .mx_MImageBody,
-.mx_EventTile[data-layout="bubble"] .mx_MVideoBody { max-width: 100% !important; }
-.mx_RoomView_MessageList { padding-inline: 12px !important; }
-
-/* ---- 3. COMPOSITORE: niente fascia scura sotto ---- */
-.mx_RoomView_body,
-.mx_RoomView_timeline,
-.mx_RoomView_statusArea,
-.mx_MessageComposer_wrapper,
-.mx_RoomView_messagePanel,
-.mx_MainSplit > .mx_RoomView_body {
+/* lista: ariosa, senza righe, con anteprima */
+[data-testid="room-list"],
+[class*="_roomList_"] {
   background: transparent !important;
 }
-.mx_MessageComposer {
-  margin: 0 14px 12px 14px !important;
-  overflow: hidden !important;
+[data-testid="virtuoso-item-list"] {
+  padding-bottom: 96px !important;
 }
-
-/* ===== 1. Larghezza della conversazione ===== */
-.mx_RoomView_timeline,
-.mx_ScrollPanel .mx_RoomView_MessageList {
-  max-width: none !important;
-  width: 100% !important;
-}
-
-.mx_RoomView_MessageList {
-  max-width: 900px !important;
-  margin-inline: auto !important;
-  padding-inline: 8px !important;
-}
-
-.mx_EventTile[data-layout="bubble"] {
-  --eventbubble-margin-inline-start: 56px !important;
-  --eventbubble-margin-inline-end: 56px !important;
-  margin-inline: 56px !important;
-}
-
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
-  max-width: 76% !important;
-}
-
-.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_avatar {
-  right: -44px !important;
-  inset-inline-end: -44px !important;
-  left: auto !important;
-}
-.mx_EventTile[data-layout="bubble"][data-self="false"] .mx_EventTile_avatar {
-  left: -44px !important;
-  inset-inline-start: -44px !important;
-  right: auto !important;
-}
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_avatar,
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_avatar .mx_BaseAvatar,
-.mx_EventTile[data-layout="bubble"] .mx_EventTile_avatar img {
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  top: auto !important;
-  bottom: 2px !important;
-}
-
-/* ===== 2a. Conferma di lettura dentro la finestra ===== */
-.mx_ReadReceiptGroup {
-  right: 8px !important;
-  inset-inline-end: 8px !important;
-}
-.mx_ReadReceiptGroup_button,
-.mx_ReadReceiptMarker .mx_BaseAvatar {
-  width: 14px !important;
-  height: 14px !important;
-}
-
-/* ===== 2b. Barra di scrittura centrata come i messaggi ===== */
-.mx_MessageComposer {
-  max-width: 900px !important;
-  margin-inline: auto !important;
-}
-
-/* Conferma di lettura: nella corsia, non dentro la bolla. */
-.mx_ReadReceiptGroup {
-  right: -34px !important;
-  inset-inline-end: -34px !important;
-}
-
-/* Barra di scrittura: niente accensione al clic. */
-.mx_MessageComposer:focus,
-.mx_MessageComposer:focus-within,
-.mx_MessageComposer_wrapper:focus-within,
-.mx_BasicMessageComposer:focus-within,
-.mx_BasicMessageComposer_input:focus,
-.mx_SendMessageComposer:focus-within {
-  outline: none !important;
+.mx_RoomListItemView {
+  height: auto !important;
+  min-height: 66px !important;
+  padding: 0 10px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
-  transition: none !important;
-  border-color: inherit !important;
+}
+.mx_RoomListItemView::before,
+.mx_RoomListItemView::after,
+.mx_RoomListItemView > [class*="_container_"]::before,
+.mx_RoomListItemView > [class*="_container_"]::after {
+  display: none !important;
+}
+.mx_RoomListItemView > [class*="_container_"] {
+  width: 100%;
+  min-height: 64px;
+  padding: 9px 12px !important;
+  gap: 13px !important;
+  border-radius: 18px;
+  border: 0 !important;
+  align-items: center !important;
+  transition: background .15s;
+}
+.mx_RoomListItemView:hover > [class*="_container_"],
+.mx_RoomListItemView:focus-visible > [class*="_container_"] {
+  background: var(--o-hl);
+}
+.mx_RoomListItemView_selected > [class*="_container_"],
+.mx_RoomListItemView[aria-selected="true"] > [class*="_container_"] {
+  background: var(--o-hl-2) !important;
+}
+.mx_RoomListItemView .mx_RoomAvatarView,
+.mx_RoomListItemView [class*="_container_"] > .mx_BaseAvatar,
+.mx_RoomListItemView .mx_RoomAvatarView .mx_BaseAvatar {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  --cpd-avatar-size: 46px !important;
+  font-size: 18px !important;
+}
+.mx_RoomListItemView .mx_RoomAvatarView_PresenceDecoration {
+  left: 34px !important;
+  top: 34px !important;
+}
+.mx_RoomListItemView [class*="_roomName_"] {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--o-text) !important;
+}
+.mx_RoomListItemView [class*="_messagePreview_"] {
+  font-size: 13.5px !important;
+  color: var(--o-text-2) !important;
+  margin-top: 2px;
+}
+.mx_RoomListItemView [class*="_unread-counter_"],
+.mx_RoomListItemView [class*="_notificationDecoration_"] [class*="_unread-counter_"] {
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  background: var(--o-accent) !important;
+  color: #fff !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+}
+.mx_RoomListItemView [class*="_hoverMenu_"] button {
+  color: var(--o-text-2) !important;
 }
 
-/* Barra laterale: fondo piatto, in entrambi i temi. */
-.mx_SpacePanel,
-.cpd-theme-dark .mx_SpacePanel,
-.cpd-theme-light .mx_SpacePanel {
-  background: var(--cpd-color-bg-canvas-default) !important;
+/* pillola in basso: Chat / Spazi / + */
+#orizon-basso {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+#orizon-basso .orizon-pillola {
+  pointer-events: auto;
+  padding: 6px;
+  gap: 4px;
+}
+.orizon-tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.orizon-tabs::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--orizon-hl-x, 0px);
+  width: var(--orizon-hl-w, 0px);
+  border-radius: 999px;
+  background: var(--o-hl-2);
+  pointer-events: none;
+}
+.orizon-tab {
+  position: relative;
+  z-index: 1;
+  height: 46px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--o-text-2);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.orizon-tab > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+}
+.orizon-tab svg { width: 21px; height: 21px; flex: none; }
+.orizon-tab b { font-weight: 600; color: var(--o-text); }
+.orizon-tab.on { color: var(--o-text); }
+.orizon-piu {
+  width: 44px;
+  height: 44px;
+  margin-left: 6px;
+  border: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--o-glass-strong);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3);
+  color: var(--o-text);
+  cursor: pointer;
+}
+.orizon-piu svg { width: 21px; height: 21px; }
+
+/* scheda "Spazi": la colonna degli spazi si apre sopra la lista */
+body.orizon-spazi .mx_SpacePanel {
+  display: flex !important;
+  position: fixed !important;
+  z-index: 40 !important;
+  top: var(--orizon-spazi-top, 70px) !important;
+  left: var(--orizon-spazi-left, 0px) !important;
+  width: var(--orizon-spazi-w, 360px) !important;
+  bottom: 96px !important;
+  max-width: none !important;
+  padding: 8px 10px 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+body.orizon-spazi .mx_SpacePanel .mx_UserMenu,
+body.orizon-spazi .mx_SpacePanel .mx_SpacePanel_toggleCollapse,
+body.orizon-spazi .mx_SpacePanel .mx_ThreadsActivityCentre_container,
+body.orizon-spazi .mx_SpacePanel .mx_QuickSettingsButton {
+  display: none !important;
+}
+body.orizon-spazi .mx_SpacePanel .mx_SpaceTreeLevel {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+body.orizon-spazi .mx_SpacePanel { box-sizing: border-box !important; }
+body.orizon-spazi .mx_SpaceButton {
+  border-radius: 18px !important;
+  padding: 9px 12px !important;
+  width: auto !important;
+}
+body.orizon-spazi .mx_SpaceButton_active,
+body.orizon-spazi .mx_SpaceButton:hover {
+  background: var(--o-hl-2) !important;
+}
+body.orizon-spazi .mx_SpaceButton_name {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--o-text) !important;
+}
+body.orizon-spazi .mx_SpaceItem,
+body.orizon-spazi .mx_SpaceButton {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+body.orizon-spazi .mx_SpaceItem { display: flex !important; margin: 0 0 4px !important; padding: 0 !important; }
+body.orizon-spazi .mx_SpaceButton { margin: 0 !important; }
+body.orizon-spazi .mx_SpaceButton_selectionWrapper {
+  width: 100% !important;
+  padding: 0 !important;
+  gap: 13px;
+  background: transparent !important;
+}
+body.orizon-spazi .mx_SpaceButton_avatarWrapper,
+body.orizon-spazi .mx_SpaceButton_avatarPlaceholder,
+body.orizon-spazi .mx_SpaceButton .mx_BaseAvatar,
+body.orizon-spazi .mx_SpaceButton [class*="_avatar_"] {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  --cpd-avatar-size: 42px !important;
+  border-radius: 14px !important;
+  font-size: 17px !important;
+}
+body.orizon-spazi .mx_SpaceButton_avatarPlaceholder {
+  background: var(--o-hl-2) !important;
+}
+body.orizon-spazi .mx_SpaceButton .mx_SpaceButton_icon {
+  box-sizing: border-box !important;
+  width: 42px !important;
+  height: 42px !important;
+  padding: 11px !important;
+  border-radius: 14px !important;
+  background: var(--o-hl-2) !important;
+}
+body.orizon-spazi .mx_SpaceButton .mx_SpaceButton_icon svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: var(--o-text) !important;
+}
+body.orizon-spazi .mx_SpacePanel_badgeContainer {
+  left: 30px !important;
+  top: -2px !important;
+}
+body.orizon-spazi .mx_SpaceButton_menuButton {
+  margin-left: auto !important;
+}
+body.orizon-spazi [data-testid="primary-filters"],
+body.orizon-spazi [data-testid="room-list"],
+body.orizon-spazi .mx_RoomListPanel [class*="_emptyRoomList_"] {
+  visibility: hidden !important;
+}
+
+/* ---------- 3. Conversazione ---------- */
+.mx_RoomView,
+.mx_RoomView_wrapper,
+.mx_RoomView_body,
+.mx_MainSplit,
+.mx_RoomView_timeline,
+.mx_RoomView_messagePanel,
+.mx_RoomView_statusArea,
+.mx_RoomView_MessageList,
+.mx_HomePage,
+.mx_AutoHideScrollbar.mx_RoomView_messagePanel {
+  background: var(--o-bg) !important;
   background-image: none !important;
 }
 
-/* Lista stanze piu' compatta. */
-.mx_RoomListItemView {
-  min-height: 48px !important;
-  padding-block: 4px !important;
+/* intestazione: pillola con foto e nome, pillola con le azioni */
+.mx_RoomHeader {
+  position: relative;
+  height: 72px !important;
+  padding: 14px 18px !important;
+  gap: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
-
-.mx_RoomListHeaderView {
-  padding-block: 8px !important;
+.mx_RoomHeader > .mx_WithPresenceIndicator,
+.mx_RoomHeader > .mx_BaseAvatar,
+.mx_RoomHeader > span > .mx_BaseAvatar {
+  position: relative;
+  z-index: 2;
+  margin: 0 !important;
 }
-
-.mx_RoomListSearchView {
-  margin-block: 6px !important;
+/* foto 38 dentro una pillola alta 46: 4 pixel tutto intorno */
+.mx_RoomHeader .mx_WithPresenceIndicator .mx_BaseAvatar,
+.mx_RoomHeader > .mx_BaseAvatar {
+  width: 38px !important;
+  height: 38px !important;
+  --cpd-avatar-size: 38px !important;
+  font-size: 15px !important;
 }
-
-.mx_RoomListPrimaryFilters {
-  margin-block: 4px !important;
-  gap: 4px !important;
+.mx_RoomHeader > .mx_WithPresenceIndicator,
+.mx_RoomHeader > .mx_BaseAvatar {
+  flex: none !important;
 }
-
-.mx_RoomListPrimaryFilters button {
-  height: 26px !important;
-  padding-inline: 10px !important;
-  font-size: 12px !important;
+.mx_RoomHeader_infoWrapper {
+  box-sizing: border-box !important;
+  flex: 0 1 auto !important;
+  min-width: 0;
+  max-width: min(calc(100% - 104px), 560px);
+  height: 46px;
+  margin: 0 auto 0 -42px !important;
+  padding: 0 20px 0 52px !important;
+  border-radius: 999px !important;
+  display: flex;
+  align-items: center;
 }
-
-/* Lista: via filtri e titolo. */
-.mx_RoomListPrimaryFilters,
-[data-testid="room-list-header"] h1,
-.mx_RoomListHeaderView_title {
-  display: none !important;
+.mx_RoomHeader_heading {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--o-text) !important;
 }
-
-/* Via i filtri della lista. */
-[data-testid="primary-filters"] {
-  display: none !important;
-}
-
-/* ===== La foto profilo al posto della bussola ===== */
-
-/* Via la bussola. */
-[data-testid="room-list-search"] [aria-label="Esplora stanze"] {
-  display: none !important;
-}
-
-/* Spazio a destra della ricerca per la foto. */
-[data-testid="room-list-search"] {
-  padding-inline-end: 56px !important;
-}
-
-/* La colonna stretta sparisce, ma resta il contenitore della foto. */
-.mx_LeftPanel_wrapper {
-  position: relative !important;
-}
-.mx_SpacePanel {
-  position: static !important;
-  width: 0 !important;
-  min-width: 0 !important;
+.mx_RoomHeader_info {
+  gap: 0 !important;
+  flex: 0 1 auto !important;
+  min-width: 0;
   padding: 0 !important;
-  border: none !important;
-  background: none !important;
+}
+/* via i tasti "Conversazioni" e "Info stanza" (orizon.js li segna) */
+.mx_RoomHeader > button[class*="_icon-button_"].orizon-via,
+.mx_RoomHeader > .orizon-via {
+  display: none !important;
+}
+/* le azioni: lo sfondo della pillola lo disegna ::before, con posizione e larghezza da orizon.js */
+.mx_RoomHeader::before {
+  content: "";
+  position: absolute;
+  top: var(--orizon-azioni-y, 13px);
+  height: 46px;
+  left: var(--orizon-azioni-x, 100%);
+  width: var(--orizon-azioni-w, 0px);
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--o-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), var(--o-shadow);
+  pointer-events: none;
+  z-index: 0;
+}
+/* tasti tondi 38 dentro la pillola alta 46: stessi 4 pixel della foto */
+.mx_RoomHeader > button[class*="_icon-button_"],
+.mx_RoomHeader > [class*="_icon-button_"] {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  padding: 0 !important;
+  --cpd-icon-button-size: 38px !important;
+  margin: 0 !important;
+  border-radius: 999px !important;
+  color: var(--o-text) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.mx_RoomHeader > button[class*="_icon-button_"] + button[class*="_icon-button_"] {
+  margin-left: 4px !important;
+}
+.mx_RoomHeader > .mx_FacePile {
+  position: relative;
+  z-index: 1;
+  margin: 0 !important;
+}
+/* le foto dei membri nei gruppi stanno dentro la pillola delle azioni */
+.mx_RoomHeader > div[class*="_typography_"] {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 38px !important;
+  margin: 0 0 0 4px !important;
+  padding: 0 12px 0 6px !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--o-text-2) !important;
+  cursor: pointer;
+}
+.mx_RoomHeader > div[class*="_typography_"] > * {
+  background: transparent !important;
+}
+.mx_RoomHeader > div[class*="_typography_"]:hover {
+  background: var(--o-hl-2) !important;
+}
+.mx_RoomHeader > button[class*="_icon-button_"]::before,
+.mx_RoomHeader > button[class*="_icon-button_"]::after {
+  display: none !important;
+}
+.mx_RoomHeader > button[class*="_icon-button_"]:hover,
+.mx_RoomHeader > button[class*="_icon-button_"]:focus-visible {
+  background: var(--o-hl-2) !important;
+}
+.mx_RoomHeader > button[class*="_icon-button_"] > div {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.mx_RoomHeader > button[class*="_icon-button_"] svg {
+  color: var(--o-text) !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* messaggi: bolle grigie */
+.mx_RoomView_body[data-layout="bubble"] .mx_RoomView_timeline {
+  max-width: none !important;
+}
+.mx_RoomView_MessageList {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 940px !important;
+  margin-inline: auto !important;
+  padding-inline: 16px !important;
+}
+.mx_EventTile[data-layout="bubble"] {
+  --EventTile_bubble_line-color: var(--o-bubble-in);
+}
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line {
+  background: var(--o-bubble-in) !important;
+  background-image: none !important;
+  color: var(--o-text) !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 0 0 1px var(--o-line) !important;
+  border: 0 !important;
+}
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line {
+  background: var(--o-bubble-out) !important;
+}
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line *:not(a):not(code):not(.mx_Pill *):not([class*="_avatar_"]):not([class*="_avatar_"] *) {
+  color: inherit;
+}
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_body:not(.mx_EventTile_bigEmoji) {
+  color: var(--o-text) !important;
+  font-size: 14.5px !important;
+}
+.mx_EventTile[data-layout="bubble"]:not(.mx_EventTile_info) > .mx_EventTile_line:not(:has(.mx_EventTile_bigEmoji)):not(:has(.mx_LegacyCallEvent_wrapper)):not(:has([class*="_container_1opqj_"])):not(:has([class*="_container_122d2_"])) {
+  padding: 8px 14px !important;
+}
+.mx_EventTile[data-layout="bubble"] .mx_MessageTimestamp {
+  color: var(--o-text-3) !important;
+}
+/* la tua foto accanto alle tue bolle non serve */
+.mx_EventTile[data-layout="bubble"][data-self="true"] > .mx_EventTile_avatar {
+  display: none !important;
+}
+/* emoji grandi: senza bolla */
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:has(.mx_EventTile_bigEmoji),
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:has(.mx_LegacyCallEvent_wrapper) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* entrate, inviti, modifiche: una riga piccola al centro, niente bolla */
+.mx_EventTile[data-layout="bubble"].mx_EventTile_info .mx_EventTile_line,
+.mx_GenericEventListSummary .mx_EventTile_line {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--o-text-3) !important;
+  justify-content: center !important;
+  margin-inline: auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+.mx_EventTile[data-layout="bubble"].mx_EventTile_info,
+.mx_GenericEventListSummary[data-layout="bubble"] {
+  --EventTile_bubble_line-color: transparent;
+}
+.mx_EventTile.mx_EventTile_info > .mx_EventTile_avatar {
+  display: none !important;
+}
+.mx_EventTile_info .mx_TextualEvent,
+.mx_GenericEventListSummary_summary {
+  font-size: 12.5px !important;
+  color: var(--o-text-3) !important;
+  text-align: center;
+}
+
+/* separatore del giorno: una piccola pillola */
+.mx_TimelineSeparator {
+  justify-content: center !important;
+}
+.mx_TimelineSeparator > hr {
+  display: none !important;
+}
+.mx_TimelineSeparator > [class*="_content_"] {
+  height: 28px;
+  padding: 0 14px !important;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+}
+.mx_TimelineSeparator h2 {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: var(--o-text-2) !important;
+}
+
+/* chiamate nuove (finite o in corso): niente bolla intorno */
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:has([class*="_container_1opqj_"]),
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:has([class*="_container_122d2_"]) {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mx_EventTile[data-layout="bubble"]:has([class*="_container_1opqj_"]) > .mx_EventTile_avatar,
+.mx_EventTile[data-layout="bubble"]:has([class*="_container_122d2_"]) > .mx_EventTile_avatar,
+.mx_EventTile[data-layout="bubble"]:has([class*="_container_1opqj_"]) .mx_DisambiguatedProfile {
+  display: none !important;
+}
+/* chiamata finita: una pillola al centro, come le date */
+[class*="_container_1opqj_"] {
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 6px auto !important;
+  padding: 8px 16px 8px 12px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--o-glass) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), var(--o-shadow) !important;
+  color: var(--o-text) !important;
+  gap: 10px !important;
+}
+[class*="_container_1opqj_"] [class*="_icon_1opqj_"] {
+  box-sizing: content-box;
+  width: 16px !important;
+  height: 16px !important;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--o-hl-2);
+  color: var(--o-text) !important;
+}
+[class*="_title_1opqj_"] {
+  flex: 0 1 auto !important;
+  font-size: 14px !important;
+}
+[class*="_time_1opqj_"] {
+  margin-left: 4px;
+  color: var(--o-text-3) !important;
+}
+/* chiamata in corso: una scheda arrotondata al centro */
+[class*="_container_122d2_"] {
+  width: 100% !important;
+  max-width: 440px !important;
+  margin: 8px auto !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background: var(--o-bubble-in) !important;
+  box-shadow: inset 0 0 0 1px var(--o-edge-3) !important;
+}
+[class*="_container_122d2_"] button {
+  border-radius: 999px !important;
+}
+
+/* chiamata vocale o video: una pillola, non una barra rossa */
+.mx_LegacyCallEvent_wrapper {
+  display: flex !important;
+  justify-content: center !important;
+  background: transparent !important;
+}
+.mx_LegacyCallEvent {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 420px !important;
+  padding: 8px 18px 8px 8px !important;
+  border-radius: 999px !important;
+  background: var(--o-glass) !important;
+  box-shadow: inset 0 0 0 1px var(--o-edge-3), var(--o-shadow) !important;
+  color: var(--o-text) !important;
+  gap: 12px;
+}
+.mx_LegacyCallEvent * {
+  color: inherit;
+}
+.mx_LegacyCallEvent_type,
+.mx_LegacyCallEvent_content {
+  color: var(--o-text-2) !important;
+}
+
+/* risposte, reazioni, codice */
+.mx_ReplyChain,
+.mx_ReplyTile {
+  background: var(--o-hl) !important;
+  border-radius: 14px !important;
+  border-left-color: var(--o-accent) !important;
+}
+.mx_ReactionsRowButton {
+  background: var(--o-hl) !important;
+  border-color: transparent !important;
+  border-radius: 999px !important;
+}
+.mx_ReactionsRowButton_selected {
+  background: color-mix(in srgb, var(--o-accent) 18%, transparent) !important;
+  border-color: color-mix(in srgb, var(--o-accent) 45%, transparent) !important;
+}
+.mx_EventTile_content code,
+.mx_EventTile_content pre {
+  background: var(--o-hl) !important;
+}
+
+/* inizio della chat e avvisi */
+.mx_NewRoomIntro h2,
+.mx_NewRoomIntro p {
+  color: var(--o-text) !important;
+}
+.mx_EventTileBubble {
+  background: var(--o-island) !important;
+  border-radius: 20px !important;
+}
+
+/* ---------- 4. Barra per scrivere: "+" a parte, poi la pillola ---------- */
+.mx_MessageComposer {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 940px !important;
+  margin: 0 auto 16px !important;
+  padding: 0 16px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
   overflow: visible !important;
 }
-
-/* Via casetta, +, icona dei messaggi, ingranaggio e "Espandi". */
-.mx_SpacePanel .mx_SpaceTreeLevel,
-.mx_SpacePanel .mx_ThreadsActivityCentre_container,
-.mx_SpacePanel .mx_QuickSettingsButton,
-.mx_SpacePanel .mx_SpacePanel_toggleCollapse {
+.mx_MessageComposer_wrapper {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.mx_MessageComposer_row {
+  position: relative;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 52px;
+  align-items: center !important;
+  padding: 0 6px 0 82px !important;
+  gap: 2px;
+}
+.mx_MessageComposer_row::before {
+  content: "";
+  position: absolute;
+  left: 62px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 26px;
+  z-index: 0;
+  pointer-events: none;
+}
+.mx_MessageComposer_row > * {
+  position: relative;
+  z-index: 1;
+}
+.mx_MessageComposer_actions {
+  display: contents !important;
+}
+.mx_MessageComposer_e2eIconWrapper {
   display: none !important;
 }
-
-/* La foto va dove c'era la bussola. */
-.mx_SpacePanel .mx_UserMenu {
+.mx_SendMessageComposer,
+.mx_BasicMessageComposer {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+}
+.mx_BasicMessageComposer_input {
+  padding: 15px 0 !important;
+  font-size: 14.5px !important;
+  color: var(--o-text) !important;
+}
+.mx_BasicMessageComposer_input.mx_BasicMessageComposer_inputEmpty > :first-child::before {
+  color: var(--o-text-3) !important;
+}
+/* "Altre opzioni" diventa il "+" nel cerchio a sinistra */
+.mx_MessageComposer_buttonMenu {
   position: absolute !important;
-  top: 16px !important;
-  right: 14px !important;
-  z-index: 10 !important;
-  margin: 0 !important;
+  left: 0;
+  top: 0;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 999px !important;
+  z-index: 1;
+}
+.mx_MessageComposer_buttonMenu svg {
+  display: none !important;
+}
+.mx_MessageComposer_buttonMenu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 21px;
+  height: 21px;
+  background: var(--o-text);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.mx_MessageComposer_button,
+.mx_MessageComposer_row button[class*="_icon-button_"] {
+  color: var(--o-text-2) !important;
+}
+.mx_MessageComposer_sendMessage {
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 10px !important;
+  border-radius: 999px !important;
+  background: var(--o-accent) !important;
+  margin: 0 0 0 4px !important;
+  align-self: center;
+}
+.mx_MessageComposer_sendMessage svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: #fff !important;
+}
+.mx_MessageComposer_sendMessage::before {
+  background-color: #fff !important;
+}
+.mx_MessageComposer:focus-within,
+.mx_MessageComposer_wrapper:focus-within,
+.mx_BasicMessageComposer:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- 5. Finestre, menu e impostazioni ---------- */
+.mx_Dialog_background {
+  background: var(--o-scrim) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 1 !important;
+}
+.mx_Dialog {
+  background: var(--o-raised) !important;
+  color: var(--o-text) !important;
+  border-radius: 32px !important;
+  border: 0 !important;
+  box-shadow: var(--o-shadow-big), inset 0 0 0 1px var(--o-line) !important;
+}
+/* Element mette un secondo bordo di vetro intorno alla finestra: ne basta uno */
+.mx_Dialog_border[class*="_glass_"] {
+  padding: 0 !important;
+  background: transparent !important;
+  outline: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-radius: 32px !important;
+}
+.mx_Dialog_border[class*="_glass_"] > :first-child {
+  border-radius: 32px !important;
+}
+/* la X: tonda, 40, centrata sull'altezza del titolo */
+.mx_Dialog_cancelButton {
+  box-sizing: border-box !important;
+  top: 27px !important;
+  right: 28px !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 10px !important;
+  border-radius: 999px !important;
+  background: var(--o-hl) !important;
+}
+.mx_Dialog_cancelButton:hover {
+  background: var(--o-hl-2) !important;
+}
+.mx_Dialog_cancelButton svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: var(--o-text-2) !important;
+}
+/* campi di testo nelle finestre: tutti uguali (stesso fondo, bordo, altezza e angoli) */
+.mx_Dialog {
+  --cpd-color-bg-canvas-default: var(--o-field-solid);
+}
+.mx_Dialog input[class*="_control_"],
+.mx_Dialog .mx_Field,
+.mx_Dialog .mx_CopyableText_border {
+  box-sizing: border-box !important;
+  min-height: 48px;
+  border: 1px solid var(--o-field-line) !important;
+  border-radius: 14px !important;
+  background: var(--o-field-solid) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: var(--o-text) !important;
+}
+.mx_Dialog input[class*="_control_"] {
+  height: 48px;
+  padding: 0 16px !important;
+}
+.mx_Dialog input[class*="_control_"]:focus,
+.mx_Dialog .mx_Field:focus-within {
+  border-color: var(--o-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--o-accent) 22%, transparent) !important;
+}
+.mx_Dialog .mx_Field input,
+.mx_Dialog .mx_Field select,
+.mx_Dialog .mx_Field textarea {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  padding: 13px 15px !important;
+}
+.mx_Dialog .mx_Field label {
+  margin: 12px 14px !important;
+}
+.mx_Dialog .mx_Field input:focus + label,
+.mx_Dialog .mx_Field input:not(:placeholder-shown) + label,
+.mx_Dialog .mx_Field select + label,
+.mx_Dialog .mx_Field textarea:focus + label,
+.mx_Dialog .mx_Field textarea:not(:placeholder-shown) + label,
+.mx_Dialog .mx_Field_labelAlwaysTopLeft label {
+  transform: translateY(-19px) !important;
+  border-radius: 4px;
+}
+.mx_Dialog .mx_Field:focus-within label {
+  color: var(--o-accent) !important;
+}
+/* scelta del tema e della disposizione: riquadri arrotondati come il resto */
+/* ogni tema si mostra con i suoi colori (come fa Element): qui cambio solo gli angoli */
+.mx_ThemeChoicePanel_themeSelector,
+.mx_LayoutSwitcher_LayoutSelector .mxLayoutSwitcher_LayoutSelector_LayoutRadio {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+.mx_LayoutSwitcher_LayoutSelector .mxLayoutSwitcher_LayoutSelector_LayoutRadio {
+  border: 1px solid var(--o-field-line) !important;
+  background: var(--o-field-solid) !important;
+}
+.mx_ThemeChoicePanel_themeSelector {
+  padding: 12px 18px 12px 14px !important;
+}
+.mx_ThemeChoicePanel_themeSelector:has(input:checked),
+.mx_LayoutSwitcher_LayoutSelector .mxLayoutSwitcher_LayoutSelector_LayoutRadio:has(input:checked) {
+  border-color: var(--o-accent) !important;
+  box-shadow: 0 0 0 1px var(--o-accent) !important;
+}
+.mx_Dialog .mx_CopyableText_border {
+  display: flex !important;
+  align-items: center;
+  padding: 0 6px 0 16px !important;
+}
+.mx_Dialog .mx_CopyableText_copyButton {
+  box-sizing: border-box !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 9px !important;
+  border-radius: 999px !important;
+}
+.mx_Dialog .mx_CopyableText_copyButton > div,
+.mx_Dialog .mx_CopyableText_copyButton svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.mx_ContextualMenu,
+.mx_IconizedContextMenu,
+[role="menu"][data-state="open"] {
+  background: var(--o-glass-strong) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.7);
+  backdrop-filter: blur(28px) saturate(1.7);
+  border-radius: 22px !important;
+  border: 0 !important;
+  box-shadow: var(--o-shadow-big), inset 0 0 0 1px var(--o-edge-3) !important;
+}
+.mx_IconizedContextMenu_item,
+[role="menuitem"] {
+  border-radius: 999px !important;
+}
+
+/* impostazioni: le sezioni in una pillola in alto, quella aperta mostra il nome */
+.mx_TabbedView.mx_TabbedView_tabsOnLeft {
+  flex-direction: column !important;
   padding: 0 !important;
 }
-
-/* Via tre puntini e matita. */
-[data-testid="room-list-header"],
-header[aria-label="Opzioni stanza"] {
-  display: none !important;
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels {
+  position: relative;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+  height: auto !important;
+  min-width: 0 !important;
+  margin: 0 0 20px !important;
+  padding: 4px !important;
+  border-radius: 999px;
+  background: var(--o-island);
+  box-shadow: inset 0 0 0 1px var(--o-line);
+  align-self: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  min-height: 48px !important;
+  max-height: none !important;
+  flex: none !important;
+  box-sizing: border-box !important;
+}
+.mx_SettingsDialog_content,
+.mx_UserSettingsDialog .mx_TabbedView {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  inset: auto !important;
+  position: relative !important;
+}
+.mx_UserSettingsDialog .mx_TabbedView_tabLabels {
+  margin-left: 0 !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels::-webkit-scrollbar { display: none; }
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: var(--orizon-hl-x, 4px);
+  width: var(--orizon-hl-w, 0px);
+  border-radius: 999px;
+  background: var(--o-hl-2);
+  pointer-events: none;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: auto !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--o-text-2) !important;
+  display: flex !important;
+  align-items: center;
+  gap: 0 !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel::before {
+  margin: 0 !important;
+  background-color: currentColor !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel svg {
+  margin: 0 !important;
+  color: currentColor !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel_text {
+  display: inline-block !important;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: max-width .32s cubic-bezier(.3, .7, .2, 1), opacity .2s, margin .32s;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel_active {
+  color: var(--o-text) !important;
+  padding: 0 16px 0 13px !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel_active .mx_TabbedView_tabLabel_text {
+  max-width: 220px;
+  opacity: 1;
+  margin-left: 9px !important;
+  font-weight: 600 !important;
+  color: var(--o-text) !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabPanel {
+  margin: 0 !important;
+  width: 100%;
+}
+.mx_UserSettingsDialog .mx_TabbedView_tabPanel {
+  box-sizing: border-box !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+/* contenuto a isole */
+.mx_SettingsTab {
+  padding-inline: 0 !important;
+}
+.mx_SettingsTab_sections {
+  gap: 20px !important;
+}
+.mx_SettingsSection > h2 {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.4px;
+  color: var(--o-text) !important;
+}
+.mx_SettingsSubsection,
+.mx_UserProfileSettings {
+  box-sizing: border-box !important;
+  padding: 20px !important;
+  border-radius: 24px !important;
+  background: var(--o-island) !important;
+  box-shadow: inset 0 0 0 1px var(--o-line) !important;
+}
+.mx_SettingsSubsection > :first-child,
+.mx_UserProfileSettings > :first-child {
+  margin-top: 0 !important;
+}
+.mx_SettingsSubsection > :last-child,
+.mx_UserProfileSettings > :last-child {
+  margin-bottom: 0 !important;
+}
+.mx_UserProfileSettings {
+  border-bottom: 0 !important;
+}
+.mx_UserProfileSettings .mx_UserProfileSettings_profile {
+  margin-top: 20px !important;
+  gap: 20px !important;
+}
+.mx_UserProfileSettings .mx_UserProfileSettings_profile_controls_userId {
+  margin-top: 16px !important;
+}
+.mx_UserProfileSettings .mx_UserProfileSettings_profile_controls_userId .mx_CopyableText {
+  margin: 8px 0 0 !important;
+}
+.mx_UserProfileSettings label[class*="_label_"],
+.mx_UserProfileSettings .mx_UserProfileSettings_profile_controls_userId_label {
+  display: block;
+  margin-bottom: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--o-text) !important;
+}
+.mx_UserProfileSettings [class*="_field_"] {
+  gap: 0 !important;
+}
+.mx_UserProfileSettings .mx_UserProfileSettings_profile_buttons {
+  margin: 20px 0 0 !important;
+  gap: 10px;
+}
+.mx_UserProfileSettings .mx_UserProfileSettings_profile_buttons > * {
+  box-sizing: border-box;
+  height: 40px;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  display: inline-flex !important;
+  align-items: center;
+}
+.mx_SettingsSubsection .mx_SettingsSubsection {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.mx_SettingsSubsectionHeading_heading {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+.mx_SettingsSubsection_text,
+.mx_SettingsSubsection_description {
+  color: var(--o-text-2) !important;
+}
+.mx_Field,
+.mx_Field input,
+.mx_Field textarea,
+.mx_Field select,
+.mx_CopyableText_border {
+  border-radius: 14px !important;
+}
+.mx_SearchBox.mx_textinput,
+.mx_SpaceHierarchy_list ~ .mx_SearchBox,
+.mx_SpaceRoomView .mx_SearchBox {
+  border-radius: 999px !important;
+  padding-left: 6px;
+}
+.mx_UserNotifSettings_grid {
+  width: 100% !important;
+  grid-template-columns: auto repeat(3, minmax(62px, max-content)) !important;
+}
+.mx_Dialog .mx_AccessibleButton_kind_primary,
+.mx_AccessibleButton_kind_primary {
+  background: var(--o-accent) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+}
+.mx_AccessibleButton_kind_primary_outline,
+.mx_AccessibleButton_kind_secondary {
+  border-radius: 999px !important;
+}
+.mx_AccessibleButton_kind_danger,
+.mx_AccessibleButton_kind_danger_outline {
+  background: var(--o-danger-bg) !important;
+  color: var(--o-danger) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+.mx_AccessibleButton_kind_danger svg,
+.mx_AccessibleButton_kind_danger_outline svg {
+  color: var(--o-danger) !important;
 }
 
-/* ===== Foto profilo sul sito (Element 1.12.20 e successive) =====
-   Qui la colonna degli spazi sta fuori dalla colonna di sinistra,
-   quindi la foto si aggancia direttamente alla barra di ricerca. */
-@supports (anchor-name: --a) {
-  [data-testid="room-list-search"] {
-    anchor-name: --orizon-ricerca;
+/* interruttori e caselle */
+.mx_ToggleSwitch_on,
+[role="switch"][aria-checked="true"] {
+  background-color: var(--o-accent) !important;
+}
+
+/* barre di scorrimento: sottili, senza frecce, staccate dai bordi, visibili solo quando ci passi sopra */
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto !important;
+    scrollbar-color: auto !important;
   }
-  .mx_SpacePanel:not(.mx_LeftPanel_wrapper *) .mx_UserMenu {
-    position: fixed !important;
-    position-anchor: --orizon-ricerca;
-    top: anchor(center) !important;
-    left: calc(anchor(right) - 64px) !important;
-    right: auto !important;
-    translate: 0 -50%;
+  ::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+    background: transparent !important;
+  }
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent !important;
+  }
+  ::-webkit-scrollbar-track { margin: 16px 0; }
+  ::-webkit-scrollbar-thumb {
+    min-height: 48px;
+    border: 6px solid transparent;
+    border-radius: 999px;
+    background: transparent !important;
+    background-clip: padding-box !important;
+  }
+  *:hover::-webkit-scrollbar-thumb {
+    background-color: var(--o-hl-2) !important;
+  }
+  ::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(--o-text-3) !important;
+  }
+}
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  *:hover {
+    scrollbar-color: var(--o-hl-2) transparent;
   }
 }
 
-/* Browser senza ancoraggio CSS: la foto va in basso a sinistra,
-   così non copre le icone della stanza. */
-@supports not (anchor-name: --a) {
-  .mx_SpacePanel:not(.mx_LeftPanel_wrapper *) .mx_UserMenu {
-    position: fixed !important;
-    top: auto !important;
-    right: auto !important;
-    left: 12px !important;
-    bottom: 12px !important;
-  }
+/* avvisi in basso a sinistra */
+.mx_Toast_toast {
+  background: var(--o-glass-strong) !important;
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border-radius: 24px !important;
+  box-shadow: var(--o-shadow-big), inset 0 0 0 1px var(--o-edge-3) !important;
+  color: var(--o-text) !important;
+}
+
+/* ---------- 6. Rifiniture ---------- */
+/* niente fascia grigia dietro al messaggio quando ci passi sopra */
+.mx_EventTile[data-layout="bubble"]:hover::before,
+.mx_EventTile[data-layout="bubble"].mx_EventTile_selected::before,
+.mx_EventTile[data-layout="bubble"].mx_EventTile_actionBarFocused::before {
+  background: transparent !important;
+}
+.mx_EventTile[data-layout="bubble"]:hover .mx_EventTile_avatar img {
+  box-shadow: none !important;
+}
+/* l'ora compare accanto alla bolla, non sopra al testo */
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:not(.mx_EventTile_mediaLine) .mx_MessageActionBar + .mx_MessageTimestamp,
+.mx_EventTile[data-layout="bubble"] .mx_EventTile_line:not(.mx_EventTile_mediaLine) > a {
+  left: 100% !important;
+  right: auto !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%);
+  padding: 0 10px !important;
+  font-size: 11.5px !important;
+  white-space: nowrap;
+}
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line:not(.mx_EventTile_mediaLine) .mx_MessageActionBar + .mx_MessageTimestamp,
+.mx_EventTile[data-layout="bubble"][data-self="true"] .mx_EventTile_line:not(.mx_EventTile_mediaLine) > a {
+  left: auto !important;
+  right: 100% !important;
+}
+/* barra delle azioni sul messaggio: una pillola di vetro */
+.mx_MessageActionBar {
+  padding: 3px !important;
+  gap: 2px;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--o-glass-strong) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: var(--o-shadow), inset 0 0 0 1px var(--o-edge-3) !important;
+}
+.mx_MessageActionBar_iconButton,
+.mx_MessageActionBar > * {
+  border-radius: 999px !important;
+}
+.mx_MessageActionBar_iconButton:hover {
+  background: var(--o-hl-2) !important;
+}
+/* lista: niente riquadro bianco dopo il clic, solo un bordo morbido con la tastiera */
+.mx_RoomListItemView,
+.mx_RoomListItemView:focus,
+.mx_RoomListItemView:focus-visible {
+  outline: none !important;
+}
+.mx_RoomListItemView:focus-visible > [class*="_container_"] {
+  box-shadow: inset 0 0 0 2px var(--o-accent) !important;
+}
+/* risposta in preparazione: una scheda arrotondata sopra la pillola */
+.mx_ReplyPreview {
+  margin: 0 0 8px 62px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background: var(--o-glass) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow: inset 0 0 0 1px var(--o-edge-3) !important;
+}
+.mx_ReplyPreview .mx_ReplyPreview_section { border: 0 !important; padding: 0 !important; }
+.mx_ReplyPreview .mx_ReplyTile,
+.mx_ReplyPreview .mx_ReplyPreview_header + * {
+  border-left: 3px solid var(--o-accent) !important;
+  border-radius: 4px;
+  padding-left: 10px !important;
+  background: transparent !important;
+}
+.mx_ReplyPreview_title { color: var(--o-text-2) !important; font-size: 12.5px !important; }
+/* citazione nella bolla */
+.mx_EventTile[data-layout="bubble"] .mx_ReplyChain {
+  border-left: 3px solid var(--o-accent) !important;
+  border-radius: 6px;
+  background: var(--o-hl) !important;
+  padding: 6px 10px !important;
+  margin-bottom: 6px !important;
+}
+
+
+
+/* foto di profili e stanze: l'immagine riempie sempre tutto il cerchio (prima restava schiacciata in alto) */
+[class*="_avatar_"] > img,
+.mx_BaseAvatar > img,
+.mx_BaseAvatar_image {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+}
+
+/* ---------- 7. Info della chat e dei contatti: voci raggruppate in schede, come le impostazioni ---------- */
+.mx_RightPanel {
+  background: var(--o-info-bg) !important;
+  border-left: 1px solid var(--o-info-line) !important;
+}
+.mx_RightPanel .mx_BaseCard,
+.mx_RightPanel .mx_BaseCard_header {
+  background: transparent !important;
+}
+.mx_RightPanel .mx_BaseCard_header {
+  border-bottom: 0 !important;
+  padding: 14px 16px 8px !important;
+}
+.mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"] {
+  box-sizing: border-box !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 8px !important;
+  border-radius: 999px !important;
+  background: var(--o-info-card) !important;
+}
+.mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"] > div {
+  width: 20px !important;
+  height: 20px !important;
+}
+.mx_RightPanel .mx_RoomSummaryCard_search label {
+  border-radius: 999px !important;
+  background: var(--o-info-card) !important;
+  border-color: transparent !important;
+}
+/* intestazione: foto, nome, stato della cifratura e argomento */
+.mx_RoomSummaryCard_container {
+  padding: 12px 16px 6px !important;
+  gap: 0 !important;
+}
+.mx_RoomSummaryCard_container > .mx_BaseAvatar {
+  width: 88px !important;
+  height: 88px !important;
+  --cpd-avatar-size: 88px !important;
+  margin: 0 auto 14px !important;
+}
+.mx_RoomSummaryCard_container h1 {
+  font-size: 20px !important;
+  font-weight: 650 !important;
+  color: var(--o-text) !important;
+}
+.mx_RoomSummaryCard_badges {
+  margin-top: 10px !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+}
+.mx_RoomSummaryCard_badges [class*="_badge_"] {
+  height: 28px;
+  white-space: nowrap;
+  font-size: 12.5px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--o-info-card) !important;
+  color: var(--o-text-2) !important;
+  font-weight: 500 !important;
+  gap: 6px !important;
+}
+.mx_RoomSummaryCard_badges [class*="_badge_"] svg {
+  width: 15px !important;
+  height: 15px !important;
+  color: var(--o-text-2) !important;
+}
+.mx_RoomSummaryCard_topic {
+  margin-top: 12px !important;
+}
+.mx_RoomSummaryCard_topic a,
+.mx_RoomSummaryCard_topic p {
+  color: var(--o-text-2) !important;
+}
+/* le righe di separazione diventano spazio tra una scheda e l'altra */
+.mx_RightPanel [role="separator"] {
+  height: 14px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  visibility: hidden;
+}
+.mx_RightPanel [role="menubar"] {
+  padding: 4px 12px 16px !important;
+}
+.mx_RightPanel .mx_RoomSummaryCard_bottomOptions {
+  display: flex !important;
+  flex-direction: column;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+/* le voci: un'unica scheda per gruppo, con una riga sottile tra una voce e l'altra */
+.mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"] {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 48px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border-radius: 0 !important;
+  background-color: var(--o-info-card) !important;
+  background-image: linear-gradient(var(--o-info-line), var(--o-info-line)) !important;
+  background-size: calc(100% - 52px) 1px !important;
+  background-position: 52px 0 !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  outline-offset: -2px;
+  grid-template: "icon label ." auto / auto auto minmax(8px, 1fr) !important;
+  align-items: center !important;
+  column-gap: 0 !important;
+}
+.mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"] > [class*="_icon_"] {
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 16px 0 0 !important;
+  color: var(--o-text-2) !important;
+}
+.mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"] > :last-child:not([class*="_label_"]):not([class*="_icon_"]) {
+  justify-self: end;
+}
+.mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"]:hover,
+.mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"]:focus-visible {
+  background-color: color-mix(in srgb, var(--o-info-card) 100%, var(--o-text) 6%) !important;
+}
+/* prima voce del gruppo: angoli in alto, niente riga sopra */
+.mx_RightPanel [role="menubar"] > [class*="_item_"][role^="menuitem"]:first-child,
+.mx_RightPanel [role="menubar"] > [role="separator"] + [class*="_item_"][role^="menuitem"],
+.mx_RightPanel [role="menubar"] .mx_RoomSummaryCard_bottomOptions > [class*="_item_"][role^="menuitem"]:first-child {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  background-image: none !important;
+}
+/* ultima voce del gruppo: angoli in basso */
+.mx_RightPanel [role="menubar"] > [class*="_item_"][role^="menuitem"]:last-child,
+.mx_RightPanel [role="menubar"] > [class*="_item_"][role^="menuitem"]:has(+ [role="separator"]),
+.mx_RightPanel [role="menubar"] .mx_RoomSummaryCard_bottomOptions > [class*="_item_"][role^="menuitem"]:last-child {
+  border-bottom-left-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
+}
+.mx_RightPanel [role="menubar"] [class*="_item_"] [class*="_label_"] {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+/* profilo di un contatto: ogni gruppo di azioni è una scheda */
+.mx_UserInfo .mx_UserInfo_container:not(.mx_UserInfo_header) {
+  margin: 0 12px 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background: var(--o-info-card) !important;
+  overflow: hidden;
+}
+.mx_UserInfo .mx_UserInfo_header {
+  border: 0 !important;
+  margin-bottom: 10px !important;
+}
+.mx_UserInfo .mx_UserInfo_profileField {
+  padding: 12px 16px 2px !important;
+  margin: 0 !important;
+}
+.mx_UserInfo .mx_UserInfo_roleDescription {
+  font-size: 12.5px !important;
+  color: var(--o-text-2) !important;
+}
+.mx_UserInfo .mx_UserInfo_container [class*="_item_"][role="button"] {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 48px;
+  margin: 0 !important;
+  padding: 10px 16px !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(var(--o-info-line), var(--o-info-line)) !important;
+  background-size: calc(100% - 52px) 1px !important;
+  background-position: 52px 0 !important;
+  background-repeat: no-repeat !important;
+  grid-template: "icon label ." auto / auto 1fr minmax(8px, auto) !important;
+  align-items: center !important;
+  column-gap: 0 !important;
+  text-align: left;
+}
+.mx_UserInfo .mx_UserInfo_container > [class*="_item_"][role="button"]:first-of-type {
+  background-image: none !important;
+}
+.mx_UserInfo .mx_UserInfo_container [class*="_item_"][role="button"]:hover {
+  background-color: color-mix(in srgb, var(--o-info-card) 100%, var(--o-text) 6%) !important;
+}
+.mx_UserInfo .mx_UserInfo_container [class*="_item_"][role="button"] > [class*="_icon_"] {
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 16px 0 0 !important;
+}
+.mx_UserInfo .mx_UserInfo_container [class*="_item_"] [class*="_label_"] {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+/* elenco delle persone: una scheda unica con tutti i membri */
+.mx_MemberListView .mx_MemberListHeaderView_invite_large {
+  border: 0 !important;
+  background: var(--o-info-card) !important;
+  color: var(--o-text) !important;
+  height: 44px !important;
+}
+.mx_MemberListView .mx_MemberListHeaderView_invite_large:hover {
+  background: color-mix(in srgb, var(--o-info-card) 100%, var(--o-text) 6%) !important;
+}
+.mx_MemberListView .mx_MemberListHeaderView > div[class*="_typography_"] {
+  padding-left: 28px !important;
+  color: var(--o-text-2) !important;
+}
+.mx_MemberListView .mx_MemberTileView {
+  box-sizing: border-box !important;
+  margin: 0 12px !important;
+  width: auto !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: var(--o-info-card) !important;
+  background-image: linear-gradient(var(--o-info-line), var(--o-info-line)) !important;
+  background-size: calc(100% - 62px) 1px !important;
+  background-position: 62px 0 !important;
+  background-repeat: no-repeat !important;
+}
+.mx_MemberListView .mx_MemberTileView:hover,
+.mx_MemberListView .mx_MemberTileView:focus-visible {
+  background-color: color-mix(in srgb, var(--o-info-card) 100%, var(--o-text) 6%) !important;
+}
+.mx_MemberListView [role="listbox"] > div > div > div:first-child .mx_MemberTileView {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  background-image: none !important;
+}
+.mx_MemberListView [role="listbox"] > div > div > div:last-child .mx_MemberTileView {
+  border-bottom-left-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
+}
+.mx_UserInfo .mx_UserInfo_container [class*="_item_"][role="button"] [class*="_label_"] {
+  justify-self: start !important;
+  text-align: left !important;
+}
+.mx_MemberListView .mx_MemberListHeaderView,
+.mx_MemberListView .mx_MemberListHeaderView > * {
+  border: 0 !important;
+  box-shadow: none !important;
 }

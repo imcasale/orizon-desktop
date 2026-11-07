@@ -148,10 +148,10 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "libgbm1",
         ],
         recommends: ["libsqlcipher0"],
-        fpm: ["--deb-pre-depends", "libc6 (>= 2.34)", "--iteration", "2"],
+        fpm: ["--deb-pre-depends", "libc6 (>= 2.34)", "--iteration", "1"],
     },
     rpm: {
-        fpm: ["--iteration", "2"],
+        fpm: ["--iteration", "1"],
     },
     pacman: {
         depends: [
@@ -167,7 +167,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "alsa-lib",
             "mesa",
         ],
-        fpm: ["--iteration", "2"],
+        fpm: ["--iteration", "1"],
     },
     mac: {
         target: ["dmg", "zip"],

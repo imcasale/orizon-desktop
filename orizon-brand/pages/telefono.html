@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#B8141C">
+<title>Orizon</title>
+<link rel="icon" href="/vector-icons/180.png">
+<link rel="apple-touch-icon" href="/vector-icons/180.png">
+<style>
+  /* Orizon dal telefono: app Android (test), iPhone (in arrivo) oppure il browser. Stesso stile del benvenuto. */
+  :root {
+    --bg: #FFFFFF;
+    --card: #F5F5F7;
+    --text: #14121F;
+    --text-2: #6B6979;
+    --accent: #8B1A2B;
+    --accent-2: #A0263A;
+    --accent-soft: rgba(139, 26, 43, .09);
+    --line: rgba(20, 18, 31, .12);
+    --hover: rgba(20, 18, 31, .06);
+    --menu: rgba(255, 255, 255, .97);
+    --shadow: 0 16px 40px rgba(20, 18, 31, .14), 0 2px 8px rgba(20, 18, 31, .06);
+  }
+  body.dark {
+    --bg: #0E0E12;
+    --card: #18181E;
+    --text: #F2F1F7;
+    --text-2: #9C9AAE;
+    --accent: #EE2229;
+    --accent-2: #F0383E;
+    --accent-soft: rgba(238, 34, 41, .14);
+    --line: rgba(255, 255, 255, .14);
+    --hover: rgba(255, 255, 255, .08);
+    --menu: rgba(26, 26, 32, .97);
+    --shadow: 0 16px 40px rgba(0, 0, 0, .5), 0 2px 8px rgba(0, 0, 0, .3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    font-family: Inter, "Space Grotesk", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--bg); color: var(--text);
+    transition: background .25s, color .25s;
+    display: flex; flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* barra in alto: lingua a sinistra, tema a destra */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 0; }
+  .round { height: 40px; min-width: 40px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; color: var(--text-2); font-size: 14px; font-weight: 500; transition: background .18s, color .18s; }
+  .round:hover, .round:active { background: var(--hover); color: var(--text); }
+  .round svg { width: 19px; height: 19px; flex: none; }
+  #theme { padding: 0; width: 40px; }
+
+  main { flex: 1; width: 100%; max-width: 440px; margin: 0 auto; padding: 18px 20px 28px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .icon { display: block; width: 96px; height: 96px; border-radius: 26%; box-shadow: 0 10px 28px rgba(0, 0, 0, .16); }
+  h1 { margin-top: 18px; font-size: 26px; font-weight: 700; letter-spacing: -.4px; }
+  .sub { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--text-2); min-height: 22px; }
+
+  /* le schede: Android e iPhone (quella del tuo telefono va per prima) */
+  .cards { width: 100%; margin-top: 26px; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .card { width: 100%; padding: 16px; border-radius: 24px; background: var(--card); }
+  .card.mine { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .ic { width: 46px; height: 46px; flex: none; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); }
+  .ic svg { width: 24px; height: 24px; }
+  .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .tx b { font-size: 16px; font-weight: 650; }
+  .tx span { font-size: 14px; color: var(--text-2); }
+  .chip { flex: none; height: 26px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; background: var(--accent); color: #fff; white-space: nowrap; }
+  .chip[hidden] { display: none; }
+  .soon { background: var(--hover); color: var(--text-2); }
+
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 50px; border-radius: 999px; font-size: 15px; font-weight: 600; letter-spacing: .1px; text-decoration: none; transition: background .18s, transform .12s, border-color .18s; }
+  .btn:active { transform: scale(.98); }
+  .primary { background: var(--accent); color: #fff; }
+  .primary:hover { background: var(--accent-2); }
+  .secondary { color: var(--accent); border: 1.5px solid var(--line); }
+  .secondary:hover { border-color: var(--accent); }
+  .card .btn { margin-top: 14px; }
+
+  .web { width: 100%; margin-top: 22px; }
+  .note { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--text-2); max-width: 320px; min-height: 19px; }
+
+  .link { margin-top: 14px; height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--accent); text-decoration: none; transition: background .18s; }
+  .link:hover, .link:active { background: var(--hover); }
+  .link svg { width: 15px; height: 15px; }
+
+  .dom { padding: 6px 0 18px; text-align: center; font-size: 12px; }
+  .dom a { color: var(--text-2); text-decoration: none; opacity: .8; }
+
+  /* lingue: un foglio che sale dal basso */
+  .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 5; }
+  .sheet {
+    position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); max-width: 440px; margin: 0 auto; max-height: min(460px, 70vh); overflow-y: auto;
+    padding: 8px; border-radius: 26px; border: 1px solid var(--line); background: var(--menu); box-shadow: var(--shadow);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+    transform: translateY(calc(100% + 24px)); transition: transform .28s cubic-bezier(.3, .7, .2, 1); z-index: 6;
+  }
+  .open .scrim { opacity: 1; pointer-events: auto; }
+  .open .sheet { transform: none; }
+  .sheet button { display: flex; align-items: center; gap: 12px; width: 100%; height: 46px; padding: 0 14px; border-radius: 999px; font-size: 15px; text-align: left; }
+  .sheet button:active { background: var(--hover); }
+  .sheet .code { width: 26px; font-size: 11px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; opacity: .55; }
+  .sheet button[aria-selected="true"] { background: var(--accent); color: #fff; font-weight: 600; }
+  .sheet button[aria-selected="true"] .code { opacity: .8; }
+  .sheet::-webkit-scrollbar { width: 0; }
+
+  @media (min-height: 760px) { main { justify-content: center; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="top">
+    <button class="round" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+      <span id="langLabel"></span>
+    </button>
+    <button class="round" id="theme" aria-label="Tema"></button>
+  </div>
+
+  <main>
+    <img class="icon" src="/vector-icons/512.png" alt="" width="96" height="96">
+    <h1>Orizon</h1>
+    <p class="sub" id="tag"></p>
+
+    <section class="cards" id="cards">
+      <article class="card" id="cardAndroid">
+        <div class="row">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.3 9.4h9.4a4.7 4.7 0 0 0-2.1-3.7l1-1.8a.4.4 0 1 0-.7-.4l-1 1.8a4.9 4.9 0 0 0-3.8 0l-1-1.8a.4.4 0 1 0-.7.4l1 1.8a4.7 4.7 0 0 0-2.1 3.7zm2.4-2a.6.6 0 1 1 0 1.2.6.6 0 0 1 0-1.2zm4.6 0a.6.6 0 1 1 0 1.2.6.6 0 0 1 0-1.2zM7.3 10.4v6.2c0 .6.5 1.1 1.1 1.1h.7v2.2a.95.95 0 0 0 1.9 0v-2.2h2v2.2a.95.95 0 0 0 1.9 0v-2.2h.7c.6 0 1.1-.5 1.1-1.1v-6.2zM5.5 10.4a.95.95 0 0 0-.95.95v4.1a.95.95 0 0 0 1.9 0v-4.1a.95.95 0 0 0-.95-.95zm13 0a.95.95 0 0 0-.95.95v4.1a.95.95 0 0 0 1.9 0v-4.1a.95.95 0 0 0-.95-.95z"/></svg></span>
+          <div class="tx"><b id="and"></b><span id="andS"></span></div>
+          <span class="chip" id="mineAndroid" hidden></span>
+        </div>
+        <a class="btn primary" id="andB" href="mailto:info@4orizon.eu"></a>
+      </article>
+      <article class="card" id="cardIphone">
+        <div class="row">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="6.5" y="2.8" width="11" height="18.4" rx="2.8"/><path d="M10.6 5.6h2.8"/></svg></span>
+          <div class="tx"><b id="ios"></b><span id="iosS"></span></div>
+          <span class="chip" id="mineIphone" hidden></span>
+        </div>
+      </article>
+    </section>
+
+    <div class="web">
+      <button class="btn secondary" id="web"></button>
+    </div>
+    <p class="note" id="webS"></p>
+    <a class="link" id="allLink" href="https://www.4orizon.eu/download" target="_blank" rel="noopener">
+      <span id="all"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+  </main>
+
+  <div class="dom"><a href="https://4orizon.eu" target="_blank" rel="noopener">4orizon.eu</a></div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="listbox"></div>
+
+<script>
+/* testi: tag, scelta, Android, stato, tasto, iPhone, stato, "il tuo telefono", browser, nota, tutte le versioni, oggetto e testo della mail */
+var K = ['tag', 'and', 'andS', 'andB', 'ios', 'iosS', 'mine', 'web', 'webS', 'all', 'subj', 'body'];
+var L = {
+  it: ["Italiano", "Messaggistica cifrata end-to-end.", "App Android", "In test su Google Play", "Chiedi di provarla", "App iPhone", "In arrivo", "Il tuo telefono", "Continua nel browser", "Funziona, ma è pensato per lo schermo del computer.", "Tutte le versioni", "Test di Orizon per Android", "Ciao, vorrei provare Orizon per Android. L'indirizzo del mio account Google è: "],
+  en: ["English", "End-to-end encrypted messaging.", "Android app", "In testing on Google Play", "Ask to try it", "iPhone app", "Coming soon", "Your phone", "Continue in the browser", "It works, but it's designed for a computer screen.", "All versions", "Orizon for Android testing", "Hi, I'd like to try Orizon for Android. My Google account address is: "],
+  de: ["Deutsch", "Ende-zu-Ende-verschlüsselte Nachrichten.", "Android-App", "Im Test bei Google Play", "Zum Testen anfragen", "iPhone-App", "Demnächst", "Dein Handy", "Im Browser fortfahren", "Funktioniert, ist aber für den Computerbildschirm gedacht.", "Alle Versionen", "Test von Orizon für Android", "Hallo, ich möchte Orizon für Android testen. Die Adresse meines Google-Kontos lautet: "],
+  fr: ["Français", "Messagerie chiffrée de bout en bout.", "App Android", "En test sur Google Play", "Demander à l'essayer", "App iPhone", "Bientôt disponible", "Votre téléphone", "Continuer dans le navigateur", "Ça fonctionne, mais c'est conçu pour un écran d'ordinateur.", "Toutes les versions", "Test d'Orizon pour Android", "Bonjour, j'aimerais essayer Orizon pour Android. L'adresse de mon compte Google est : "],
+  es: ["Español", "Mensajería cifrada de extremo a extremo.", "App para Android", "En pruebas en Google Play", "Pedir probarla", "App para iPhone", "Próximamente", "Tu teléfono", "Continuar en el navegador", "Funciona, pero está pensado para la pantalla de un ordenador.", "Todas las versiones", "Prueba de Orizon para Android", "Hola, me gustaría probar Orizon para Android. La dirección de mi cuenta de Google es: "],
+  pt: ["Português", "Mensagens cifradas ponta a ponta.", "App Android", "Em testes no Google Play", "Pedir para experimentar", "App iPhone", "Brevemente", "O teu telemóvel", "Continuar no navegador", "Funciona, mas foi pensado para o ecrã do computador.", "Todas as versões", "Teste do Orizon para Android", "Olá, gostaria de experimentar o Orizon para Android. O endereço da minha conta Google é: "],
+  nl: ["Nederlands", "End-to-end versleutelde berichten.", "Android-app", "In test op Google Play", "Vraag om te testen", "iPhone-app", "Binnenkort", "Jouw telefoon", "Doorgaan in de browser", "Het werkt, maar is gemaakt voor een computerscherm.", "Alle versies", "Test van Orizon voor Android", "Hallo, ik wil Orizon voor Android graag uitproberen. Het adres van mijn Google-account is: "],
+  pl: ["Polski", "Wiadomości szyfrowane end-to-end.", "Aplikacja na Androida", "W testach w Google Play", "Poproś o dostęp", "Aplikacja na iPhone'a", "Wkrótce", "Twój telefon", "Kontynuuj w przeglądarce", "Działa, ale jest przeznaczona na ekran komputera.", "Wszystkie wersje", "Test Orizon na Androida", "Cześć, chciałbym wypróbować Orizon na Androida. Adres mojego konta Google to: "],
+  sv: ["Svenska", "Totalsträckskrypterade meddelanden.", "Android-app", "Testas på Google Play", "Be om att få testa", "iPhone-app", "Kommer snart", "Din telefon", "Fortsätt i webbläsaren", "Det fungerar, men är gjort för en datorskärm.", "Alla versioner", "Test av Orizon för Android", "Hej, jag vill gärna testa Orizon för Android. Adressen till mitt Google-konto är: "],
+  da: ["Dansk", "End-to-end-krypterede beskeder.", "Android-app", "I test på Google Play", "Bed om at prøve den", "iPhone-app", "Kommer snart", "Din telefon", "Fortsæt i browseren", "Det virker, men er lavet til en computerskærm.", "Alle versioner", "Test af Orizon til Android", "Hej, jeg vil gerne prøve Orizon til Android. Adressen på min Google-konto er: "],
+  fi: ["Suomi", "Päästä päähän salatut viestit.", "Android-sovellus", "Testissä Google Playssa", "Pyydä testiin", "iPhone-sovellus", "Tulossa pian", "Puhelimesi", "Jatka selaimessa", "Toimii, mutta on tehty tietokoneen näytölle.", "Kaikki versiot", "Orizon Androidille -testi", "Hei, haluaisin kokeilla Orizonia Androidille. Google-tilini osoite on: "],
+  cs: ["Čeština", "Zprávy šifrované end-to-end.", "Aplikace pro Android", "V testování na Google Play", "Požádat o vyzkoušení", "Aplikace pro iPhone", "Již brzy", "Váš telefon", "Pokračovat v prohlížeči", "Funguje, ale je určen pro obrazovku počítače.", "Všechny verze", "Test Orizonu pro Android", "Dobrý den, rád bych vyzkoušel Orizon pro Android. Adresa mého účtu Google je: "],
+  sk: ["Slovenčina", "Správy šifrované end-to-end.", "Aplikácia pre Android", "V testovaní na Google Play", "Požiadať o vyskúšanie", "Aplikácia pre iPhone", "Už čoskoro", "Váš telefón", "Pokračovať v prehliadači", "Funguje, ale je určený pre obrazovku počítača.", "Všetky verzie", "Test Orizonu pre Android", "Dobrý deň, rád by som vyskúšal Orizon pre Android. Adresa môjho účtu Google je: "],
+  hu: ["Magyar", "Végpontok közti titkosított üzenetküldés.", "Android-alkalmazás", "Tesztelés alatt a Google Playen", "Jelentkezés a tesztre", "iPhone-alkalmazás", "Hamarosan", "A te telefonod", "Folytatás a böngészőben", "Működik, de számítógép képernyőjére készült.", "Összes verzió", "Orizon Android-teszt", "Szia, szeretném kipróbálni az Orizont Androidon. A Google-fiókom címe: "],
+  ro: ["Română", "Mesagerie criptată end-to-end.", "Aplicația Android", "În testare pe Google Play", "Cere să o încerci", "Aplicația iPhone", "În curând", "Telefonul tău", "Continuă în browser", "Funcționează, dar e gândit pentru ecranul unui computer.", "Toate versiunile", "Test Orizon pentru Android", "Bună, aș vrea să încerc Orizon pentru Android. Adresa contului meu Google este: "],
+  bg: ["Български", "Съобщения с криптиране от край до край.", "Приложение за Android", "В тестване в Google Play", "Поискайте достъп", "Приложение за iPhone", "Очаквайте скоро", "Вашият телефон", "Продължете в браузъра", "Работи, но е създадено за екран на компютър.", "Всички версии", "Тест на Orizon за Android", "Здравейте, искам да изпробвам Orizon за Android. Адресът на профила ми в Google е: "],
+  el: ["Ελληνικά", "Μηνύματα με κρυπτογράφηση από άκρο σε άκρο.", "Εφαρμογή Android", "Σε δοκιμή στο Google Play", "Ζητήστε να τη δοκιμάσετε", "Εφαρμογή iPhone", "Σύντομα", "Το κινητό σας", "Συνέχεια στο πρόγραμμα περιήγησης", "Λειτουργεί, αλλά είναι σχεδιασμένο για οθόνη υπολογιστή.", "Όλες οι εκδόσεις", "Δοκιμή του Orizon για Android", "Γεια σας, θα ήθελα να δοκιμάσω το Orizon για Android. Η διεύθυνση του λογαριασμού μου Google είναι: "],
+  hr: ["Hrvatski", "Poruke šifrirane s kraja na kraj.", "Aplikacija za Android", "U testiranju na Google Playu", "Zatražite isprobavanje", "Aplikacija za iPhone", "Uskoro", "Vaš mobitel", "Nastavi u pregledniku", "Radi, ali je namijenjen zaslonu računala.", "Sve verzije", "Test Orizona za Android", "Pozdrav, želio bih isprobati Orizon za Android. Adresa mog Google računa je: "],
+  sl: ["Slovenščina", "Sporočila s šifriranjem od konca do konca.", "Aplikacija za Android", "V preizkusu na Google Play", "Prosite za preizkus", "Aplikacija za iPhone", "Kmalu", "Vaš telefon", "Nadaljuj v brskalniku", "Deluje, vendar je namenjen zaslonu računalnika.", "Vse različice", "Preizkus Orizona za Android", "Pozdravljeni, rad bi preizkusil Orizon za Android. Naslov mojega Google računa je: "],
+  et: ["Eesti", "Läbiva krüpteeringuga sõnumid.", "Androidi rakendus", "Testimisel Google Plays", "Palu testima pääseda", "iPhone'i rakendus", "Peagi tulekul", "Sinu telefon", "Jätka brauseris", "See töötab, kuid on mõeldud arvutiekraanile.", "Kõik versioonid", "Orizoni Androidi test", "Tere, sooviksin proovida Orizonit Androidis. Minu Google'i konto aadress on: "],
+  lv: ["Latviešu", "Pilnībā šifrēta ziņapmaiņa.", "Android lietotne", "Testēšanā Google Play", "Lūgt iespēju izmēģināt", "iPhone lietotne", "Drīzumā", "Tavs tālrunis", "Turpināt pārlūkā", "Darbojas, bet ir paredzēts datora ekrānam.", "Visas versijas", "Orizon Android testēšana", "Sveiki! Es vēlētos izmēģināt Orizon Android ierīcē. Mana Google konta adrese ir: "],
+  lt: ["Lietuvių", "Ištisai šifruoti pranešimai.", "Android programėlė", "Testuojama „Google Play“", "Prašyti išbandyti", "iPhone programėlė", "Jau greitai", "Tavo telefonas", "Tęsti naršyklėje", "Veikia, bet sukurta kompiuterio ekranui.", "Visos versijos", "Orizon Android testas", "Sveiki, norėčiau išbandyti Orizon Android įrenginiui. Mano Google paskyros adresas: "],
+  uk: ["Українська", "Наскрізно зашифровані повідомлення.", "Застосунок для Android", "Тестується в Google Play", "Попросити доступ", "Застосунок для iPhone", "Незабаром", "Ваш телефон", "Продовжити в браузері", "Працює, але розраховано на екран комп'ютера.", "Усі версії", "Тест Orizon для Android", "Вітаю! Хочу випробувати Orizon для Android. Адреса мого облікового запису Google: "]
+};
+
+function $(id) { return document.getElementById(id); }
+function store(k, v) {
+  try {
+    if (v === undefined) return localStorage.getItem(k);
+    localStorage.setItem(k, v);
+  } catch (e) { return null; }
+}
+function t(key) { var a = L[lang]; return a[K.indexOf(key) + 1]; }
+
+/* la lingua è la stessa di Orizon (Element la tiene in mx_local_settings) */
+function elementLang() {
+  try { var s = JSON.parse(localStorage.getItem('mx_local_settings') || '{}'); return s.language || ''; } catch (e) { return ''; }
+}
+function setElementLang(code) {
+  try {
+    var s = JSON.parse(localStorage.getItem('mx_local_settings') || '{}');
+    s.language = code;
+    localStorage.setItem('mx_local_settings', JSON.stringify(s));
+  } catch (e) {}
+}
+var lang = (elementLang() || store('orizon.lang') || navigator.language || 'it').slice(0, 2).toLowerCase();
+if (!L[lang]) lang = 'en';
+
+/* quale telefono: la sua scheda va per prima, con il segno "il tuo telefono" */
+var ua = navigator.userAgent || '';
+var device = /Android/i.test(ua) ? 'android' : /iPhone|iPod|iPad/.test(ua) ? 'iphone' : '';
+if (device === 'iphone') $('cards').insertBefore($('cardIphone'), $('cardAndroid'));
+if (device) $(device === 'android' ? 'cardAndroid' : 'cardIphone').classList.add('mine');
+
+/* testo che si ricompone quando cambi lingua, come nel benvenuto */
+var GLYPHS = '!<>-_\\/[]{}=+*^?#$%&@~;:';
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function scramble(el, text, dur) {
+  if (el._raf) cancelAnimationFrame(el._raf);
+  if (reduced) { el.textContent = text; return; }
+  var chars = Array.from(text);
+  var plan = chars.map(function () { return { to: dur * 0.45 + Math.random() * dur * 0.55, glyph: GLYPHS[(Math.random() * GLYPHS.length) | 0], next: Math.random() * 110 }; });
+  var start = performance.now();
+  function frame(now) {
+    var tt = now - start, out = '', done = 0;
+    for (var i = 0; i < chars.length; i++) {
+      if (chars[i] === ' ') { out += ' '; done++; continue; }
+      if (tt >= plan[i].to) { out += chars[i]; done++; continue; }
+      if (tt >= plan[i].next) { plan[i].glyph = GLYPHS[(Math.random() * GLYPHS.length) | 0]; plan[i].next = tt + 110 * (0.7 + Math.random() * 0.6); }
+      out += plan[i].glyph;
+    }
+    el.textContent = out;
+    if (done < chars.length) el._raf = requestAnimationFrame(frame);
+    else { el.textContent = text; el._raf = null; }
+  }
+  el._raf = requestAnimationFrame(frame);
+}
+function put(id, text, animate) { if (animate) scramble($(id), text, 1000); else $(id).textContent = text; }
+
+function render(animate) {
+  document.documentElement.lang = lang;
+  ['tag', 'and', 'andS', 'andB', 'ios', 'iosS', 'web', 'webS', 'all'].forEach(function (k) { put(k, t(k), animate); });
+  put('langLabel', L[lang][0], animate);
+  ['mineAndroid', 'mineIphone'].forEach(function (id) {
+    var on = (id === 'mineAndroid' && device === 'android') || (id === 'mineIphone' && device === 'iphone');
+    $(id).hidden = !on;
+    if (on) put(id, t('mine'), animate);
+  });
+  $('andB').href = 'mailto:info@4orizon.eu?subject=' + encodeURIComponent(t('subj')) + '&body=' + encodeURIComponent(t('body'));
+  var m = $('sheet');
+  m.innerHTML = '';
+  Object.keys(L).sort(function (a, b) { return L[a][0].localeCompare(L[b][0]); }).forEach(function (k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'option');
+    b.setAttribute('aria-selected', k === lang ? 'true' : 'false');
+    b.innerHTML = '<span class="code">' + k + '</span><span class="nm"></span>';
+    b.querySelector('.nm').textContent = L[k][0];
+    b.onclick = function () {
+      closeSheet();
+      if (k === lang) return;
+      lang = k;
+      store('orizon.lang', k);
+      setElementLang(k);
+      render(true);
+    };
+    m.appendChild(b);
+  });
+}
+
+function openSheet() {
+  document.body.classList.add('open');
+  $('langBtn').setAttribute('aria-expanded', 'true');
+  var sel = $('sheet').querySelector('[aria-selected="true"]');
+  if (sel) $('sheet').scrollTop = Math.max(0, sel.offsetTop - 140);
+}
+function closeSheet() { document.body.classList.remove('open'); $('langBtn').setAttribute('aria-expanded', 'false'); }
+$('langBtn').onclick = openSheet;
+$('scrim').onclick = closeSheet;
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+
+/* "Continua nel browser": Orizon web, e su questo telefono la pagina non torna più */
+$('web').onclick = function () {
+  store('orizon.browser', '1');
+  try { sessionStorage.setItem('orizon.browser', '1'); sessionStorage.setItem('skip_mobile_redirect', 'true'); } catch (e) {}
+  location.replace('/' + location.hash);
+};
+
+/* tema: lo stesso del benvenuto */
+var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.1M12 19.5v2.1M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.4 12h2.1M19.5 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>';
+var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/></svg>';
+function applyTheme(dark) {
+  document.body.classList.toggle('dark', dark);
+  $('theme').innerHTML = dark ? SUN : MOON;
+  var m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = dark ? '#0E0E12' : '#FFFFFF';
+}
+var saved = store('orizon.theme');
+applyTheme(saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+$('theme').onclick = function () {
+  var dark = !document.body.classList.contains('dark');
+  applyTheme(dark);
+  store('orizon.theme', dark ? 'dark' : 'light');
+};
+
+render(false);
+</script>
+</body>
+</html>
