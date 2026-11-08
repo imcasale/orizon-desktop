@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>eu._4orizon.Orizon</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-only</project_license>
+  <name>Orizon</name>
+  <summary>Encrypted chats and video calls</summary>
+  <summary xml:lang="it">Chat e videochiamate cifrate</summary>
+  <description>
+    <p>Orizon is an end-to-end encrypted messenger: chats, voice and video calls, groups and spaces. You don't need a phone number to sign up.</p>
+    <p xml:lang="it">Orizon è un'app di messaggistica cifrata end-to-end: chat, chiamate e videochiamate, gruppi e spazi. Per iscriverti non serve il numero di telefono.</p>
+    <p>It is based on the open Matrix protocol and on Element. The servers are in Europe.</p>
+    <p xml:lang="it">Si basa sul protocollo aperto Matrix e su Element. I server sono in Europa.</p>
+  </description>
+  <launchable type="desktop-id">eu._4orizon.Orizon.desktop</launchable>
+  <developer id="eu.4orizon">
+    <name>Orizon</name>
+  </developer>
+  <url type="homepage">https://4orizon.eu</url>
+  <url type="help">https://4orizon.eu/aiuto</url>
+  <url type="vcs-browser">https://github.com/imcasale/orizon-desktop</url>
+  <branding>
+    <color type="primary" scheme_preference="light">#8B1A2B</color>
+    <color type="primary" scheme_preference="dark">#EE2229</color>
+  </branding>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-audio">intense</content_attribute>
+  </content_rating>
+  <releases>
+    <release version="1.12.27" date="2026-11-08"/>
+  </releases>
+</component>

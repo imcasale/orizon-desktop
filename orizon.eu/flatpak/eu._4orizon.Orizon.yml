@@ -1,0 +1,55 @@
+# Flatpak di Orizon per il repository di Orizon (https://4orizon.eu/repo/flatpak).
+# Non è un manifest per Flathub e non va inviato a Flathub.
+# Versione e impronta del .deb le aggiorna flatpak-orizon.sh.
+id: eu._4orizon.Orizon
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '25.08'
+command: orizon-desktop
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  # webcam per le videochiamate e scheda video
+  - --device=all
+  - --filesystem=xdg-download
+  - --talk-name=org.freedesktop.Notifications
+  # portachiavi del sistema, dove Electron tiene la chiave del database locale
+  - --talk-name=org.freedesktop.secrets
+  - --talk-name=org.kde.kwalletd5
+  - --talk-name=org.kde.kwalletd6
+  # icona nella barra di sistema
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+modules:
+  - name: orizon
+    buildsystem: simple
+    sources:
+      - type: file
+        url: https://4orizon.eu/repo/deb/pool/main/orizon-desktop_1.12.27_amd64.deb
+        sha256: 1a34a1d003143e9ebf1af8c049603e8c46747b7fed9f5659307f18b8e5149ccc
+        dest-filename: orizon.deb
+      - type: file
+        path: orizon-avvio.sh
+      - type: file
+        path: eu._4orizon.Orizon.metainfo.xml
+    build-commands:
+      - ar x orizon.deb
+      - tar -xf data.tar.*
+      - mkdir -p /app/orizon
+      - cp -a opt/Orizon/. /app/orizon/
+      - rm -f /app/orizon/chrome-sandbox
+      - install -Dm755 orizon-avvio.sh /app/bin/orizon-desktop
+      - |
+        for d in usr/share/icons/hicolor/*/apps; do
+          s=$(basename "$(dirname "$d")")
+          install -Dm644 "$d/orizon-desktop.png" "/app/share/icons/hicolor/$s/apps/eu._4orizon.Orizon.png"
+        done
+      - sed -e 's|^Exec=.*|Exec=orizon-desktop %U|' -e 's|^Icon=.*|Icon=eu._4orizon.Orizon|' usr/share/applications/orizon-desktop.desktop > eu._4orizon.Orizon.desktop
+      - install -Dm644 eu._4orizon.Orizon.desktop /app/share/applications/eu._4orizon.Orizon.desktop
+      - install -Dm644 eu._4orizon.Orizon.metainfo.xml /app/share/metainfo/eu._4orizon.Orizon.metainfo.xml
