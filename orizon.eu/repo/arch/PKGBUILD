@@ -1,0 +1,27 @@
+# Maintainer: Gianluca Casale <info at 4orizon dot eu>
+# Pacchetto del repository pacman di Orizon (https://4orizon.eu/repo/arch), fatto dal .deb della stessa versione.
+# pkgver lo aggiorna prepara-arch.sh.
+
+pkgname=orizon-desktop
+pkgver=0
+pkgrel=1
+pkgdesc='Desktop app of Orizon, an end-to-end encrypted messenger based on Matrix'
+arch=('x86_64')
+url='https://4orizon.eu'
+license=('AGPL-3.0-only')
+depends=('gtk3' 'libnotify' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'at-spi2-core' 'util-linux-libs'
+         'libsecret' 'alsa-lib' 'mesa')
+optdepends=('sqlcipher: search in encrypted rooms')
+conflicts=('orizon-desktop-bin')
+options=('!strip' '!debug')
+source=("orizon-desktop_${pkgver}_amd64.deb")
+sha256sums=('SKIP')
+
+package() {
+  bsdtar -xf "${srcdir}"/data.tar.* -C "${pkgdir}"
+  # The .deb sets the setuid bit on the Chromium sandbox after installing; do the same here
+  # (needed on kernels without unprivileged user namespaces).
+  chmod 4755 "${pkgdir}/opt/Orizon/chrome-sandbox"
+  install -d "${pkgdir}/usr/bin"
+  ln -s /opt/Orizon/orizon-desktop "${pkgdir}/usr/bin/orizon-desktop"
+}
