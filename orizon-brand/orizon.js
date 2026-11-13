@@ -88,65 +88,8 @@
     try { if (window.mxDispatcher) window.mxDispatcher.dispatch(typeof action === 'string' ? { action: action } : action); } catch (e) {}
   }
 
-  /* ---------- vetro liquido (come GlassSurface) ---------- */
-  var liquid = (function () {
-    var ua = navigator.userAgent, probe = document.createElement('div');
-    probe.style.backdropFilter = 'url(#x)';
-    if (!/Chrome|Chromium|Electron/.test(ua) || /Firefox/.test(ua) || probe.style.backdropFilter === '') return function () {};
-    var holder = null, count = 0;
-    function map(w, h, r, o) {
-      var edge = Math.min(w, h) * (o.border * 0.5);
-      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
-        '<defs><linearGradient id="r" x1="100%" y1="0%" x2="0%" y2="0%"><stop offset="0%" stop-color="#0000"/><stop offset="100%" stop-color="red"/></linearGradient>' +
-        '<linearGradient id="b" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#0000"/><stop offset="100%" stop-color="blue"/></linearGradient>' +
-        '<filter id="s" filterUnits="userSpaceOnUse" x="0" y="0" width="' + w + '" height="' + h + '" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="' + o.blur + '"/></filter></defs>' +
-        '<rect width="' + w + '" height="' + h + '" fill="black"/>' +
-        '<rect width="' + w + '" height="' + h + '" rx="' + r + '" fill="url(#r)"/>' +
-        '<rect width="' + w + '" height="' + h + '" rx="' + r + '" fill="url(#b)" style="mix-blend-mode:difference"/>' +
-        '<rect x="' + edge + '" y="' + edge + '" width="' + (w - edge * 2) + '" height="' + (h - edge * 2) + '" rx="' + r + '" fill="hsl(0 0% ' + o.brightness + '% / ' + o.opacity + ')" filter="url(#s)"/></svg>';
-      return 'data:image/svg+xml,' + encodeURIComponent(svg);
-    }
-    return function (el, opt) {
-      if (el.__liquid) return;
-      el.__liquid = true;
-      var o = { scale: -80, red: 0, green: 10, blue: 20, border: 0.07, brightness: 50, opacity: 0.93, blur: 11, displace: 0.5 };
-      for (var k in opt) o[k] = opt[k];
-      if (!holder) {
-        holder = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        holder.setAttribute('aria-hidden', 'true');
-        holder.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-        document.body.appendChild(holder);
-      }
-      var id = 'orizon-liquido-' + (++count);
-      var box = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      box.innerHTML = '<filter id="' + id + '" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">' +
-        '<feImage x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="map" scale="' + (o.scale + o.red) + '" xChannelSelector="R" yChannelSelector="G" result="dr"/>' +
-        '<feColorMatrix in="dr" type="matrix" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="red"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="map" scale="' + (o.scale + o.green) + '" xChannelSelector="R" yChannelSelector="G" result="dg"/>' +
-        '<feColorMatrix in="dg" type="matrix" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" result="green"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="map" scale="' + (o.scale + o.blue) + '" xChannelSelector="R" yChannelSelector="G" result="db"/>' +
-        '<feColorMatrix in="db" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="blue"/>' +
-        '<feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="out"/>' +
-        '<feGaussianBlur in="out" stdDeviation="' + o.displace + '"/></filter>';
-      var filter = box.firstChild;
-      holder.appendChild(filter);
-      var image = filter.querySelector('feImage'), last = '';
-      function update() {
-        var w = el.offsetWidth, h = el.offsetHeight;
-        if (!w || !h) return;
-        var r = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, w / 2, h / 2);
-        var key = w + 'x' + h + 'x' + r;
-        if (key === last) return;
-        last = key;
-        image.setAttribute('href', map(w, h, r, o));
-      }
-      update();
-      if (window.ResizeObserver) new ResizeObserver(update).observe(el);
-      el.classList.add('liquid');
-      el.style.backdropFilter = 'url(#' + id + ') saturate(1.15)';
-    };
-  })();
+  /* ---------- vetro: lo disegna orizon.css (sfocatura, riflessi sul bordo); il vecchio filtro che sdoppiava i colori non c'è più ---------- */
+  function liquid() {}
 
   /* ---------- movimento liquido: il bordo davanti arriva prima, quello dietro lo segue ---------- */
   function Spring(k) { this.x = 0; this.v = 0; this.t = 0; this.k = k; }
@@ -184,7 +127,7 @@
   /* schede che si allargano quando sono scelte (pillola in basso, sezioni delle impostazioni) */
   function Tabs(track, items, opts) {
     this.track = track; this.items = items; this.opts = opts;
-    this.pos = new Spring(420); this.lead = new Spring(900); this.raf = 0; this.sel = -1;
+    this.pos = new Spring(420); this.lead = new Spring(900); this.mini = new Spring(260); this.raf = 0; this.sel = -1;
     this.measure();
   }
   Tabs.prototype.measure = function () {
@@ -195,7 +138,9 @@
   };
   Tabs.prototype.width = function (i, p) {
     var w = Math.max(0, Math.min(1, 1 - Math.abs(p - i)));
-    return this.collapsed[i] + (this.expanded[i] - this.collapsed[i]) * w;
+    var full = this.collapsed[i] + (this.expanded[i] - this.collapsed[i]) * w;
+    var m = Math.max(0, Math.min(1, this.mini.x)), small = this.opts.miniW || full;
+    return full + (small - full) * m;
   };
   Tabs.prototype.start = function (i, p) { var x = 0; for (var k = 0; k < i; k++) x += this.width(k, p) + this.gap; return x; };
   Tabs.prototype.edge = function (e, p, right) {
@@ -210,7 +155,7 @@
     this.items.forEach(function (it, i) {
       it.style.width = self.width(i, p).toFixed(1) + 'px';
       var lb = self.opts.label(it);
-      if (lb) lb.style.opacity = Math.max(0, 1 - Math.abs(p - i)).toFixed(3);
+      if (lb) lb.style.opacity = (Math.max(0, 1 - Math.abs(p - i)) * (1 - Math.max(0, Math.min(1, self.mini.x)))).toFixed(3);
     });
     var fwd = lead >= p;
     var L = this.edge(fwd ? p : lead, p, false), R = this.edge(fwd ? lead : p, p, true);
@@ -225,15 +170,243 @@
     }
     if (i === this.sel) return;
     this.sel = i; this.pos.t = i; this.lead.t = i;
+    this.run();
+  };
+  Tabs.prototype.setMini = function (on) {
+    var t = on ? 1 : 0;
+    if (this.mini.t === t) return;
+    this.mini.t = t;
+    if (reduced) { this.mini.x = t; this.draw(); return; }
+    this.run();
+  };
+  Tabs.prototype.run = function () {
     var self = this, last = performance.now();
     cancelAnimationFrame(this.raf);
     (function frame(now) {
       var dt = Math.min(0.034, (now - last) / 1000); last = now;
-      self.pos.step(dt); self.lead.step(dt); self.draw();
-      if (!(self.pos.settled() && self.lead.settled())) self.raf = requestAnimationFrame(frame);
-      else { self.pos.x = self.lead.x = i; self.draw(); }
+      self.pos.step(dt); self.lead.step(dt); self.mini.step(dt); self.draw();
+      if (!(self.pos.settled() && self.lead.settled() && self.mini.settled())) self.raf = requestAnimationFrame(frame);
+      else { self.pos.x = self.lead.x = self.sel; self.mini.x = self.mini.t; self.draw(); }
     })(last);
   };
+
+  /* ---------- la goccia: segue il mouse sulle pillole, premuta diventa una lente che ingrandisce ----------
+     o.items()   le voci della pillola        o.sel()   quella scelta (-1: nessuna, la goccia c'è solo sotto il mouse)
+     o.pick(i,el) cosa fare quando la lascio su una voce dopo averla trascinata (di solito il clic)
+     o.swell     di quanto si gonfia in altezza quando è premuta */
+  var gocce = [];
+  function chiaro() { return !!(document.body && document.body.classList.contains('cpd-theme-light')); }
+  function Goccia(host, o) {
+    this.host = host; this.o = o;
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    var d = document.createElement('span');
+    d.className = 'orizon-goccia';
+    d.setAttribute('aria-hidden', 'true');
+    var l = document.createElement('span');
+    l.className = 'orizon-goccia-lente';
+    d.appendChild(l);
+    this.d = d; this.l = l;
+    this.s = { x: 0, w: 0, t: 0, h: 0, a: 0, g: 0, st: 0, sk: 0, vx: 0, vw: 0, vt: 0, vh: 0, va: 0, vg: 0, vst: 0, vsk: 0 };
+    this.hov = -1; this.down = false; this.moved = false; this.px = 0; this.x0 = 0; this.raf = 0; this.last = 0; this.pid = null;
+    var self = this;
+    this.on = {
+      move: function (e) { self.move(e); },
+      leave: function () { if (!self.down && self.hov !== -1) { self.hov = -1; self.kick(); } },
+      down: function (e) { self.press(e); },
+      up: function (e) { self.release(e); },
+      cancel: function () { self.down = false; self.kick(); }
+    };
+    host.addEventListener('pointermove', this.on.move);
+    host.addEventListener('pointerleave', this.on.leave);
+    host.addEventListener('pointerdown', this.on.down);
+    host.addEventListener('pointerup', this.on.up);
+    host.addEventListener('pointercancel', this.on.cancel);
+    this.attach();
+    gocce.push(this);
+  }
+  Goccia.prototype.attach = function () { if (this.d.parentNode !== this.host) this.host.appendChild(this.d); };
+  Goccia.prototype.scale = function () {
+    var r = this.host.getBoundingClientRect();
+    return (r.width && this.host.offsetWidth) ? r.width / this.host.offsetWidth : 1;
+  };
+  Goccia.prototype.rects = function () {
+    var host = this.host, hr = host.getBoundingClientRect(), k = this.scale();
+    return this.o.items().map(function (el) {
+      var r = el.getBoundingClientRect();
+      return { x: (r.left - hr.left) / k + host.scrollLeft - host.clientLeft, y: (r.top - hr.top) / k + host.scrollTop - host.clientTop, w: r.width / k, h: r.height / k, el: el };
+    }).filter(function (r) { return r.w > 0 && r.h > 0; });
+  };
+  Goccia.prototype.local = function (e) {
+    var hr = this.host.getBoundingClientRect();
+    return (e.clientX - hr.left) / this.scale() + this.host.scrollLeft - this.host.clientLeft;
+  };
+  Goccia.prototype.nearest = function (it, x) {
+    var best = 0, bd = 1e9;
+    for (var i = 0; i < it.length; i++) { var d = Math.abs(x - (it[i].x + it[i].w / 2)); if (d < bd) { bd = d; best = i; } }
+    return best;
+  };
+  Goccia.prototype.at = function (it, x) {
+    for (var i = 0; i < it.length; i++) if (x >= it[i].x - 2 && x <= it[i].x + it[i].w + 2) return i;
+    return -1;
+  };
+  Goccia.prototype.move = function (e) {
+    if (this.down) {
+      this.px = this.local(e);
+      if (!this.moved && Math.abs(this.px - this.x0) > 6) {
+        this.moved = true;
+        try { this.host.setPointerCapture(e.pointerId); this.pid = e.pointerId; } catch (err) {}
+      }
+      this.kick();
+      return;
+    }
+    if (e.pointerType === 'touch') return;
+    var i = this.at(this.rects(), this.local(e));
+    if (i !== this.hov) { this.hov = i; this.kick(); }
+  };
+  Goccia.prototype.press = function (e) {
+    if (e.button) return;
+    var it = this.rects();
+    if (this.at(it, this.local(e)) < 0) return;
+    this.down = true; this.moved = false; this.px = this.x0 = this.local(e);
+    this.s.vst += 2.6;
+    this.lente(it);
+    this.kick();
+  };
+  Goccia.prototype.release = function () {
+    if (!this.down) return;
+    this.down = false;
+    if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
+    if (this.moved) {
+      var it = this.rects();
+      if (it.length) {
+        var i = this.nearest(it, this.px);
+        this.hov = i;
+        if (this.o.pick) this.o.pick(i, it[i].el); else it[i].el.click();
+        /* il clic vero, che arriva subito dopo, non deve scegliere un'altra voce */
+        var stop = function (ev) { ev.stopPropagation(); ev.preventDefault(); window.removeEventListener('click', stop, true); };
+        window.addEventListener('click', stop, true);
+        setTimeout(function () { window.removeEventListener('click', stop, true); }, 350);
+      }
+    }
+    this.kick();
+  };
+  /* dentro la goccia: le stesse voci, ingrandite (si vedono solo mentre è premuta) */
+  var COPIA = ['display', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'color', 'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing',
+    'lineHeight', 'whiteSpace', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'width', 'height', 'borderRadius', 'opacity', 'boxSizing', 'overflow', 'fill', 'stroke', 'maskImage', 'webkitMaskImage', 'backgroundColor'];
+  function copiaStile(src, dst, top) {
+    var cs = getComputedStyle(src);
+    COPIA.forEach(function (k) {
+      if (top && (k === 'backgroundColor' || k === 'width' || k === 'height')) return;
+      if (k === 'backgroundColor' && !/mask/.test(cs.webkitMaskImage || cs.maskImage || '')) return;
+      try { dst.style[k] = cs[k]; } catch (e) {}
+    });
+    var a = src.children, b = dst.children;
+    for (var i = 0; i < a.length && i < b.length; i++) copiaStile(a[i], b[i], false);
+  }
+  Goccia.prototype.lente = function (it) {
+    var l = this.l;
+    l.textContent = '';
+    l.style.width = this.host.scrollWidth + 'px';
+    l.style.height = this.host.scrollHeight + 'px';
+    it.forEach(function (r) {
+      var c = r.el.cloneNode(true);
+      copiaStile(r.el, c, true);
+      /* una copia solo da vedere: niente ruoli, nomi o id doppi */
+      [c].concat($$('*', c)).forEach(function (n) {
+        ['id', 'role', 'aria-selected', 'aria-hidden', 'aria-label', 'aria-labelledby', 'aria-current', 'aria-pressed', 'data-testid', 'tabindex', 'class'].forEach(function (k) { n.removeAttribute(k); });
+      });
+      c.style.position = 'absolute';
+      c.style.left = r.x + 'px'; c.style.top = r.y + 'px';
+      c.style.width = r.w + 'px'; c.style.height = r.h + 'px';
+      c.style.margin = '0';
+      c.style.color = chiaro() ? '#0B0D10' : '#FFFFFF';
+      l.appendChild(c);
+    });
+  };
+  Goccia.prototype.target = function () {
+    var it = this.rects(), s = this.s, sw = this.o.swell == null ? 6 : this.o.swell;
+    if (!it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
+    if (this.down) {
+      var n = this.nearest(it, this.px), w = it[n].w + 14, f = it[0], z = it[it.length - 1];
+      var cx = Math.max(f.x + f.w / 2, Math.min(z.x + z.w / 2, this.px));
+      return { x: cx - w / 2, w: w, t: it[n].y - sw, h: it[n].h + sw * 2, a: 1, g: 1 };
+    }
+    var i = this.hov >= 0 && this.hov < it.length ? this.hov : this.o.sel();
+    if (i < 0 || i >= it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
+    return { x: it[i].x, w: it[i].w, t: it[i].y, h: it[i].h, a: 1, g: 0 };
+  };
+  function molla(o, key, target, k, c, dt, eps, veps) {
+    var vk = 'v' + key;
+    o[vk] += (-k * (o[key] - target) - c * o[vk]) * dt;
+    o[key] += o[vk] * dt;
+    return Math.abs(o[key] - target) > eps || Math.abs(o[vk]) > veps;
+  }
+  Goccia.prototype.step = function (dt) {
+    var s = this.s, T = this.target();
+    if (reduced || (T.a > 0.5 && s.a < 0.05 && !this.down)) { s.x = T.x; s.w = T.w; s.t = T.t; s.h = T.h; s.vx = s.vw = s.vt = s.vh = 0; }
+    var k = this.down ? 700 : 380, c = this.down ? 30 : 19, m = false;
+    m = molla(s, 'x', T.x, k, c, dt, 0.25, 3) || m;
+    m = molla(s, 'w', T.w, k, c, dt, 0.25, 3) || m;
+    m = molla(s, 't', T.t, k, c, dt, 0.25, 3) || m;
+    m = molla(s, 'h', T.h, k, c, dt, 0.25, 3) || m;
+    m = molla(s, 'a', T.a, 260, 30, dt, 0.005, 0.05) || m;
+    m = molla(s, 'g', T.g, 300, 22, dt, 0.005, 0.05) || m;
+    m = molla(s, 'st', reduced ? 0 : Math.min(Math.abs(s.vx) / 1500, 0.42), 340, 9, dt, 0.004, 0.04) || m;
+    m = molla(s, 'sk', reduced ? 0 : Math.max(-14, Math.min(14, -s.vx / 80)), 280, 12, dt, 0.05, 0.5) || m;
+    if (!m && !this.down) {
+      s.x = T.x; s.w = T.w; s.t = T.t; s.h = T.h; s.a = T.a; s.g = T.g; s.st = 0; s.sk = 0;
+      s.vx = s.vw = s.vt = s.vh = s.va = s.vg = s.vst = s.vsk = 0;
+    }
+    return m || this.down;
+  };
+  Goccia.prototype.draw = function () {
+    var s = this.s, d = this.d, g = Math.max(0, Math.min(1, s.g)), r = function (n) { return Math.round(n * 100) / 100; };
+    var mix = function (p, q) { return p + (q - p) * g; };
+    var hx = r(Math.max(8, Math.min(62, 32 - s.sk * 1.6))), bg, sh;
+    if (!chiaro()) {
+      bg = 'radial-gradient(90% 70% at ' + hx + '% 14%, rgba(255,255,255,' + r(0.06 + 0.32 * g) + '), rgba(255,255,255,0) 62%), radial-gradient(70% 55% at ' + r(100 - hx) + '% 106%, rgba(255,255,255,' + r(0.03 + 0.22 * g) + '), rgba(255,255,255,0) 66%), rgba(' + Math.round(mix(255, 64)) + ',' + Math.round(mix(255, 68)) + ',' + Math.round(mix(255, 78)) + ',' + r(mix(0.11, 0.93)) + ')';
+      sh = 'inset 0 0 0 1px rgba(255,255,255,' + r(0.06 + 0.3 * g) + '), inset 1.5px 1.5px 2px rgba(255,255,255,' + r(0.4 + 0.45 * g) + '), inset -1px -1px 2px rgba(255,255,255,' + r(0.14 + 0.26 * g) + '), inset 0 -6px 12px rgba(0,0,0,' + r(0.18 * g) + '), 0 ' + r(4 + 10 * g) + 'px ' + r(12 + 18 * g) + 'px rgba(0,0,0,' + r(0.3 + 0.15 * g) + ')';
+    } else {
+      var c = Math.round(mix(0, 255));
+      bg = 'radial-gradient(90% 70% at ' + hx + '% 14%, rgba(255,255,255,' + r(0.45 + 0.4 * g) + '), rgba(255,255,255,0) 62%), rgba(' + c + ',' + c + ',' + c + ',' + r(mix(0.07, 0.9)) + ')';
+      sh = 'inset 0 0 0 1px rgba(0,0,0,' + r(0.04 + 0.03 * g) + '), inset 1.5px 1.5px 2px rgba(255,255,255,.95), inset -1px -1px 2px rgba(0,0,0,' + r(0.08 + 0.04 * g) + '), 0 ' + r(3 + 8 * g) + 'px ' + r(10 + 16 * g) + 'px rgba(0,0,0,' + r(0.08 + 0.12 * g) + ')';
+    }
+    d.style.left = r(s.x) + 'px'; d.style.top = r(s.t) + 'px';
+    d.style.width = r(Math.max(0, s.w)) + 'px'; d.style.height = r(Math.max(0, s.h)) + 'px';
+    d.style.opacity = r(Math.max(0, Math.min(1, s.a)));
+    d.style.transform = 'scale(' + r(1 + s.st) + ', ' + r(1 - s.st * 0.55) + ') skewX(' + r(s.sk) + 'deg)';
+    d.style.background = bg; d.style.boxShadow = sh;
+    var l = this.l;
+    if (g < 0.01 && !this.down && l.firstChild) l.textContent = '';
+    l.style.opacity = r(g);
+    l.style.transform = 'translate(' + r(-s.x) + 'px, ' + r(-s.t) + 'px) scale(1.22)';
+    l.style.transformOrigin = r(s.x + s.w / 2) + 'px ' + r(s.t + s.h / 2) + 'px';
+    var pill = this.o.pill && this.o.pill();
+    if (pill) pill.style.transform = g > 0.01 ? 'scale(' + r(1 + 0.02 * g) + ')' : '';
+  };
+  Goccia.prototype.kick = function () {
+    if (this.raf) return;
+    var self = this;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(function frame(now) {
+      var dt = Math.max(0.001, Math.min(0.032, (now - self.last) / 1000));
+      self.last = now;
+      var go = self.step(dt);
+      self.draw();
+      self.raf = go ? requestAnimationFrame(frame) : 0;
+    });
+  };
+  Goccia.prototype.alive = function () { return document.body.contains(this.host); };
+  function goccia(host, o) {
+    if (!host) return null;
+    if (host.__goccia && host.__goccia.alive()) { host.__goccia.o = o; host.__goccia.attach(); return host.__goccia; }
+    host.__goccia = new Goccia(host, o);
+    return host.__goccia;
+  }
+  function kickGocce() {
+    gocce = gocce.filter(function (g) { return g.alive(); });
+    gocce.forEach(function (g) { g.attach(); g.kick(); });
+  }
 
   /* ---------- colonna di sinistra: titolo + pillola con ricerca e foto ---------- */
   var testa = null, fotoKey = '';
@@ -336,6 +509,17 @@
     tutte.setAttribute('aria-selected', on ? 'false' : 'true');
     var target = on || tutte;
     filtri.hl.to(target.offsetLeft, target.offsetWidth);
+    if (wrap) {
+      list.classList.add('orizon-con-goccia');
+      goccia(wrap, {
+        items: function () { return $$('[role="option"]', list).filter(function (b) { var r = b.getBoundingClientRect(), lr = list.getBoundingClientRect(); return r.right > lr.left + 8 && r.left < lr.right - 8; }); },
+        sel: function () {
+          var it = $$('[role="option"]', list).filter(function (b) { var r = b.getBoundingClientRect(), lr = list.getBoundingClientRect(); return r.right > lr.left + 8 && r.left < lr.right - 8; });
+          return it.findIndex(function (b) { return b.getAttribute('aria-selected') === 'true'; });
+        },
+        pill: function () { return fondo; }
+      });
+    }
     /* il filtro scelto si vede sempre per intero: se è al bordo, la pillola scorre */
     if (filtri.sel !== target) {
       var primo = filtri.sel === null;
@@ -381,7 +565,7 @@
         '<div class="orizon-tabs">' +
         '<button type="button" class="orizon-tab on" role="tab" aria-selected="true"><span>' + ICON.chat + '<b data-t="chat"></b></span></button>' +
         '<button type="button" class="orizon-tab" role="tab" aria-selected="false"><span>' + ICON.spazi + '<b data-t="spazi"></b></span></button>' +
-        '</div><button type="button" class="orizon-piu">' + ICON.piu + '</button></div>';
+        '</div></div><button type="button" class="orizon-piu orizon-vetro">' + ICON.piu + '</button>';
       var tabs = $$('.orizon-tab', basso);
       tabs[0].onclick = function () {
         var wasSpaces = scheda === 1;
@@ -405,15 +589,45 @@
     var key = lang();
     if (!bassoTabs || bassoTabs.key !== key) {
       bassoTabs = new Tabs($('.orizon-tabs', basso), tabs, {
-        gap: 4,
+        gap: 0,
+        miniW: 40,
         collapsed: function (it) { var s = it.firstChild; return 13 + s.firstChild.getBoundingClientRect().width + 13; },
         expanded: function (it) { var s = it.firstChild; s.style.width = 'max-content'; var w = s.getBoundingClientRect().width; s.style.width = ''; return Math.ceil(w) + 1; },
         label: function (it) { return it.querySelector('b'); }
       });
       bassoTabs.key = key;
       bassoTabs.select(scheda, true);
+      if (mini) { bassoTabs.mini.x = bassoTabs.mini.t = 1; bassoTabs.draw(); }
     }
+    var tr = $('.orizon-tabs', basso);
+    tr.classList.add('orizon-con-goccia');
+    goccia(tr, {
+      items: function () { return $$('.orizon-tab', basso); },
+      sel: function () { return scheda; },
+      pill: function () { return $('.orizon-pillola', basso); }
+    });
   }
+
+  /* scorrendo la lista verso il basso la pillola si fa piccola, tornando su torna grande (come sul telefono) */
+  var mini = false, listaY = 0;
+  function setMini(on) {
+    if (on === mini) return;
+    mini = on;
+    if (basso) basso.classList.toggle('orizon-mini', on);
+    if (bassoTabs) bassoTabs.setMini(on);
+    kickGocce();
+    var t0 = performance.now();
+    (function segui(now) { kickGocce(); if (now - t0 < 520) requestAnimationFrame(segui); })(t0);
+  }
+  document.addEventListener('scroll', function (e) {
+    var el = e.target;
+    if (!el || !el.matches || !el.matches('.mx_RoomListPanel [data-testid="room-list"]')) return;
+    var y = el.scrollTop, dy = y - listaY;
+    listaY = y;
+    if (y < 24) setMini(false);
+    else if (dy > 3) setMini(true);
+    else if (dy < -3) setMini(false);
+  }, true);
 
   /* ---------- intestazione della chat: sfondo della pillola con le azioni ---------- */
   function headerActions() {
@@ -430,6 +644,10 @@
     });
     var btns = $$(':scope > button[class*="_icon-button_"]:not(.orizon-via), :scope > .mx_FacePile, :scope > div[class*="_typography_"]', h);
     if (!btns.length) { h.style.setProperty('--orizon-azioni-w', '0px'); h.__aw = 0; return; }
+    goccia(h, {
+      items: function () { return $$(':scope > button[class*="_icon-button_"]:not(.orizon-via)', h).filter(function (b) { return b.offsetWidth > 0; }); },
+      sel: function () { return -1; }
+    });
     var hr = h.getBoundingClientRect();
     var a = btns[0].getBoundingClientRect(), b = btns[btns.length - 1].getBoundingClientRect();
     var x = Math.round(a.left - hr.left - 4), w = Math.round(b.right - a.left + 8);
@@ -467,6 +685,12 @@
       });
       setTabs.select(Math.max(0, lis.findIndex(function (li) { return li.classList.contains('mx_TabbedView_tabLabel_active'); })), true);
     }
+    ul.classList.add('orizon-con-goccia');
+    goccia(ul, {
+      items: function () { return $$(':scope > .mx_TabbedView_tabLabel', ul); },
+      sel: function () { return $$(':scope > .mx_TabbedView_tabLabel', ul).findIndex(function (li) { return li.classList.contains('mx_TabbedView_tabLabel_active'); }); },
+      swell: 2
+    });
     var i = lis.findIndex(function (li) { return li.classList.contains('mx_TabbedView_tabLabel_active'); });
     if (i >= 0 && i !== setTabs.sel) {
       setTabs.select(i);
@@ -498,6 +722,7 @@
       headerActions();
       settingsTabs();
       if (scheda === 1) posizionaSpazi();
+      kickGocce();
     } catch (e) {
       if (window.console) console.warn('orizon', e);
     }

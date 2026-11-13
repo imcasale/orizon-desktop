@@ -2136,3 +2136,304 @@ body.orizon-spazi .mx_RoomListPanel [class*="_emptyRoomList_"] {
   border: 0 !important;
   box-shadow: none !important;
 }
+
+/* ================================================================
+   8. VETRO LIQUIDO — come l'app Android (26.11)
+   Pillole, isole e finestre di vetro con i riflessi sul bordo;
+   la goccia che segue il mouse e diventa lente la muove orizon.js.
+   ================================================================ */
+body.cpd-theme-dark {
+  --o-lq-bg: rgba(22, 24, 29, .42);
+  --o-lq-filter: blur(18px) saturate(1.8) brightness(1.1);
+  --o-lq-shadow: 0 10px 28px rgba(0, 0, 0, .4), 0 1px 3px rgba(0, 0, 0, .35), inset 0 0 12px rgba(255, 255, 255, .05), inset 3px 3px 7px -3px rgba(255, 255, 255, .4), inset -3px -3px 7px -3px rgba(255, 255, 255, .2), inset 0 -12px 18px -12px rgba(0, 0, 0, .4), inset 1px 1px 0 rgba(255, 255, 255, .3), inset -1px -1px 0 rgba(255, 255, 255, .12);
+  --o-lq-panel: rgba(24, 26, 32, .86);
+  --o-lq-panel-shadow: 0 24px 70px rgba(0, 0, 0, .55), inset 0 1px 1px rgba(255, 255, 255, .16), inset 0 0 18px rgba(255, 255, 255, .04), inset 1px 1px 0 rgba(255, 255, 255, .2), inset -1px -1px 0 rgba(255, 255, 255, .08);
+  --o-lq-isle: rgba(255, 255, 255, .045);
+  --o-lq-isle-shadow: 0 6px 18px rgba(0, 0, 0, .28), inset 0 0 14px rgba(255, 255, 255, .035), inset 3px 3px 7px -3px rgba(255, 255, 255, .28), inset -3px -3px 7px -3px rgba(255, 255, 255, .12), inset 1px 1px 0 rgba(255, 255, 255, .18), inset -1px -1px 0 rgba(255, 255, 255, .07);
+  --o-btn: #F2F4F8;
+  --o-btn-text: #0B0D10;
+  --o-sw-off: rgba(255, 255, 255, .16);
+}
+body.cpd-theme-light {
+  --o-lq-bg: rgba(255, 255, 255, .34);
+  --o-lq-filter: blur(12px) saturate(1.8) brightness(1.04);
+  --o-lq-shadow: 0 8px 26px rgba(0, 0, 0, .13), 0 1px 3px rgba(0, 0, 0, .1), inset 0 0 12px rgba(255, 255, 255, .5), inset 3px 3px 6px -3px #FFFFFF, inset -3px -3px 7px -3px rgba(0, 0, 0, .12), inset 0 -12px 18px -12px rgba(0, 0, 0, .06), inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 rgba(0, 0, 0, .06);
+  --o-lq-panel: rgba(248, 248, 250, .88);
+  --o-lq-panel-shadow: 0 24px 70px rgba(0, 0, 0, .22), inset 0 1px 1px #FFFFFF, inset 0 0 18px rgba(255, 255, 255, .6), inset -1px -1px 0 rgba(0, 0, 0, .05);
+  --o-lq-isle: rgba(255, 255, 255, .8);
+  --o-lq-isle-shadow: 0 4px 14px rgba(0, 0, 0, .07), inset 3px 3px 7px -3px #FFFFFF, inset -3px -3px 7px -3px rgba(0, 0, 0, .07), inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 rgba(0, 0, 0, .05);
+  --o-btn: #111317;
+  --o-btn-text: #FFFFFF;
+  --o-sw-off: rgba(0, 0, 0, .14);
+}
+
+/* pillole e tasti di vetro */
+body[class*="cpd-theme"] .orizon-vetro,
+body[class*="cpd-theme"] .orizon-vetro.liquid,
+body[class*="cpd-theme"] .mx_RoomHeader_infoWrapper,
+body[class*="cpd-theme"] .mx_TimelineSeparator > [class*="_content_"],
+body[class*="cpd-theme"] .mx_MessageComposer_row::before,
+body[class*="cpd-theme"] .mx_MessageComposer_buttonMenu,
+body[class*="cpd-theme"] .mx_RoomHeader::before,
+body[class*="cpd-theme"] [class*="_container_1opqj_"],
+body[class*="cpd-theme"] .mx_LegacyCallEvent,
+body[class*="cpd-theme"] .mx_ReplyPreview,
+body[class*="cpd-theme"] [data-testid="primary-filters"]:not(:has(> .orizon-filtri-fondo)) [role="listbox"] {
+  background: var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lq-filter) !important;
+  backdrop-filter: var(--o-lq-filter) !important;
+  box-shadow: var(--o-lq-shadow) !important;
+}
+.orizon-filtri-fondo,
+.orizon-pillola {
+  transition: transform 260ms cubic-bezier(.3, 1.7, .45, 1);
+}
+
+/* la goccia */
+.orizon-goccia {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, left, width;
+}
+.orizon-goccia-lente {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.orizon-goccia-lente > * {
+  position: absolute !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.orizon-con-goccia::before {
+  opacity: 0 !important;
+}
+.mx_RoomHeader > .orizon-goccia { z-index: 3; }
+.mx_RoomHeader > button[class*="_icon-button_"]:hover,
+.mx_RoomHeader > button[class*="_icon-button_"]:focus-visible:not(:hover) {
+  background: transparent !important;
+}
+.mx_RoomHeader > button[class*="_icon-button_"]:focus-visible {
+  outline: 2px solid var(--o-accent) !important;
+  outline-offset: 0;
+}
+
+/* pillola in basso: Chat / Spazi, e accanto il + (come sul telefono); scorrendo si fa piccola */
+#orizon-basso {
+  align-items: center;
+  gap: 10px;
+}
+#orizon-basso .orizon-pillola {
+  padding: 4px;
+  gap: 0;
+  transition: padding 480ms cubic-bezier(.3, 1.3, .4, 1), transform 260ms cubic-bezier(.3, 1.7, .45, 1);
+}
+#orizon-basso .orizon-tab {
+  height: 44px;
+  transition: height 480ms cubic-bezier(.3, 1.3, .4, 1), color .2s;
+}
+#orizon-basso .orizon-tab > span {
+  padding: 0 14px;
+  transition: padding 480ms cubic-bezier(.3, 1.3, .4, 1);
+}
+#orizon-basso .orizon-tab:hover { color: var(--o-text); }
+#orizon-basso .orizon-piu {
+  pointer-events: auto;
+  width: 52px;
+  height: 52px;
+  margin: 0;
+  border-radius: 999px;
+  transition: width 480ms cubic-bezier(.3, 1.3, .4, 1), height 480ms cubic-bezier(.3, 1.3, .4, 1), transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+#orizon-basso .orizon-piu:hover { transform: scale(1.06); }
+#orizon-basso .orizon-piu:active { transform: scale(1.14); transition: transform 260ms cubic-bezier(.3, 1.7, .45, 1); }
+#orizon-basso.orizon-mini .orizon-tab { height: 38px; }
+#orizon-basso.orizon-mini .orizon-tab > span { padding: 0 9px; }
+#orizon-basso.orizon-mini .orizon-piu { width: 46px; height: 46px; }
+#orizon-basso.orizon-mini .orizon-piu svg { width: 19px; height: 19px; }
+
+/* tasti tondi di vetro: si gonfiano un po' sotto il mouse */
+#orizon-testa .orizon-tasto,
+.mx_MessageComposer_buttonMenu {
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1), background .15s;
+}
+#orizon-testa .orizon-tasto:hover,
+.mx_MessageComposer_buttonMenu:hover { transform: scale(1.06); background: transparent; }
+#orizon-testa .orizon-tasto:active,
+.mx_MessageComposer_buttonMenu:active { transform: scale(1.14); transition: transform 260ms cubic-bezier(.3, 1.7, .45, 1); }
+
+/* barra per scrivere: tasto per inviare bianco (nero col tema chiaro) */
+.mx_MessageComposer_sendMessage {
+  background: var(--o-btn) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .25), inset 0 1px 1px rgba(255, 255, 255, .5) !important;
+}
+.mx_MessageComposer_sendMessage svg { color: var(--o-btn-text) !important; }
+.mx_MessageComposer_sendMessage::before { background-color: var(--o-btn-text) !important; }
+
+/* finestre, menu e avvisi: vetro più pieno, con il bordo che prende luce */
+body[class*="cpd-theme"] .mx_Dialog {
+  background: var(--o-lq-panel) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
+  backdrop-filter: blur(28px) saturate(1.8) !important;
+  box-shadow: var(--o-lq-panel-shadow) !important;
+}
+body[class*="cpd-theme"] .mx_ContextualMenu,
+body[class*="cpd-theme"] .mx_IconizedContextMenu,
+body[class*="cpd-theme"] [role="menu"][data-state="open"],
+body[class*="cpd-theme"] .mx_Toast_toast,
+body[class*="cpd-theme"] .mx_MessageActionBar {
+  background: var(--o-lq-panel) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
+  backdrop-filter: blur(28px) saturate(1.8) !important;
+  box-shadow: var(--o-lq-panel-shadow) !important;
+}
+.mx_Dialog_background {
+  background: var(--o-scrim) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+}
+.mx_Dialog_cancelButton {
+  background: var(--o-lq-bg) !important;
+  box-shadow: var(--o-lq-shadow) !important;
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+.mx_Dialog_cancelButton:hover { transform: scale(1.06); }
+.mx_Dialog_cancelButton svg { color: var(--o-text) !important; }
+
+/* impostazioni: la pillola delle sezioni è di vetro, la goccia sta sulla sezione aperta */
+body[class*="cpd-theme"] .mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels {
+  background: var(--o-lq-bg) !important;
+  box-shadow: var(--o-lq-shadow) !important;
+}
+.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel:hover { color: var(--o-text) !important; }
+
+/* isole: impostazioni e scelte dentro le finestre */
+body[class*="cpd-theme"] .mx_SettingsSubsection,
+body[class*="cpd-theme"] .mx_UserProfileSettings {
+  background: var(--o-lq-isle) !important;
+  box-shadow: var(--o-lq-isle-shadow) !important;
+}
+body[class*="cpd-theme"] .mx_SettingsSubsection .mx_SettingsSubsection {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* tasti principali: bianchi con la scritta nera (col tema chiaro: neri con la scritta bianca) */
+.mx_Dialog .mx_AccessibleButton_kind_primary,
+.mx_AccessibleButton_kind_primary,
+button[class*="_button_"][data-kind="primary"]:not([class*="_icon-button_"]) {
+  background: var(--o-btn) !important;
+  color: var(--o-btn-text) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .22), inset 0 1px 1px rgba(255, 255, 255, .5) !important;
+  transition: transform 380ms cubic-bezier(.3, 1.7, .45, 1), opacity .2s;
+}
+.mx_AccessibleButton_kind_primary:hover,
+button[class*="_button_"][data-kind="primary"]:not([class*="_icon-button_"]):hover {
+  transform: scale(1.03);
+}
+.mx_AccessibleButton_kind_primary svg,
+button[class*="_button_"][data-kind="primary"]:not([class*="_icon-button_"]) svg {
+  color: var(--o-btn-text) !important;
+}
+
+/* interruttori: a goccia, bianchi quando sono accesi (neri col tema chiaro) */
+.mx_ToggleSwitch {
+  width: 46px !important;
+  height: 28px !important;
+  min-width: 46px !important;
+  border-radius: 999px !important;
+  background: var(--o-sw-off) !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .3), inset 0 0 0 1px var(--o-line) !important;
+  transition: background .26s ease !important;
+}
+.mx_ToggleSwitch.mx_ToggleSwitch_on {
+  background: var(--o-btn) !important;
+}
+.mx_ToggleSwitch_ball {
+  width: 24px !important;
+  height: 24px !important;
+  top: 2px !important;
+  margin: 0 !important;
+  border-radius: 999px !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3) !important;
+  transition: left .38s cubic-bezier(.3, 1.5, .45, 1), background .26s ease, width .26s cubic-bezier(.3, 1.5, .45, 1) !important;
+}
+.mx_ToggleSwitch .mx_ToggleSwitch_ball { left: 2px !important; }
+.mx_ToggleSwitch.mx_ToggleSwitch_on .mx_ToggleSwitch_ball { left: 20px !important; background: var(--o-btn-text) !important; }
+.mx_ToggleSwitch:active .mx_ToggleSwitch_ball { width: 30px !important; }
+.mx_ToggleSwitch.mx_ToggleSwitch_on:active .mx_ToggleSwitch_ball { left: 14px !important; }
+body[class*="cpd-theme"] [role="switch"][aria-checked="true"]:not(.mx_ToggleSwitch) {
+  background-color: var(--o-btn) !important;
+}
+
+/* nelle finestre e nel pannello delle info le scelte accese sono bianche (nere col tema chiaro), come sul telefono;
+   i collegamenti restano rossi */
+body.cpd-theme-dark .mx_Dialog,
+body.cpd-theme-dark .mx_RightPanel {
+  --cpd-color-bg-accent-rest: #F2F4F8;
+  --cpd-color-bg-accent-hovered: #FFFFFF;
+  --cpd-color-bg-accent-pressed: #FFFFFF;
+  --cpd-color-icon-on-solid-primary: #0B0D10;
+}
+body.cpd-theme-light .mx_Dialog,
+body.cpd-theme-light .mx_RightPanel {
+  --cpd-color-bg-accent-rest: #111317;
+  --cpd-color-bg-accent-hovered: #000000;
+  --cpd-color-bg-accent-pressed: #000000;
+  --cpd-color-icon-on-solid-primary: #FFFFFF;
+}
+.mx_ThemeChoicePanel_themeSelector:has(input:checked),
+.mx_LayoutSwitcher_LayoutSelector .mxLayoutSwitcher_LayoutSelector_LayoutRadio:has(input:checked) {
+  border-color: var(--o-btn) !important;
+  box-shadow: 0 0 0 1px var(--o-btn) !important;
+}
+/* interruttori di Compound: più grandi, a goccia */
+[class*="_container_"]:has(> input[role="switch"]) {
+  inline-size: 48px !important;
+  block-size: 28px !important;
+}
+input[role="switch"] + [class*="_ui_"] {
+  padding: 2px !important;
+  border: 0 !important;
+  background: var(--o-sw-off) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .3), inset 0 0 0 1px var(--o-line) !important;
+  transition: background-color .26s ease !important;
+}
+input[role="switch"]:checked + [class*="_ui_"] {
+  background: var(--o-btn) !important;
+}
+input[role="switch"] + [class*="_ui_"]::after {
+  --dot-color: #FFFFFF !important;
+  border: 0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3);
+  transition: transform .38s cubic-bezier(.3, 1.5, .45, 1), background-color .26s ease !important;
+}
+input[role="switch"]:checked + [class*="_ui_"]::after {
+  --dot-color: var(--o-btn-text) !important;
+  transform: translateX(20px) !important;
+}
+/* trascinando la goccia non si seleziona il testo */
+#orizon-basso,
+#orizon-testa .orizon-pillola,
+[data-testid="primary-filters"],
+.mx_TabbedView_tabLabels,
+.mx_RoomHeader > button {
+  -webkit-user-select: none;
+  user-select: none;
+}

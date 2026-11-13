@@ -73,7 +73,7 @@ def main():
     # 2. brand
     b = WEBAPP / "brand"
     (b / "pages").mkdir(parents=True, exist_ok=True)
-    for f in ["orizon.css", "orizon.js", "translations.json"]:
+    for f in ["orizon.css", "orizon.js", "orizon-chiamata.css", "orizon-chiamata.js", "translations.json"]:
         shutil.copy2(QUI / f, b / f)
     for f in (QUI / "pages").glob("*.html"):
         shutil.copy2(f, b / "pages" / f.name)
@@ -97,12 +97,26 @@ def main():
                 .replace("<title>Element</title>", "<title>Orizon</title>"))
     idx.write_text(html, encoding="utf-8")
 
+    # 3b. la chiamata (Element Call dentro Orizon): stesso vetro e stessa goccia dell'app Android
+    ec = WEBAPP / "widgets" / "element-call" / "index.html"
+    if ec.is_file():
+        h = ec.read_text(encoding="utf-8")
+        if "orizon-chiamata" not in h:
+            if h.count("</head>") != 1 or h.count("</body>") != 1:
+                esci("widgets/element-call/index.html: non trovo </head> o </body>")
+            h = (h.replace("</head>", '<link rel="stylesheet" href="../../brand/orizon-chiamata.css"></head>')
+                  .replace("</body>", '<script src="../../brand/orizon-chiamata.js"></script></body>'))
+            ec.write_text(h, encoding="utf-8")
+        print("chiamata: stile di Orizon collegato a Element Call")
+    else:
+        print("ATTENZIONE: in questo Element Web non c'e' Element Call (widgets/element-call), la chiamata resta com'e'")
+
     # 4. configurazione dell'app desktop
     c = json.loads(CONFIG.read_text(encoding="utf-8"))
     (WEBAPP / "config.json").write_text(json.dumps(c, indent=4, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # 5. controllo
-    manca = [p for p in ["brand/orizon.css", "brand/orizon.js", "brand/translations.json", "brand/pages/welcome.html",
+    manca = [p for p in ["brand/orizon.css", "brand/orizon.js", "brand/orizon-chiamata.css", "brand/orizon-chiamata.js", "brand/translations.json", "brand/pages/welcome.html",
                          "vector-icons/512.png", "config.json"] if not (WEBAPP / p).is_file()]
     if manca:
         esci("mancano: " + ", ".join(manca))

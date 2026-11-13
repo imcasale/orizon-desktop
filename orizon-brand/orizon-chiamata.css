@@ -1,0 +1,539 @@
+/* Orizon: la chiamata (Element Call dentro Orizon desktop), col vetro liquido dell'app Android.
+   Questo file lo carica widgets/element-call/index.html (lo collega prepara-webapp.py); la goccia la muove orizon-chiamata.js. */
+body.cpd-theme-dark {
+  --oz-glass: rgba(22, 24, 29, .42);
+  --oz-filter: blur(18px) saturate(1.8) brightness(1.1);
+  --oz-shadow: 0 10px 28px rgba(0, 0, 0, .4), 0 1px 3px rgba(0, 0, 0, .35), inset 0 0 12px rgba(255, 255, 255, .05), inset 3px 3px 7px -3px rgba(255, 255, 255, .4), inset -3px -3px 7px -3px rgba(255, 255, 255, .2), inset 0 -12px 18px -12px rgba(0, 0, 0, .4), inset 1px 1px 0 rgba(255, 255, 255, .3), inset -1px -1px 0 rgba(255, 255, 255, .12);
+  --oz-panel: rgba(24, 26, 32, .9);
+  --oz-panel-shadow: 0 24px 70px rgba(0, 0, 0, .55), inset 0 1px 1px rgba(255, 255, 255, .16), inset 0 0 18px rgba(255, 255, 255, .04), inset 1px 1px 0 rgba(255, 255, 255, .2), inset -1px -1px 0 rgba(255, 255, 255, .08);
+  --oz-isle: rgba(255, 255, 255, .045);
+  --oz-isle-shadow: 0 6px 18px rgba(0, 0, 0, .28), inset 0 0 14px rgba(255, 255, 255, .035), inset 3px 3px 7px -3px rgba(255, 255, 255, .28), inset -3px -3px 7px -3px rgba(255, 255, 255, .12);
+  --oz-sub: rgba(255, 255, 255, .06);
+  --oz-open: rgba(255, 255, 255, .16);
+  --oz-on: rgba(242, 244, 248, .96);
+  --oz-on-text: #0B0D10;
+  --oz-text: #F2F4F8;
+  --oz-text-2: #A3ABB9;
+  --oz-off: #C3C8D2;
+  --oz-ring: #8C94A3;
+  --oz-sw-off: rgba(255, 255, 255, .16);
+}
+body.cpd-theme-light {
+  --oz-glass: rgba(255, 255, 255, .34);
+  --oz-filter: blur(12px) saturate(1.8) brightness(1.04);
+  --oz-shadow: 0 8px 26px rgba(0, 0, 0, .13), 0 1px 3px rgba(0, 0, 0, .1), inset 0 0 12px rgba(255, 255, 255, .5), inset 3px 3px 6px -3px #FFFFFF, inset -3px -3px 7px -3px rgba(0, 0, 0, .12), inset 0 -12px 18px -12px rgba(0, 0, 0, .06), inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 rgba(0, 0, 0, .06);
+  --oz-panel: rgba(248, 248, 250, .92);
+  --oz-panel-shadow: 0 24px 70px rgba(0, 0, 0, .22), inset 0 1px 1px #FFFFFF, inset 0 0 18px rgba(255, 255, 255, .6), inset -1px -1px 0 rgba(0, 0, 0, .05);
+  --oz-isle: rgba(255, 255, 255, .8);
+  --oz-isle-shadow: 0 4px 14px rgba(0, 0, 0, .07), inset 3px 3px 7px -3px #FFFFFF, inset -3px -3px 7px -3px rgba(0, 0, 0, .07);
+  --oz-sub: rgba(0, 0, 0, .05);
+  --oz-open: rgba(0, 0, 0, .1);
+  --oz-on: #111317;
+  --oz-on-text: #FFFFFF;
+  --oz-text: #111317;
+  --oz-text-2: #555B66;
+  --oz-off: #4A505C;
+  --oz-ring: #7A808B;
+  --oz-sw-off: rgba(0, 0, 0, .14);
+}
+
+/* ---------- la pillola dei comandi ---------- */
+[data-testid="footer-container"] {
+  background: transparent !important;
+}
+[data-testid="footer-container"] [class*="_buttons_"] {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 6px !important;
+  padding: 6px !important;
+  border-radius: 999px;
+  background: var(--oz-glass);
+  -webkit-backdrop-filter: var(--oz-filter);
+  backdrop-filter: var(--oz-filter);
+  box-shadow: var(--oz-shadow);
+  transition: transform 260ms cubic-bezier(.3, 1.7, .45, 1);
+  -webkit-user-select: none;
+  user-select: none;
+}
+[data-testid="footer-container"] [class*="_buttons_"] button {
+  box-sizing: border-box !important;
+  inline-size: 56px !important;
+  block-size: 56px !important;
+  min-inline-size: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--oz-sub) !important;
+  color: var(--oz-text) !important;
+  box-shadow: none !important;
+  outline-offset: 2px;
+  transition: background-color 220ms ease, color 220ms ease;
+}
+[data-testid="footer-container"] [class*="_buttons_"] button svg {
+  inline-size: 22px !important;
+  block-size: 22px !important;
+  color: inherit !important;
+  fill: currentColor;
+}
+/* microfono e fotocamera spenti, schermo condiviso, reazioni aperte: tasto bianco (nero col tema chiaro) */
+[data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_mute"][aria-checked="false"],
+[data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_videomute"][aria-checked="false"],
+[data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_screenshare"][aria-checked="true"],
+[data-testid="footer-container"] [class*="_buttons_"] button[class*="_raiseHand_"][aria-expanded="true"] {
+  background: var(--oz-on) !important;
+  color: var(--oz-on-text) !important;
+}
+[data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_leave"] {
+  background: #E53935 !important;
+  color: #FFFFFF !important;
+}
+/* microfono e fotocamera: il tasto e, accanto, la freccina per scegliere il dispositivo, in un gruppo */
+[data-testid="footer-container"] [class*="_buttons_"] > div:has(> [class*="_menuButton_"]) {
+  display: flex !important;
+  align-items: center;
+  gap: 0 !important;
+  border-radius: 999px;
+  background: var(--oz-sub);
+  transition: background-color 220ms ease;
+}
+[data-testid="footer-container"] [class*="_buttons_"] > div:has(> [class*="_menuButton_"][aria-expanded="true"]) {
+  background: var(--oz-open);
+}
+[data-testid="footer-container"] [class*="_buttons_"] > div:has(> [class*="_menuButton_"]) > button:not([class*="_menuButton_"]):not([aria-checked="false"]) {
+  background: transparent !important;
+}
+[data-testid="footer-container"] [class*="_buttons_"] [class*="_menuButton_"] {
+  inline-size: 30px !important;
+  background: transparent !important;
+  color: var(--oz-off) !important;
+  border-radius: 0 999px 999px 0 !important;
+}
+[data-testid="footer-container"] [class*="_buttons_"] [class*="_menuButton_"] svg {
+  inline-size: 18px !important;
+  block-size: 18px !important;
+}
+[data-testid="footer-container"] [class*="_buttons_"] [class*="_menuButton_"][aria-expanded="true"] {
+  color: var(--oz-text) !important;
+}
+
+/* la goccia (la muove orizon-chiamata.js) */
+.oz-goccia {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, left, width;
+}
+.oz-goccia-lente {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.oz-goccia-lente > * {
+  position: absolute !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* impostazioni, a sinistra: un tasto tondo di vetro */
+[data-testid="settings-bottom-left"] {
+  box-sizing: border-box !important;
+  inline-size: 48px !important;
+  block-size: 48px !important;
+  border-radius: 999px !important;
+  background: var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--oz-filter);
+  backdrop-filter: var(--oz-filter);
+  box-shadow: var(--oz-shadow) !important;
+  color: var(--oz-text) !important;
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+[data-testid="settings-bottom-left"]:hover { transform: scale(1.06); }
+[data-testid="settings-bottom-left"]:active { transform: scale(1.14); transition-duration: 260ms; }
+[data-testid="settings-bottom-left"] svg { color: var(--oz-text) !important; }
+
+/* disposizione (primo piano / griglia): una pillola di vetro con la goccia che scivola */
+[data-testid="footer-container"] fieldset[class*="_layout_"] {
+  position: relative;
+  box-sizing: border-box;
+  padding: 4px !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--oz-filter);
+  backdrop-filter: var(--oz-filter);
+  box-shadow: var(--oz-shadow) !important;
+  --cpd-switch-button-size: 44px;
+  --cpd-switch-gap: 8px;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"]::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: 999px;
+  background: var(--oz-open);
+  box-shadow: inset 1.5px 1.5px 2px rgba(255, 255, 255, .5), inset -1px -1px 2px rgba(255, 255, 255, .2), 0 4px 12px rgba(0, 0, 0, .3);
+  transition: translate 520ms cubic-bezier(.3, 1.35, .4, 1), scale 300ms cubic-bezier(.3, 1.7, .45, 1);
+  pointer-events: none;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"]:has(input:nth-of-type(2):checked)::before {
+  translate: 52px 0;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"]:active::before {
+  scale: 1.12;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"] input {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"] svg {
+  z-index: 2;
+  color: var(--oz-off) !important;
+}
+[data-testid="footer-container"] fieldset[class*="_layout_"] svg:nth-child(2) { inset-inline-start: 4px !important; }
+[data-testid="footer-container"] fieldset[class*="_layout_"] svg:nth-child(4) { inset-inline-end: 4px !important; }
+[data-testid="footer-container"] fieldset[class*="_layout_"] input:checked + svg { color: var(--oz-text) !important; }
+
+/* ---------- i riquadri delle persone ---------- */
+[data-testid="videoTile"] {
+  border-radius: 24px !important;
+}
+[data-testid="videoTile"] [class*="_nameTag_"] {
+  border-radius: 999px !important;
+  background: var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--oz-filter);
+  backdrop-filter: var(--oz-filter);
+  box-shadow: var(--oz-shadow) !important;
+  color: var(--oz-text) !important;
+}
+
+/* ---------- menu dei dispositivi (la freccina accanto a microfono e fotocamera) ---------- */
+[role="menu"][data-state="open"] {
+  border: 0 !important;
+  border-radius: 22px !important;
+  padding: 8px !important;
+  background: var(--oz-panel) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(28px) saturate(1.8);
+  box-shadow: var(--oz-panel-shadow) !important;
+}
+[role="menu"][data-state="open"] [role^="menuitem"] {
+  border-radius: 14px !important;
+}
+[role="menu"][data-state="open"] [role^="menuitem"]:hover,
+[role="menu"][data-state="open"] [role^="menuitem"]:focus-visible {
+  background: var(--oz-sub) !important;
+}
+
+/* ---------- reazioni: un pannello di vetro con tasti tondi ---------- */
+[class*="_reactionPopupMenu_"] button {
+  border-radius: 999px !important;
+  transition: transform 380ms cubic-bezier(.3, 1.7, .45, 1), background-color 160ms ease;
+}
+[class*="_reactionPopupMenu_"] [class*="_reactionButton_"]:hover {
+  transform: scale(1.18);
+}
+[class*="_reactionPopupMenu_"] button[aria-pressed="true"] {
+  background: var(--oz-on) !important;
+  color: var(--oz-on-text) !important;
+}
+
+/* ---------- impostazioni e reazioni: pannelli di vetro (come sul telefono) ---------- */
+[class*="_bg_"][data-state="open"] {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+[role="dialog"] [class*="_nav-bar-items_"] {
+  background: var(--oz-glass) !important;
+  box-shadow: var(--oz-shadow) !important;
+}
+[role="dialog"] [class*="_close_"] {
+  border-radius: 999px !important;
+  background: var(--oz-glass) !important;
+  box-shadow: var(--oz-shadow) !important;
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+[role="dialog"] [class*="_close_"]:hover { transform: scale(1.06); }
+
+/* Panels (settings, reactions): a sheet of frosted glass, white instead of green */
+[class*="_modal_"][role="dialog"] {
+  background: var(--oz-panel) !important;
+  box-shadow: var(--oz-panel-shadow);
+  --border-radius: 32px !important;
+  --handle-inline-size: 40px !important;
+  --handle-block-size: 5px !important;
+  --cpd-color-bg-accent-rest: var(--oz-on);
+  --cpd-color-bg-accent-hovered: var(--oz-on);
+  --cpd-color-text-action-accent: var(--oz-on);
+}
+[class*="_modal_"][class*="_dialog_"][role="dialog"] {
+  border-radius: 32px;
+  overflow: hidden;
+}
+[class*="_modal_"][role="dialog"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.08) 40px, rgba(255,255,255,0) 90px);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+[class*="_modal_"][role="dialog"] [class*="_content_"],
+[class*="_modal_"][role="dialog"] [class*="_header_"] {
+  background: transparent !important;
+}
+[role="dialog"] [class*="_header_"] > [class*="_handle_"] {
+  background: rgba(255,255,255,.28) !important;
+}
+
+/* Tabs (Audio, Video, Preferences): a pill of glass with a drop on the chosen one */
+[role="dialog"] [class*="_nav-bar_"] {
+  border-block-end: 0 !important;
+  margin: 8px 0 6px !important;
+  overflow: visible !important;
+  display: flex;
+  justify-content: center;
+}
+[role="dialog"] [class*="_nav-bar-items_"] {
+  position: relative;
+  gap: 0 !important;
+  padding: 4px !important;
+  border-radius: 22px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+[role="dialog"] [class*="_nav-tab_"] {
+  position: relative;
+  z-index: 1;
+  padding: 0 !important;
+}
+[role="dialog"] [class*="_nav-tab_"]::before {
+  display: none !important;
+}
+[role="dialog"] [class*="_nav-item_"] {
+  min-inline-size: 98px;
+  block-size: 36px;
+  padding: 0 14px !important;
+  border-radius: 18px !important;
+  font-weight: 600 !important;
+  color: var(--oz-off) !important;
+  background: transparent !important;
+  transition: color 200ms ease;
+}
+[role="dialog"] [class*="_nav-item_"][aria-selected="true"] {
+  color: var(--oz-text) !important;
+}
+/* Sections and islands of glass */
+[role="dialog"] [class*="_selection_"] > [class*="_title_"],
+[role="dialog"] h4 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--oz-text-2) !important;
+  margin: 18px 6px 8px !important;
+}
+[role="dialog"] [class*="_separator_"] {
+  display: none !important;
+}
+[role="dialog"] [class*="_options_"],
+[role="dialog"] [class*="_volumeSlider_"] {
+  position: relative;
+  border-radius: 26px;
+  background: var(--oz-isle);
+  box-shadow: var(--oz-isle-shadow);
+}
+[role="dialog"] [class*="_options_"]::after,
+[role="dialog"] [class*="_volumeSlider_"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: linear-gradient(135deg, rgba(255,255,255,.6), rgba(255,255,255,.1) 26%, rgba(255,255,255,0) 46%,
+    rgba(255,255,255,.05) 70%, rgba(255,255,255,.34));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Choices (speaker, earpiece, cameras): rows with a round mark of glass on the right */
+[role="dialog"] [class*="_options_"] {
+  gap: 0 !important;
+  padding: 4px 0;
+}
+[role="dialog"] [class*="_options_"] > * {
+  flex-direction: row-reverse;
+  align-items: center;
+  box-sizing: border-box;
+  min-block-size: 56px;
+  padding: 6px 18px;
+  gap: 14px;
+}
+[role="dialog"] [class*="_options_"] label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--oz-text);
+}
+[role="dialog"] input[type="radio"] + [class*="_ui_"] {
+  border: 2px solid var(--oz-ring) !important;
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+[role="dialog"] input[type="radio"]:checked + [class*="_ui_"] {
+  background-color: var(--oz-on) !important;
+  border-color: var(--oz-on) !important;
+}
+[role="dialog"] input[type="radio"]:checked + [class*="_ui_"]::after {
+  background: var(--oz-on-text) !important;
+  border-color: var(--oz-on-text) !important;
+  inline-size: 9px !important;
+  block-size: 9px !important;
+}
+
+/* Volume of the sound effects: a thin bar with a knob that becomes a drop of glass while it is dragged */
+[role="dialog"] [class*="_volumeSlider_"] {
+  margin-top: 20px !important;
+  padding: 16px 18px 14px;
+}
+[role="dialog"] [class*="_volumeSlider_"] > label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--oz-text-2);
+}
+[role="dialog"] [class*="_volumeSlider_"] > p {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--oz-text-2);
+  margin: 6px 0 4px;
+}
+[role="dialog"] [class*="_slider_"] {
+  block-size: 32px;
+  touch-action: none;
+}
+[role="dialog"] [class*="_slider_"] [class*="_track_"] {
+  position: relative;
+  block-size: 4px !important;
+  background: var(--oz-sw-off) !important;
+  outline: 0 !important;
+}
+[role="dialog"] [class*="_slider_"] [class*="_highlight_"] {
+  background: var(--oz-on) !important;
+}
+[role="dialog"] [class*="_slider_"] [class*="_handle_"] {
+  inline-size: 26px !important;
+  block-size: 26px !important;
+  background: var(--oz-on) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35) !important;
+  transition: transform 260ms cubic-bezier(.3,1.6,.45,1), background-color 200ms ease !important;
+}
+[role="dialog"] [class*="_slider_"]:active [class*="_handle_"] {
+  transform: scale(1.3);
+  background: rgba(255,255,255,.3) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,.4), inset 3px 3px 7px -3px rgba(255,255,255,.5),
+    inset -3px -3px 7px -3px rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.35) !important;
+}
+
+/* Preferences: switches with a drop instead of square boxes, grouped in one island */
+[role="dialog"] [class*="_fieldRow_"] {
+  margin: 0 !important;
+  padding: 2px 18px;
+  background: var(--oz-isle);
+}
+[role="dialog"] [class*="_fieldRow_"]:not([class*="_fieldRow_"] + [class*="_fieldRow_"]) {
+  margin-top: 12px !important;
+  padding-top: 6px;
+  border-start-start-radius: 26px;
+  border-start-end-radius: 26px;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.14);
+}
+[role="dialog"] [class*="_fieldRow_"]:not(:has(+ [class*="_fieldRow_"])) {
+  padding-bottom: 6px;
+  border-end-start-radius: 26px;
+  border-end-end-radius: 26px;
+}
+[role="dialog"] [class*="_checkboxField_"] {
+  padding: 12px 0;
+}
+[role="dialog"] [class*="_checkboxField_"] label {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 16px !important;
+  color: var(--oz-text);
+}
+[role="dialog"] [class*="_checkboxField_"] [class*="_checkbox_"] {
+  position: relative;
+  inline-size: 52px !important;
+  block-size: 32px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: var(--oz-sw-off) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.08);
+  transition: background-color 260ms ease;
+}
+[role="dialog"] [class*="_checkboxField_"]:focus-within [class*="_checkbox_"] {
+  border: 0 !important;
+}
+[role="dialog"] [class*="_checkboxField_"]:has(input:focus-visible) [class*="_checkbox_"] {
+  outline: 2px solid rgba(255,255,255,.6);
+  outline-offset: 2px;
+}
+[role="dialog"] [class*="_checkboxField_"] [class*="_checkbox_"] svg {
+  display: none !important;
+}
+[role="dialog"] [class*="_checkboxField_"] [class*="_checkbox_"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  transition: left 380ms cubic-bezier(.3,1.5,.45,1), inline-size 260ms cubic-bezier(.3,1.5,.45,1), background-color 260ms ease;
+}
+[role="dialog"] input[type="checkbox"]:checked + label > [class*="_checkbox_"] {
+  background: var(--oz-on) !important;
+}
+[role="dialog"] input[type="checkbox"]:checked + label > [class*="_checkbox_"]::after {
+  left: 22px;
+  background: var(--oz-on-text);
+}
+[role="dialog"] [class*="_checkboxField_"] label:active > [class*="_checkbox_"]::after {
+  inline-size: 36px;
+}
+[role="dialog"] input[type="checkbox"]:checked + label:active > [class*="_checkbox_"]::after {
+  left: 14px;
+}
+[role="dialog"] [class*="_checkboxField_"] [class*="_description_"] {
+  margin: 4px 0 0 !important;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--oz-text-2);
+}
+[role="dialog"] [class*="_checkboxField_"][class*="_disabled_"] {
+  opacity: .55;
+}
