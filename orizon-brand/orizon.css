@@ -2179,10 +2179,18 @@ body[class*="cpd-theme"] [class*="_container_1opqj_"],
 body[class*="cpd-theme"] .mx_LegacyCallEvent,
 body[class*="cpd-theme"] .mx_ReplyPreview,
 body[class*="cpd-theme"] [data-testid="primary-filters"]:not(:has(> .orizon-filtri-fondo)) [role="listbox"] {
-  background: var(--o-lq-bg) !important;
-  -webkit-backdrop-filter: var(--o-lq-filter) !important;
-  backdrop-filter: var(--o-lq-filter) !important;
+  /* --o-lente e --o-luce le mette orizon.js dove c'è la lente vera (Chromium); altrove resta il vetro sfocato */
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lente, var(--o-lq-filter)) !important;
+  backdrop-filter: var(--o-lente, var(--o-lq-filter)) !important;
   box-shadow: var(--o-lq-shadow) !important;
+}
+/* i vetri disegnati con ::before (la pillola delle azioni in alto, la barra per scrivere) */
+body[class*="cpd-theme"] .mx_MessageComposer_row::before,
+body[class*="cpd-theme"] .mx_RoomHeader::before {
+  background: var(--o-luce-p, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lente-p, var(--o-lq-filter)) !important;
+  backdrop-filter: var(--o-lente-p, var(--o-lq-filter)) !important;
 }
 .orizon-filtri-fondo,
 .orizon-pillola {
@@ -2290,9 +2298,9 @@ body[class*="cpd-theme"] [data-testid="primary-filters"]:not(:has(> .orizon-filt
 
 /* finestre, menu e avvisi: vetro più pieno, con il bordo che prende luce */
 body[class*="cpd-theme"] .mx_Dialog {
-  background: var(--o-lq-panel) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
-  backdrop-filter: blur(28px) saturate(1.8) !important;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-panel) !important;
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8)) !important;
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8)) !important;
   box-shadow: var(--o-lq-panel-shadow) !important;
 }
 body[class*="cpd-theme"] .mx_ContextualMenu,
@@ -2300,9 +2308,9 @@ body[class*="cpd-theme"] .mx_IconizedContextMenu,
 body[class*="cpd-theme"] [role="menu"][data-state="open"],
 body[class*="cpd-theme"] .mx_Toast_toast,
 body[class*="cpd-theme"] .mx_MessageActionBar {
-  background: var(--o-lq-panel) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
-  backdrop-filter: blur(28px) saturate(1.8) !important;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-panel) !important;
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8)) !important;
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8)) !important;
   box-shadow: var(--o-lq-panel-shadow) !important;
 }
 .mx_Dialog_background {
@@ -2311,7 +2319,9 @@ body[class*="cpd-theme"] .mx_MessageActionBar {
   backdrop-filter: blur(6px) !important;
 }
 .mx_Dialog_cancelButton {
-  background: var(--o-lq-bg) !important;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lente, none);
+  backdrop-filter: var(--o-lente, none);
   box-shadow: var(--o-lq-shadow) !important;
   transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
 }
@@ -2320,7 +2330,9 @@ body[class*="cpd-theme"] .mx_MessageActionBar {
 
 /* impostazioni: la pillola delle sezioni è di vetro, la goccia sta sulla sezione aperta */
 body[class*="cpd-theme"] .mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels {
-  background: var(--o-lq-bg) !important;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lente, none);
+  backdrop-filter: var(--o-lente, none);
   box-shadow: var(--o-lq-shadow) !important;
 }
 .mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabel:hover { color: var(--o-text) !important; }
@@ -2560,6 +2572,25 @@ body[class*="cpd-theme"] .mx_SettingsTab .mx_SettingsSection_newUi .mx_SettingsS
 .orizon-tab:focus-visible,
 .orizon-piu:focus-visible { outline-color: var(--o-ring); }
 
+/* ---------- 8e. la lente vera (come l'app Android) ----------
+   orizon.js mette su ogni vetro --o-lente (il filtro SVG con la lente) e --o-luce (il filo di luce sul bordo).
+   Non passano ai figli: un vetro dentro un vetro ha la sua lente, non quella del genitore. */
+@property --o-lente { syntax: "*"; inherits: false; }
+@property --o-luce { syntax: "*"; inherits: false; }
+/* con la lente il vetro è come sul telefono: più chiaro (si vede piegato quello che c'è dietro), solo l'ombra sotto */
+html.oz-lente body.cpd-theme-dark {
+  --o-lq-bg: rgba(22, 24, 29, .32);
+  --o-lq-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  --o-lq-panel: rgba(24, 26, 32, .74);
+  --o-lq-panel-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+}
+html.oz-lente body.cpd-theme-light {
+  --o-lq-bg: rgba(250, 250, 252, .55);
+  --o-lq-shadow: 0 4px 20px rgba(0, 0, 0, .14), inset 0 0 0 1px rgba(0, 0, 0, .07);
+  --o-lq-panel: rgba(247, 248, 250, .84);
+  --o-lq-panel-shadow: 0 20px 50px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(0, 0, 0, .06);
+}
+
 /* ---------- 8c. finestre come l'app Android: Avvia conversazione, Nuova stanza, Elenco delle stanze, Invita, Accedi ---------- */
 body.cpd-theme-dark {
   --o-f-field: rgba(255, 255, 255, .06);
@@ -2626,9 +2657,9 @@ body.cpd-theme-light {
   flex-direction: column;
   padding: 20px 22px 22px;
   border-radius: 32px;
-  background: var(--o-lq-panel);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  backdrop-filter: blur(28px) saturate(1.8);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-panel);
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
   box-shadow: var(--o-lq-panel-shadow);
   opacity: 1;
   transition: opacity 220ms ease, transform 420ms cubic-bezier(.3, 1.3, .4, 1);
@@ -2657,9 +2688,9 @@ body.cpd-theme-light {
 
 .ozf-vetro {
   position: relative;
-  background: var(--o-lq-bg);
-  -webkit-backdrop-filter: var(--o-lq-filter);
-  backdrop-filter: var(--o-lq-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg);
+  -webkit-backdrop-filter: var(--o-lente, var(--o-lq-filter));
+  backdrop-filter: var(--o-lente, var(--o-lq-filter));
   box-shadow: var(--o-lq-shadow);
 }
 .ozf-isola {
@@ -2838,9 +2869,9 @@ button.ozf-tondo:active { transform: scale(1.14); transition-duration: 260ms; }
   white-space: nowrap;
   color: var(--o-text);
   pointer-events: none;
-  background: var(--o-lq-panel);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  backdrop-filter: blur(28px) saturate(1.8);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-panel);
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
   box-shadow: var(--o-lq-panel-shadow);
   opacity: 0;
   transform: translateX(-50%) translateY(-14px) scale(.92);
@@ -2876,9 +2907,9 @@ button.ozf-tondo:active { transform: scale(1.14); transition-duration: 260ms; }
   align-items: center;
   justify-content: center;
   color: var(--o-text);
-  background: var(--o-lq-bg);
-  -webkit-backdrop-filter: var(--o-lq-filter);
-  backdrop-filter: var(--o-lq-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg);
+  -webkit-backdrop-filter: var(--o-lente, var(--o-lq-filter));
+  backdrop-filter: var(--o-lente, var(--o-lq-filter));
   box-shadow: var(--o-lq-shadow);
   transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
 }
@@ -2921,3 +2952,7 @@ button.ozf-tondo:active { transform: scale(1.14); transition-duration: 260ms; }
 .orizon-info-riga .ozf-ic { color: var(--o-text-2); margin-right: 2px; }
 .orizon-info-id { font-size: 13.5px; color: var(--o-text-2); margin-top: -2px; }
 .mx_RoomSummaryCard_alias:empty { display: none !important; }
+/* con la lente vera il bordo di luce lo disegna il filo di luce (--o-luce): via i riflessi finti */
+html.oz-lente .ozf-dialogo::after,
+html.oz-lente .ozf-vetro::after,
+html.oz-lente .orizon-azione-tondo::after { display: none; }

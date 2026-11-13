@@ -48,9 +48,9 @@ body.cpd-theme-light {
   gap: 6px !important;
   padding: 6px !important;
   border-radius: 999px;
-  background: var(--oz-glass);
-  -webkit-backdrop-filter: var(--oz-filter);
-  backdrop-filter: var(--oz-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-glass);
+  -webkit-backdrop-filter: var(--o-lente, var(--oz-filter));
+  backdrop-filter: var(--o-lente, var(--oz-filter));
   box-shadow: var(--oz-shadow);
   transition: transform 260ms cubic-bezier(.3, 1.7, .45, 1);
   -webkit-user-select: none;
@@ -155,9 +155,9 @@ body.cpd-theme-light {
   inline-size: 48px !important;
   block-size: 48px !important;
   border-radius: 999px !important;
-  background: var(--oz-glass) !important;
-  -webkit-backdrop-filter: var(--oz-filter);
-  backdrop-filter: var(--oz-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--o-lente, var(--oz-filter));
+  backdrop-filter: var(--o-lente, var(--oz-filter));
   box-shadow: var(--oz-shadow) !important;
   color: var(--oz-text) !important;
   transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
@@ -174,9 +174,9 @@ body.cpd-theme-light {
   gap: 8px !important;
   border: 0 !important;
   border-radius: 999px !important;
-  background: var(--oz-glass) !important;
-  -webkit-backdrop-filter: var(--oz-filter);
-  backdrop-filter: var(--oz-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--o-lente, var(--oz-filter));
+  backdrop-filter: var(--o-lente, var(--oz-filter));
   box-shadow: var(--oz-shadow) !important;
   --cpd-switch-button-size: 44px;
   --cpd-switch-gap: 8px;
@@ -221,9 +221,9 @@ body.cpd-theme-light {
 }
 [data-testid="videoTile"] [class*="_nameTag_"] {
   border-radius: 999px !important;
-  background: var(--oz-glass) !important;
-  -webkit-backdrop-filter: var(--oz-filter);
-  backdrop-filter: var(--oz-filter);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-glass) !important;
+  -webkit-backdrop-filter: var(--o-lente, var(--oz-filter));
+  backdrop-filter: var(--o-lente, var(--oz-filter));
   box-shadow: var(--oz-shadow) !important;
   color: var(--oz-text) !important;
 }
@@ -233,9 +233,9 @@ body.cpd-theme-light {
   border: 0 !important;
   border-radius: 22px !important;
   padding: 8px !important;
-  background: var(--oz-panel) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  backdrop-filter: blur(28px) saturate(1.8);
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-panel) !important;
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
   box-shadow: var(--oz-panel-shadow) !important;
 }
 [role="menu"][data-state="open"] [role^="menuitem"] {
@@ -278,7 +278,9 @@ body.cpd-theme-light {
 
 /* Panels (settings, reactions): a sheet of frosted glass, white instead of green */
 [class*="_modal_"][role="dialog"] {
-  background: var(--oz-panel) !important;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--oz-panel) !important;
+  -webkit-backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
+  backdrop-filter: var(--o-lente, blur(28px) saturate(1.8));
   box-shadow: var(--oz-panel-shadow);
   --border-radius: 32px !important;
   --handle-inline-size: 40px !important;
@@ -556,4 +558,20 @@ body.cpd-theme-light {
   [data-testid="footer-container"] [class*="_buttons_"] button[aria-disabled="true"] > svg {
     color: inherit !important;
   }
+}
+
+/* la lente vera, come sull'app (la mette orizon-chiamata.js dove il browser la sa fare) */
+@property --o-lente { syntax: "*"; inherits: false; }
+@property --o-luce { syntax: "*"; inherits: false; }
+html.oz-lente body.cpd-theme-dark {
+  --oz-glass: rgba(22, 24, 29, .32);
+  --oz-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  --oz-panel: rgba(24, 26, 32, .74);
+  --oz-panel-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+}
+html.oz-lente body.cpd-theme-light {
+  --oz-glass: rgba(250, 250, 252, .55);
+  --oz-shadow: 0 4px 20px rgba(0, 0, 0, .14), inset 0 0 0 1px rgba(0, 0, 0, .07);
+  --oz-panel: rgba(247, 248, 250, .84);
+  --oz-panel-shadow: 0 20px 50px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(0, 0, 0, .06);
 }
