@@ -143,6 +143,11 @@ body.cpd-theme-light {
   box-shadow: none !important;
   outline: none !important;
 }
+.oz-goccia-lente * {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none !important;
+}
 
 /* impostazioni, a sinistra: un tasto tondo di vetro */
 [data-testid="settings-bottom-left"] {

@@ -26,17 +26,17 @@
     this.hov = -1; this.down = false; this.moved = false; this.px = 0; this.x0 = 0; this.raf = 0; this.last = 0; this.pid = null;
     var self = this;
     this.on = {
-      move: function (e) { self.move(e); },
+      move: function (e) { if (!self.down) self.move(e); },
       leave: function () { if (!self.down && self.hov !== -1) { self.hov = -1; self.kick(); } },
       down: function (e) { self.press(e); },
-      up: function (e) { self.release(e); },
-      cancel: function () { self.down = false; self.kick(); }
+      /* mentre è premuta la seguo su tutta la finestra: anche se il mouse esce dalla pillola, quando lo lascio la goccia si ferma */
+      wmove: function (e) { if (self.down) self.move(e); },
+      wup: function (e) { self.release(e); },
+      wcancel: function () { self.cancel(); }
     };
     host.addEventListener('pointermove', this.on.move);
     host.addEventListener('pointerleave', this.on.leave);
     host.addEventListener('pointerdown', this.on.down);
-    host.addEventListener('pointerup', this.on.up);
-    host.addEventListener('pointercancel', this.on.cancel);
     this.attach();
     gocce.push(this);
   }
@@ -65,7 +65,23 @@
     for (var i = 0; i < it.length; i++) if (x >= it[i].x - 2 && x <= it[i].x + it[i].w + 2) return i;
     return -1;
   };
+  Goccia.prototype.ascolta = function (on) {
+    var f = on ? 'addEventListener' : 'removeEventListener';
+    window[f]('pointermove', this.on.wmove, true);
+    window[f]('pointerup', this.on.wup, true);
+    window[f]('pointercancel', this.on.wcancel, true);
+    window[f]('blur', this.on.wcancel);
+  };
+  Goccia.prototype.cancel = function () {
+    if (!this.down) return;
+    this.down = false;
+    this.ascolta(false);
+    if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
+    this.kick();
+  };
   Goccia.prototype.move = function (e) {
+    /* il tasto è già stato lasciato (fuori dalla finestra): la goccia si ferma qui */
+    if (this.down && e.pointerType === 'mouse' && e.buttons === 0) { this.release(e); return; }
     if (this.down) {
       this.px = this.local(e);
       if (!this.moved && Math.abs(this.px - this.x0) > 6) {
@@ -84,6 +100,7 @@
     var it = this.rects();
     if (this.at(it, this.local(e)) < 0) return;
     this.down = true; this.moved = false; this.px = this.x0 = this.local(e);
+    this.ascolta(true);
     this.s.vst += 2.6;
     this.lente(it);
     this.kick();
@@ -91,6 +108,7 @@
   Goccia.prototype.release = function () {
     if (!this.down) return;
     this.down = false;
+    this.ascolta(false);
     if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
     if (this.moved) {
       var it = this.rects();
@@ -107,13 +125,12 @@
     this.kick();
   };
   /* dentro la goccia: le stesse voci, ingrandite (si vedono solo mentre è premuta) */
-  var COPIA = ['display', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'color', 'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing',
+  var COPIA = ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle', 'borderColor', 'display', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'color', 'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing',
     'lineHeight', 'whiteSpace', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'width', 'height', 'borderRadius', 'opacity', 'boxSizing', 'overflow', 'fill', 'stroke', 'maskImage', 'webkitMaskImage', 'backgroundColor'];
   function copiaStile(src, dst, top) {
     var cs = getComputedStyle(src);
     COPIA.forEach(function (k) {
-      if (top && (k === 'backgroundColor' || k === 'width' || k === 'height')) return;
-      if (k === 'backgroundColor' && !/mask/.test(cs.webkitMaskImage || cs.maskImage || '')) return;
+      if (top && (k === 'width' || k === 'height')) return;
       try { dst.style[k] = cs[k]; } catch (e) {}
     });
     var a = src.children, b = dst.children;
@@ -223,7 +240,6 @@
     gocce = gocce.filter(function (g) { return g.alive(); });
     gocce.forEach(function (g) { g.attach(); g.kick(); });
   }
-
 
   /* la pillola: i tasti visibili (il microfono e la fotocamera con la loro freccina contano come uno) */
   var usato = -1;
