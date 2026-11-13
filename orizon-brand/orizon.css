@@ -2232,7 +2232,7 @@ body[class*="cpd-theme"] [data-testid="primary-filters"]:not(:has(> .orizon-filt
   background: transparent !important;
 }
 .mx_RoomHeader > button[class*="_icon-button_"]:focus-visible {
-  outline: 2px solid var(--o-accent) !important;
+  outline: 2px solid var(--o-ring, rgba(255, 255, 255, .4)) !important;
   outline-offset: 0;
 }
 
@@ -2443,3 +2443,481 @@ input[role="switch"]:checked + [class*="_ui_"]::after {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* lista delle chat: la chat aperta non ha bordi; con la tastiera un bordo leggero (non rosso) */
+body.cpd-theme-dark { --o-ring: rgba(255, 255, 255, .34); }
+body.cpd-theme-light { --o-ring: rgba(0, 0, 0, .24); }
+.mx_RoomListItemView:focus-visible > [class*="_container_"] {
+  box-shadow: inset 0 0 0 1.5px var(--o-ring) !important;
+}
+.mx_RoomListItemView[aria-selected="true"]:focus-visible > [class*="_container_"],
+.mx_RoomListItemView_selected:focus-visible > [class*="_container_"],
+.mx_RoomListItemView:focus:not(:focus-visible) > [class*="_container_"] {
+  box-shadow: none !important;
+}
+
+/* la lingua nelle impostazioni: al suo posto e coi colori del tema (quella rossa è solo nella pagina d'accesso) */
+.mx_SettingsSubsection .mx_LanguageDropdown,
+.mx_SettingsTab .mx_LanguageDropdown {
+  position: relative !important;
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  color: var(--o-text) !important;
+}
+.mx_SettingsSubsection .mx_LanguageDropdown .mx_Dropdown_input,
+.mx_SettingsTab .mx_LanguageDropdown .mx_Dropdown_input {
+  color: var(--o-text) !important;
+}
+.mx_SettingsSubsection .mx_LanguageDropdown .mx_Dropdown_menu,
+.mx_SettingsTab .mx_LanguageDropdown .mx_Dropdown_menu {
+  background: var(--o-lq-panel) !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: var(--o-lq-panel-shadow) !important;
+}
+
+/* contorni di chi usa la tastiera: chiari e discreti come sul telefono, non rossi */
+body.cpd-theme-dark,
+body.cpd-theme-light {
+  --cpd-color-border-focused: var(--o-ring);
+}
+.mx_Dialog input[class*="_control_"]:focus,
+.mx_Dialog .mx_Field:focus-within {
+  border-color: var(--o-ring) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--o-text) 9%, transparent) !important;
+}
+.mx_Dialog .mx_Field:focus-within label {
+  color: var(--o-text) !important;
+}
+
+/* impostazioni: isole anche dove Element non usa le sottosezioni (Voce e video, Sicurezza, Cifratura, Laboratorio) */
+body[class*="cpd-theme"] .mx_SettingsTab .mx_SettingsSection_subSections:not(:has(.mx_SettingsSubsection)):not(:has(.mx_BetaCard)):not(:empty),
+body[class*="cpd-theme"] .mx_SettingsTab form.mx_SetIntegrationManager,
+body[class*="cpd-theme"] .mx_SettingsTab .mx_SettingsSection_newUi,
+body[class*="cpd-theme"] .mx_SettingsTab .mx_BetaCard {
+  box-sizing: border-box !important;
+  padding: 20px !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background: var(--o-lq-isle) !important;
+  box-shadow: var(--o-lq-isle-shadow) !important;
+}
+body[class*="cpd-theme"] .mx_SettingsTab .mx_SettingsSection_newUi .mx_SettingsSection_newUi {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.mx_SettingsTab .mx_SettingsSection_newUi .mx_SettingsHeader { color: var(--o-text) !important; }
+/* scelte a pallino: bianche (nere col tema chiaro) come sul telefono */
+.mx_Dialog .mx_StyledRadioButton input[type="radio"]:checked + div {
+  border-color: var(--o-btn) !important;
+}
+.mx_Dialog .mx_StyledRadioButton input[type="radio"]:checked + div > div {
+  background: var(--o-btn) !important;
+}
+
+/* impostazioni (anche quelle della stanza): la pillola delle sezioni resta ferma in alto, scorre solo il contenuto */
+.mx_Dialog:has(.mx_SettingsDialog_content .mx_TabbedView_tabsOnLeft) {
+  overflow: hidden !important;
+}
+.mx_Dialog_fixedWidth:has(> .mx_SettingsDialog_content .mx_TabbedView_tabsOnLeft) {
+  display: flex !important;
+  flex-direction: column;
+}
+.mx_Dialog_fixedWidth > .mx_SettingsDialog_content:has(.mx_TabbedView_tabsOnLeft) {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex !important;
+  flex-direction: column;
+}
+.mx_SettingsDialog_content > .mx_TabbedView_tabsOnLeft {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+}
+.mx_SettingsDialog_content > .mx_TabbedView_tabsOnLeft > .mx_TabbedView_tabPanel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.mx_SettingsDialog_content > .mx_TabbedView_tabsOnLeft > .mx_TabbedView_tabPanel > .mx_TabbedView_tabPanelContent {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding-bottom: 8px;
+}
+/* la scelta del tema: il pallino prende il colore del testo di quel tema (bianco nello scuro, nero nel chiaro), non il rosso */
+.mx_ThemeChoicePanel_themeSelector input[type="radio"]:checked + [class*="_ui_"] {
+  background-color: var(--cpd-color-text-primary) !important;
+  border-color: var(--cpd-color-text-primary) !important;
+}
+.mx_ThemeChoicePanel_themeSelector input[type="radio"]:checked + [class*="_ui_"]::after {
+  background-color: var(--cpd-color-bg-canvas-default) !important;
+}
+.orizon-tasto:focus-visible,
+.orizon-tab:focus-visible,
+.orizon-piu:focus-visible { outline-color: var(--o-ring); }
+
+/* ---------- 8c. finestre come l'app Android: Avvia conversazione, Nuova stanza, Elenco delle stanze, Invita, Accedi ---------- */
+body.cpd-theme-dark {
+  --o-f-field: rgba(255, 255, 255, .06);
+  --o-f-line: rgba(255, 255, 255, .08);
+  --o-f-red: #FF6B66;
+  --o-f-ok: #5BD98A;
+  --o-f-scrim: rgba(3, 6, 12, .55);
+  --o-f-edge: linear-gradient(160deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .08) 22%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, .06) 80%, rgba(255, 255, 255, .3));
+  --o-f-edge-isle: linear-gradient(135deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .1) 26%, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, .05) 70%, rgba(255, 255, 255, .34));
+  --o-f-edge-glass: linear-gradient(135deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .14) 26%, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, .08) 70%, rgba(255, 255, 255, .55));
+}
+body.cpd-theme-light {
+  --o-f-field: rgba(0, 0, 0, .045);
+  --o-f-line: rgba(0, 0, 0, .08);
+  --o-f-red: #C81E24;
+  --o-f-ok: #13843C;
+  --o-f-scrim: rgba(20, 22, 28, .3);
+  --o-f-edge: linear-gradient(160deg, #FFFFFF, rgba(255, 255, 255, .5) 22%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .06) 80%, rgba(255, 255, 255, .9));
+  --o-f-edge-isle: linear-gradient(135deg, #FFFFFF, rgba(255, 255, 255, .5) 26%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .07) 72%, rgba(255, 255, 255, .9));
+  --o-f-edge-glass: linear-gradient(135deg, #FFFFFF, rgba(255, 255, 255, .6) 26%, rgba(0, 0, 0, .05) 50%, rgba(0, 0, 0, .09) 72%, rgba(255, 255, 255, .9));
+}
+#orizon-finestre {
+  position: fixed;
+  inset: 0;
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  visibility: hidden;
+  font-family: var(--cpd-font-family-sans, Inter, system-ui, sans-serif);
+  color: var(--o-text);
+  -webkit-font-smoothing: antialiased;
+}
+#orizon-finestre.aperta { pointer-events: auto; visibility: visible; }
+#orizon-finestre .ozf-velo {
+  position: absolute;
+  inset: 0;
+  background: var(--o-f-scrim);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+#orizon-finestre.aperta .ozf-velo { opacity: 1; }
+#orizon-finestre button { font: inherit; color: inherit; border: 0; background: none; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
+#orizon-finestre input { font: inherit; color: var(--o-text); background: transparent; border: 0; outline: none; padding: 0; margin: 0; min-width: 0; box-shadow: none; }
+#orizon-finestre input::placeholder { color: var(--o-text-2); opacity: .8; }
+#orizon-finestre button:focus-visible { outline: 2px solid var(--o-ring, rgba(255, 255, 255, .4)); outline-offset: 2px; }
+#orizon-finestre input:focus,
+#orizon-finestre input:focus-visible { outline: none !important; box-shadow: none !important; }
+#orizon-finestre .ozf-isola button.ozf-riga:focus-visible { outline-offset: -2px; }
+#orizon-finestre [hidden] { display: none !important; }
+
+.ozf-dialogo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(var(--w), calc(100vw - 32px));
+  height: min(var(--h), calc(100vh - 32px));
+  transform: translate(-50%, -50%) scale(1);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px 22px;
+  border-radius: 32px;
+  background: var(--o-lq-panel);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(28px) saturate(1.8);
+  box-shadow: var(--o-lq-panel-shadow);
+  opacity: 1;
+  transition: opacity 220ms ease, transform 420ms cubic-bezier(.3, 1.3, .4, 1);
+}
+.ozf-dialogo::after,
+.ozf-isola::after,
+.ozf-vetro::after,
+.orizon-azione-tondo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: var(--o-f-edge);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.ozf-isola::after { background: var(--o-f-edge-isle); }
+.ozf-vetro::after,
+.orizon-azione-tondo::after { background: var(--o-f-edge-glass); }
+.ozf-dialogo.entra { opacity: 0; transform: translate(-50%, -50%) scale(.94); }
+.ozf-dialogo.esce { opacity: 0; transform: translate(-50%, -50%) scale(.97); pointer-events: none; transition-duration: 200ms, 260ms; }
+#orizon-finestre:not(.aperta) .ozf-dialogo { opacity: 0; transform: translate(-50%, -50%) scale(.94); }
+
+.ozf-vetro {
+  position: relative;
+  background: var(--o-lq-bg);
+  -webkit-backdrop-filter: var(--o-lq-filter);
+  backdrop-filter: var(--o-lq-filter);
+  box-shadow: var(--o-lq-shadow);
+}
+.ozf-isola {
+  position: relative;
+  border-radius: 22px;
+  padding: 4px 0;
+  background: var(--o-lq-isle);
+  box-shadow: var(--o-lq-isle-shadow);
+}
+.ozf-ic { display: inline-flex; flex: none; position: relative; }
+.ozf-ic svg { display: block; }
+.ozf-tondo {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+button.ozf-tondo:hover { transform: scale(1.06); }
+button.ozf-tondo:active { transform: scale(1.14); transition-duration: 260ms; }
+
+.ozf-testa { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; flex: none; }
+.ozf-testa h2 { flex: 1; min-width: 0; margin: 0; font-size: 20px; font-weight: 700; line-height: 1.25; color: var(--o-text); letter-spacing: -.2px; }
+.ozf-cerca {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  margin-top: 14px;
+  padding: 0 16px;
+  flex: none;
+  box-sizing: border-box;
+  border-radius: 23px;
+  color: var(--o-text-2);
+  cursor: text;
+}
+.ozf-cerca input { position: relative; flex: 1; font-size: 15px !important; height: 100%; }
+.ozf-cerca.ozf-alto { height: 52px; border-radius: 26px; margin-top: 0; }
+.ozf-corpo {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 14px -4px 0;
+  padding: 2px 4px 6px;
+  scrollbar-width: none;
+}
+.ozf-corpo::-webkit-scrollbar { display: none; }
+.ozf-etichetta { font-size: 13px; font-weight: 600; color: var(--o-text-2); padding: 18px 6px 8px; }
+.ozf-riga {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 18px !important;
+  box-sizing: border-box;
+  font-size: 14.5px;
+  color: var(--o-text);
+  border-radius: 18px;
+  transition: background 160ms ease;
+}
+.ozf-riga:hover { background: var(--o-f-field) !important; }
+.ozf-riga > .ozf-ic { color: var(--o-text-2); }
+.ozf-tx { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ozf-sub { font-size: 12.5px; line-height: 1.4; color: var(--o-text-2); overflow-wrap: anywhere; }
+.ozf-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ozf-persona { min-height: 60px; }
+.ozf-persona .ozf-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ozf-isola > .ozf-riga + .ozf-riga::before { content: ""; position: absolute; left: 51px; right: 18px; top: 0; height: 1px; background: var(--o-f-line); }
+.ozf-semplice > .ozf-riga + .ozf-riga::before { left: 18px; }
+.ozf-persone > .ozf-riga + .ozf-riga::before { left: 70px; }
+.ozf-vuoto { position: relative; margin: 0; padding: 16px 18px; font-size: 14px; color: var(--o-text-2); }
+.ozf-av {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 600;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.ozf-av.con-foto { background-color: transparent !important; }
+
+/* tasti bianchi (neri col tema chiaro) */
+.ozf-bianco {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px !important;
+  box-sizing: border-box;
+  flex: none;
+  border-radius: 23px !important;
+  background: var(--o-btn) !important;
+  color: var(--o-btn-text) !important;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25), inset 0 1px 1px rgba(255, 255, 255, .6);
+  transition: transform 380ms cubic-bezier(.3, 1.7, .45, 1), opacity 200ms ease;
+}
+.ozf-bianco:hover { transform: scale(1.03); }
+.ozf-bianco:active { transform: scale(.97); }
+.ozf-bianco[aria-disabled="true"] { opacity: .4; cursor: default; transform: none; }
+.ozf-bianco.ozf-piccolo { height: 40px; padding: 0 20px !important; }
+.ozf-bianco.ozf-largo { width: 100%; margin-top: auto; }
+.ozf-bianco.lavora { opacity: .6; pointer-events: none; }
+
+/* Nuova stanza */
+.ozf-centro { display: flex; justify-content: center; padding: 6px 0 16px; }
+.ozf-foto { position: relative; width: 92px !important; height: 92px !important; color: var(--o-text); background-size: cover !important; background-position: center !important; }
+.ozf-foto.con-foto > .ozf-ic:first-child { opacity: 0; }
+.ozf-foto .ozf-piu { position: absolute; right: 0; bottom: 2px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--o-btn); color: var(--o-btn-text); }
+.ozf-campo { position: relative; display: flex !important; flex-direction: column; gap: 4px; padding: 10px 18px 12px; cursor: text; border-radius: 18px; }
+.ozf-campo .ozf-lab { font-size: 12.5px; font-weight: 600; color: var(--o-text-2); }
+.ozf-campo input { font-size: 15.5px !important; height: 24px; }
+.ozf-campo + .ozf-campo::before { content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px; background: var(--o-f-line); }
+.ozf-radio { padding-top: 11px !important; padding-bottom: 11px !important; }
+.ozf-pallino { position: relative; width: 22px; height: 22px; border-radius: 11px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 2px var(--o-text-2); transition: background 220ms ease, box-shadow 220ms ease; }
+.ozf-pallino span { width: 9px; height: 9px; border-radius: 5px; background: var(--o-btn-text); transform: scale(0); transition: transform 420ms cubic-bezier(.3, 1.8, .45, 1); }
+.ozf-radio[aria-checked="true"] .ozf-pallino { background: var(--o-btn); box-shadow: none; }
+.ozf-radio[aria-checked="true"] .ozf-pallino span { transform: scale(1); }
+.ozf-alias { display: flex !important; align-items: center; gap: 4px; height: 52px; padding: 0 18px !important; box-sizing: border-box; font-size: 15.5px; cursor: text; }
+.ozf-alias input { position: relative; flex: 1; font-size: 15.5px !important; height: 100%; }
+.ozf-fisso { position: relative; color: var(--o-text-2); flex: none; }
+.ozf-nota { position: relative; margin: 10px 6px 0; font-size: 13px; line-height: 1.45; color: var(--o-text-2); }
+.ozf-nota.ozf-errore { color: var(--o-f-red); }
+.ozf-nota.ozf-ok { color: var(--o-f-ok); }
+
+/* Elenco delle stanze */
+.ozf-vuota > * { flex: none; }
+.ozf-vuota { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100%; padding: 0 30px 20px; box-sizing: border-box; }
+.ozf-tondo.ozf-grande { width: 96px; height: 96px; color: var(--o-text); }
+.ozf-vuota h3 { margin: 22px 0 8px; font-size: 18px; font-weight: 700; color: var(--o-text); }
+.ozf-vuota p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--o-text-2); max-width: 360px; }
+.ozf-vuota .ozf-bianco { margin-top: 22px; }
+.ozf-attesa { margin: 40px 0 0; text-align: center; font-size: 14px; color: var(--o-text-2); }
+.ozf-membri { position: relative; display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--o-text-2); flex: none; }
+.ozf-entra { position: relative; flex: none; height: 32px; padding: 0 14px; border-radius: 16px; display: flex; align-items: center; background: var(--o-btn); color: var(--o-btn-text); font-size: 13.5px; font-weight: 600; }
+.ozf-entra.lavora { opacity: .5; }
+
+/* Invita */
+.ozf-invita-corpo { display: flex; flex-direction: column; align-items: stretch; margin-top: 4px; }
+.ozf-sotto { margin: 0; text-align: center; font-size: 14px; color: var(--o-text-2); }
+.ozf-qr { align-self: center; margin-top: 18px; padding: 14px; border-radius: 26px; background: #FFFFFF; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); line-height: 0; }
+.ozf-chi { text-align: center; margin-top: 14px; }
+.ozf-chi-nome { font-size: 17px; font-weight: 700; color: var(--o-text); }
+.ozf-chi .ozf-sub { margin-top: 3px; font-size: 13.5px; }
+.ozf-messaggio { margin-top: 16px; display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 18px; }
+.ozf-msg-t { font-size: 14px; font-weight: 700; color: var(--o-text); }
+.ozf-messaggio .ozf-sub { font-size: 13px; line-height: 1.45; }
+.ozf-invita > .ozf-bianco { margin-top: 14px; }
+
+/* Accedi tramite indirizzo */
+.ozf-accedi-corpo { margin-top: 18px; overflow: visible; }
+
+/* l'avviso in alto */
+#orizon-avviso {
+  position: fixed;
+  left: 50%;
+  top: 22px;
+  z-index: 4600;
+  padding: 11px 18px;
+  border-radius: 21px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--o-text);
+  pointer-events: none;
+  background: var(--o-lq-panel);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  backdrop-filter: blur(28px) saturate(1.8);
+  box-shadow: var(--o-lq-panel-shadow);
+  opacity: 0;
+  transform: translateX(-50%) translateY(-14px) scale(.92);
+  transition: opacity 220ms ease, transform 420ms cubic-bezier(.3, 1.4, .45, 1);
+}
+#orizon-avviso.on { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+
+/* ---------- 8d. pannello delle info: tasti tondi e "Segna come non letto" ---------- */
+.orizon-info { display: flex; flex-direction: column; gap: 0; padding: 0 0 4px; }
+.orizon-azioni { display: flex; justify-content: center; gap: 18px; padding: 4px 0 18px; }
+.orizon-azione {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 76px;
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--o-text-2);
+  cursor: pointer;
+}
+.orizon-azione-tondo {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--o-text);
+  background: var(--o-lq-bg);
+  -webkit-backdrop-filter: var(--o-lq-filter);
+  backdrop-filter: var(--o-lq-filter);
+  box-shadow: var(--o-lq-shadow);
+  transition: transform 480ms cubic-bezier(.3, 1.7, .45, 1);
+}
+.orizon-azione:hover .orizon-azione-tondo { transform: scale(1.06); }
+.orizon-azione:active .orizon-azione-tondo { transform: scale(1.14); transition-duration: 260ms; }
+.orizon-azione[aria-disabled="true"] { opacity: .45; cursor: default; }
+.orizon-azione[aria-disabled="true"] .orizon-azione-tondo { transform: none; }
+.orizon-azione:focus-visible { outline: none; }
+.orizon-azione:focus-visible .orizon-azione-tondo { outline: 2px solid var(--o-ring); outline-offset: 2px; }
+.orizon-info-isola {
+  position: relative;
+  margin: 0 12px;
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--o-info-card, var(--o-lq-isle));
+}
+.orizon-info-riga {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px !important;
+  border: 0 !important;
+  background: none !important;
+  box-sizing: border-box;
+  border-radius: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--o-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+.orizon-info-riga:hover { background: color-mix(in srgb, var(--o-info-card, transparent) 100%, var(--o-text) 6%) !important; }
+.orizon-info-riga:focus-visible { outline: 2px solid var(--o-ring); outline-offset: -2px; }
+.orizon-info-riga .ozf-ic { color: var(--o-text-2); margin-right: 2px; }
+.orizon-info-id { font-size: 13.5px; color: var(--o-text-2); margin-top: -2px; }
+.mx_RoomSummaryCard_alias:empty { display: none !important; }

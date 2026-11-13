@@ -127,3 +127,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # 6. Element ha ancora tutto quello su cui si appoggia Orizon? (se no si ferma e dice cosa manca)
+    controllo = QUI / "controlla-element.py"
+    if controllo.is_file():
+        import runpy
+        runpy.run_path(str(controllo), init_globals={"WEBAPP": WEBAPP}, run_name="__main__")

@@ -542,3 +542,18 @@ body.cpd-theme-light {
 [role="dialog"] [class*="_checkboxField_"][class*="_disabled_"] {
   opacity: .55;
 }
+
+/* microfono e fotocamera spenti anche quando non si possono accendere (niente permesso o niente dispositivo):
+   bianchi come sul telefono, solo un po' spenti. Compound mette i tasti disattivati in un livello (@layer) con !important,
+   e lì vince il livello che viene prima: per questo la regola sta nel primo livello di Element Call ("normalize"). */
+@layer normalize {
+  [data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_mute"][aria-checked="false"][aria-disabled="true"],
+  [data-testid="footer-container"] [class*="_buttons_"] button[data-testid="incall_videomute"][aria-checked="false"][aria-disabled="true"] {
+    background: var(--oz-on) !important;
+    color: var(--oz-on-text) !important;
+    opacity: .5;
+  }
+  [data-testid="footer-container"] [class*="_buttons_"] button[aria-disabled="true"] > svg {
+    color: inherit !important;
+  }
+}

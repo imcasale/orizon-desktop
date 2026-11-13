@@ -23,11 +23,11 @@
     d.appendChild(l);
     this.d = d; this.l = l;
     this.s = { x: 0, w: 0, t: 0, h: 0, a: 0, g: 0, st: 0, sk: 0, vx: 0, vw: 0, vt: 0, vh: 0, va: 0, vg: 0, vst: 0, vsk: 0 };
-    this.hov = -1; this.down = false; this.moved = false; this.px = 0; this.x0 = 0; this.raf = 0; this.last = 0; this.pid = null;
+    this.hov = null; this.down = false; this.moved = false; this.px = 0; this.x0 = 0; this.raf = 0; this.last = 0; this.pid = null;
     var self = this;
     this.on = {
       move: function (e) { if (!self.down) self.move(e); },
-      leave: function () { if (!self.down && self.hov !== -1) { self.hov = -1; self.kick(); } },
+      leave: function () { if (!self.down && self.hov) { self.hov = null; self.kick(); } },
       down: function (e) { self.press(e); },
       /* mentre è premuta la seguo su tutta la finestra: anche se il mouse esce dalla pillola, quando lo lascio la goccia si ferma */
       wmove: function (e) { if (self.down) self.move(e); },
@@ -74,7 +74,7 @@
   };
   Goccia.prototype.cancel = function () {
     if (!this.down) return;
-    this.down = false;
+    this.down = false; this.lens = false; clearTimeout(this.tLens);
     this.ascolta(false);
     if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
     this.kick();
@@ -87,34 +87,49 @@
       if (!this.moved && Math.abs(this.px - this.x0) > 6) {
         this.moved = true;
         try { this.host.setPointerCapture(e.pointerId); this.pid = e.pointerId; } catch (err) {}
+        this.accendi();
       }
       this.kick();
       return;
     }
     if (e.pointerType === 'touch') return;
-    var i = this.at(this.rects(), this.local(e));
-    if (i !== this.hov) { this.hov = i; this.kick(); }
+    var it = this.rects(), i = this.at(it, this.local(e)), el = i >= 0 ? it[i].el : null;
+    if (el !== this.hov) {
+      this.hov = el; this.kick();
+      /* una voce tagliata dal bordo: la pillola scorre per mostrarla intera */
+      if (el && this.o.reveal) this.o.reveal(el);
+    }
   };
   Goccia.prototype.press = function (e) {
     if (e.button) return;
-    var it = this.rects();
-    if (this.at(it, this.local(e)) < 0) return;
-    this.down = true; this.moved = false; this.px = this.x0 = this.local(e);
+    var it = this.rects(), i = this.at(it, this.local(e));
+    if (i < 0) return;
+    this.down = true; this.moved = false; this.lens = false; this.px = this.x0 = this.local(e);
+    this.hov = it[i].el;
     this.ascolta(true);
+    /* un clic veloce sceglie e basta; tenendo premuto (o trascinando) la goccia diventa una lente */
+    var self = this;
+    clearTimeout(this.tLens);
+    this.tLens = setTimeout(function () { if (self.down) self.accendi(); }, 170);
+    this.kick();
+  };
+  Goccia.prototype.accendi = function () {
+    if (this.lens || !this.down) return;
+    this.lens = true;
     this.s.vst += 2.6;
-    this.lente(it);
+    this.lente(this.rects());
     this.kick();
   };
   Goccia.prototype.release = function () {
     if (!this.down) return;
-    this.down = false;
+    this.down = false; this.lens = false; clearTimeout(this.tLens);
     this.ascolta(false);
     if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
     if (this.moved) {
       var it = this.rects();
       if (it.length) {
         var i = this.nearest(it, this.px);
-        this.hov = i;
+        this.hov = it[i].el;
         if (this.o.pick) this.o.pick(i, it[i].el); else it[i].el.click();
         /* il clic vero, che arriva subito dopo, non deve scegliere un'altra voce */
         var stop = function (ev) { ev.stopPropagation(); ev.preventDefault(); window.removeEventListener('click', stop, true); };
@@ -157,16 +172,26 @@
     });
   };
   Goccia.prototype.target = function () {
-    var it = this.rects(), s = this.s, sw = this.o.swell == null ? 6 : this.o.swell;
+    var it = this.rects(), s = this.s, sw = this.o.swell == null ? 6 : this.o.swell, T;
     if (!it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
-    if (this.down) {
+    if (this.down && this.lens) {
       var n = this.nearest(it, this.px), w = it[n].w + 14, f = it[0], z = it[it.length - 1];
       var cx = Math.max(f.x + f.w / 2, Math.min(z.x + z.w / 2, this.px));
-      return { x: cx - w / 2, w: w, t: it[n].y - sw, h: it[n].h + sw * 2, a: 1, g: 1 };
+      T = { x: cx - w / 2, w: w, t: it[n].y - sw, h: it[n].h + sw * 2, a: 1, g: 1 };
+    } else {
+      var hi = -1;
+      if (this.hov) for (var q = 0; q < it.length; q++) if (it[q].el === this.hov) { hi = q; break; }
+      var i = hi >= 0 ? hi : this.o.sel();
+      if (i < 0 || i >= it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
+      T = { x: it[i].x, w: it[i].w, t: it[i].y, h: it[i].h, a: 1, g: 0 };
     }
-    var i = this.hov >= 0 && this.hov < it.length ? this.hov : this.o.sel();
-    if (i < 0 || i >= it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
-    return { x: it[i].x, w: it[i].w, t: it[i].y, h: it[i].h, a: 1, g: 0 };
+    var c = this.o.clip && this.o.clip();
+    if (c) {
+      var L = Math.max(T.x, c.l), R = Math.min(T.x + T.w, c.r);
+      if (R - L < 24) { L = Math.min(L, c.r - 24); R = L + 24; }
+      T.x = L; T.w = R - L;
+    }
+    return T;
   };
   function molla(o, key, target, k, c, dt, eps, veps) {
     var vk = 'v' + key;
@@ -177,7 +202,7 @@
   Goccia.prototype.step = function (dt) {
     var s = this.s, T = this.target();
     if (reduced || (T.a > 0.5 && s.a < 0.05 && !this.down)) { s.x = T.x; s.w = T.w; s.t = T.t; s.h = T.h; s.vx = s.vw = s.vt = s.vh = 0; }
-    var k = this.down ? 700 : 380, c = this.down ? 30 : 19, m = false;
+    var lens = this.down && this.lens, k = lens ? 700 : 380, c = lens ? 30 : 19, m = false;
     m = molla(s, 'x', T.x, k, c, dt, 0.25, 3) || m;
     m = molla(s, 'w', T.w, k, c, dt, 0.25, 3) || m;
     m = molla(s, 't', T.t, k, c, dt, 0.25, 3) || m;
