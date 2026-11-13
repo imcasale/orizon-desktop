@@ -2591,6 +2591,38 @@ html.oz-lente body.cpd-theme-light {
   --o-lq-panel-shadow: 0 20px 50px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(0, 0, 0, .06);
 }
 
+/* la selezione a riposo (dietro alle voci) e la luce sotto il mouse delle bolle di vetro, come sull'app */
+.orizon-riposo {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+}
+.orizon-bagliore {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: plus-lighter;
+}
+/* le bolle le muove orizon.js con una molla: niente transizioni CSS sulla scala */
+.orizon-bolla {
+  transition-property: width, height, background, background-color, color, box-shadow, opacity, padding !important;
+}
+#orizon-basso .orizon-piu,
+#orizon-testa .orizon-tasto,
+.ozf-tondo,
+.mx_MessageComposer_buttonMenu,
+.mx_Dialog_cancelButton {
+  position: relative;
+}
+
 /* ---------- 8c. finestre come l'app Android: Avvia conversazione, Nuova stanza, Elenco delle stanze, Invita, Accedi ---------- */
 body.cpd-theme-dark {
   --o-f-field: rgba(255, 255, 255, .06);

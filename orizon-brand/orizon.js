@@ -92,9 +92,9 @@
   function liquid() {}
 
   /* ---------- movimento liquido: il bordo davanti arriva prima, quello dietro lo segue ---------- */
-  function Spring(k) { this.x = 0; this.v = 0; this.t = 0; this.k = k; }
+  function Spring(k, z) { this.x = 0; this.v = 0; this.t = 0; this.k = k; this.z = z || 1; }
   Spring.prototype.step = function (dt) {
-    var c = 2 * Math.sqrt(this.k);
+    var c = 2 * this.z * Math.sqrt(this.k);
     this.v += (-this.k * (this.x - this.t) - c * this.v) * dt;
     this.x += this.v * dt;
   };
@@ -127,7 +127,8 @@
   /* schede che si allargano quando sono scelte (pillola in basso, sezioni delle impostazioni) */
   function Tabs(track, items, opts) {
     this.track = track; this.items = items; this.opts = opts;
-    this.pos = new Spring(420); this.lead = new Spring(900); this.mini = new Spring(260); this.raf = 0; this.sel = -1;
+    /* come l'app: le schede si allargano con un piccolo rimbalzo (0,72 / 420), la pillola si fa piccola con 0,75 / 380 */
+    this.pos = new Spring(420, 0.72); this.lead = new Spring(900); this.mini = new Spring(380, 0.75); this.raf = 0; this.sel = -1;
     this.measure();
   }
   Tabs.prototype.measure = function () {
@@ -190,10 +191,6 @@
     })(last);
   };
 
-  /* ---------- la goccia: segue il mouse sulle pillole, premuta diventa una lente che ingrandisce ----------
-     o.items()   le voci della pillola        o.sel()   quella scelta (-1: nessuna, la goccia c'è solo sotto il mouse)
-     o.pick(i,el) cosa fare quando la lascio su una voce dopo averla trascinata (di solito il clic)
-     o.swell     di quanto si gonfia in altezza quando è premuta */
   var gocce = [];
   function chiaro() { return !!(document.body && document.body.classList.contains('cpd-theme-light')); }
 
@@ -317,23 +314,49 @@
     v.luce = filoLuce(w, h, r, 0.5);
     return v;
   }
-  /* la goccia premuta: lente più piccola (10dp / 14dp), ingrandimento e colori separati ai bordi */
+  /* la goccia premuta, come GlassDroplet: prima ingrandisce quello che ha sotto (1 + 0,22 x pressione, dal centro),
+     poi la lente sul bordo (10dp / 14dp x pressione) con i colori separati come RoundedRectRefractionWithDispersion:
+     sette campioni (rosso, arancio, giallo, verde, ciano, blu, viola) spostati lungo il bordo, di più verso gli angoli
+     (x*y), per niente a metà dei lati */
+  var DISPERSIONE = [
+    [1, '0.2857 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'],
+    [2 / 3, '0.2857 0 0 0 0 0 0.1429 0 0 0 0 0 0 0 0 0 0 0 1 0'],
+    [1 / 3, '0.2857 0 0 0 0 0 0.2857 0 0 0 0 0 0 0 0 0 0 0 1 0'],
+    [0, '0 0 0 0 0 0 0.2857 0 0 0 0 0 0 0 0 0 0 0 1 0'],
+    [-1 / 3, '0 0 0 0 0 0 0.2857 0 0 0 0 0 0.3333 0 0 0 0 0 1 0'],
+    [-2 / 3, '0 0 0 0 0 0 0 0 0 0 0 0 0.3333 0 0 0 0 0 1 0'],
+    [-1, '0.1429 0 0 0 0 0 0 0 0 0 0 0 0.3333 0 0 0 0 0 1 0']
+  ];
   function filtroGoccia(w, h, p) {
     var key = 'g' + w + 'x' + h + 'p' + p, v = daCache(key);
     if (v) return v;
-    var r = Math.min(w, h) / 2, mp = mappaLente(w, h, r, 10 * p, 14 * p, 1 + 0.22 * p), k = 0.05 * p, S = mp.S;
-    var canale = function (s, m, n) {
-      return '<feDisplacementMap in="SourceGraphic" in2="m" scale="' + s.toFixed(2) + '" xChannelSelector="R" yChannelSelector="G" result="d' + n + '"/>' +
-        '<feColorMatrix in="d' + n + '" type="matrix" values="' + m + '" result="c' + n + '"/>';
+    var hx = w / 2, hy = h / 2, rad = Math.min(hx, hy), gr = Math.min(rad * 1.5, hx, hy);
+    var zoom = 1 + 0.22 * p, z = 1 - 1 / zoom, alto = 10 * p, quanto = 14 * p;
+    var S = 2 * (Math.max(hx, hy) * z + 2 * quanto / zoom) + 2;
+    var mappa = function (c) {
+      return disegna(w, h, 1, function (px, py, d, i) {
+        var dx = -px * z, dy = -py * z;
+        if (alto > 0.01) {
+          var sd = sdRR(px, py, hx, hy, rad);
+          if (-sd < alto) {
+            var t = 1 - Math.max(0, -sd) / alto, dd = -(1 - Math.sqrt(Math.max(0, 1 - t * t))) * quanto, g = gradRR(px, py, hx, hy, gr);
+            var f = dd * (1 + c * (px * py) / (hx * hy)) / zoom;
+            dx += f * g[0]; dy += f * g[1];
+          }
+        }
+        d[i] = 127.5 + 255 * dx / S; d[i + 1] = 127.5 + 255 * dy / S; d[i + 2] = 128; d[i + 3] = 255;
+      });
     };
-    v = nuovoFiltro(key, w, h,
-      '<feImage href="' + mp.url + '" x="0" y="0" width="' + w + '" height="' + h + '" preserveAspectRatio="none" result="m"/>' +
-      canale(S * (1 + k), '1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0', 'r') +
-      canale(S, '0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0', 'g') +
-      canale(S * (1 - k), '0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0', 'b') +
-      '<feComposite in="cr" in2="cg" operator="arithmetic" k2="1" k3="1" result="rg"/>' +
-      '<feComposite in="rg" in2="cb" operator="arithmetic" k2="1" k3="1"/>');
-    v.luce = filoLuce(w, h, r, 0.5 * p);
+    var corpo = '', ultimo = '';
+    DISPERSIONE.forEach(function (x, n) {
+      corpo += '<feImage href="' + mappa(x[0]) + '" x="0" y="0" width="' + w + '" height="' + h + '" preserveAspectRatio="none" result="m' + n + '"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="m' + n + '" scale="' + S.toFixed(2) + '" xChannelSelector="R" yChannelSelector="G" result="d' + n + '"/>' +
+        '<feColorMatrix in="d' + n + '" type="matrix" values="' + x[1] + '" result="c' + n + '"/>';
+      if (n === 1) { corpo += '<feComposite in="c0" in2="c1" operator="arithmetic" k2="1" k3="1" result="s1"/>'; ultimo = 's1'; }
+      else if (n > 1) { corpo += '<feComposite in="' + ultimo + '" in2="c' + n + '" operator="arithmetic" k2="1" k3="1" result="s' + n + '"/>'; ultimo = 's' + n; }
+    });
+    v = nuovoFiltro(key, w, h, corpo);
+    v.luce = filoLuce(w, h, rad, 0.5 * p);
     return v;
   }
   function raggio(cs, w, h) {
@@ -391,40 +414,61 @@
     lista.forEach(function (x) { $$(x[0]).forEach(function (el) { lente(el, x[1], x[2]); }); });
     puliziaLente();
   }
+  /* ---------- la goccia: lo stesso codice dell'app Android (GlassDroplet.kt) ----------
+     A riposo è la selezione piatta sotto la voce scelta. Premuta esce dalla pillola come una goccia d'acqua
+     di misura fissa, segue il mouse, si allunga con la velocità (gelatina), ingrandisce quello che ha sotto
+     e, lasciata, torna con un rimbalzo sulla voce dove la lasci.
+     Tutto è fatto di molle smorzate integrate fotogramma per fotogramma (stesse costanti dell'app), così una
+     nuova destinazione non spezza il movimento: lo piega, come l'acqua.
+     Le posizioni sono in pixel, nelle coordinate dell'elemento "host" (la pista delle voci).
+       o.items()        le voci
+       o.sel()          la voce scelta, dove riposa la selezione (-1: nessuna, la goccia si vede solo premuta)
+       o.spec(it)       misura della goccia premuta: { w, h, top, min, max } (min e max: dove può stare il centro)
+       o.gesture        'select' (esce subito, lasciata sceglie), 'hold' (un clic la mostra un attimo, tenuta
+                        si afferra) o 'feedback' (segue soltanto, i tasti sotto fanno da soli)
+       o.pick(i, el)    cosa fare quando la lascio su un'altra voce dopo averla trascinata (di solito il clic)
+       o.layer()        dove mettere la goccia: fuori dal vetro, così ingrandisce la pillola e quello che c'è dietro
+       o.rest           colore della selezione a riposo (se manca, quello dell'app) */
+  var MIN_PREMUTA = 140, TENUTA = 140, SPOSTA = 6;
   function Goccia(host, o) {
     this.host = host; this.o = o;
     if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
-    /* o.layer(): dove mettere la goccia. Fuori dal vetro della pillola, così (come sull'app) ingrandisce
-       sia la pillola sia quello che c'è dietro: dentro un vetro vedrebbe solo il vetro */
+    /* la selezione a riposo sta dietro alle voci, come drawBehind */
+    if (o.gesture !== 'feedback') host.style.isolation = 'isolate';
     var ly = o.layer && o.layer();
     if (ly && getComputedStyle(ly).position === 'static') ly.style.position = 'relative';
+    var r = document.createElement('span');
+    r.className = 'orizon-riposo';
+    r.setAttribute('aria-hidden', 'true');
     var d = document.createElement('span');
     d.className = 'orizon-goccia';
     d.setAttribute('aria-hidden', 'true');
     var l = document.createElement('span');
     l.className = 'orizon-goccia-lente';
     d.appendChild(l);
-    this.d = d; this.l = l;
-    this.s = { x: 0, w: 0, t: 0, h: 0, a: 0, g: 0, st: 0, sk: 0, vx: 0, vw: 0, vt: 0, vh: 0, va: 0, vg: 0, vst: 0, vsk: 0 };
-    this.hov = null; this.down = false; this.moved = false; this.px = 0; this.x0 = 0; this.raf = 0; this.last = 0; this.pid = null;
+    this.r = r; this.d = d; this.l = l;
+    this.left = 0; this.top = 0; this.width = 0; this.height = 0; this.alpha = 0; this.press = 0; this.stretch = 0;
+    this.vl = 0; this.vt = 0; this.vw = 0; this.vh = 0; this.va = 0; this.vp = 0; this.vs = 0;
+    this.rest = null; this.has = false; this.spec = null; this.isPressed = false;
+    this.px = 0; this.downX = 0; this.moved = false; this.t0 = 0; this.tRel = 0; this.tHold = 0;
+    this.giu = false; this.preso = false; this.raf = 0; this.last = 0; this.pid = null;
     var self = this;
     this.on = {
-      move: function (e) { if (!self.down) self.move(e); },
-      leave: function () { if (!self.down && self.hov) { self.hov = null; self.kick(); } },
-      down: function (e) { self.press(e); },
-      /* mentre è premuta la seguo su tutta la finestra: anche se il mouse esce dalla pillola, quando lo lascio la goccia si ferma */
-      wmove: function (e) { if (self.down) self.move(e); },
-      wup: function (e) { self.release(e); },
-      wcancel: function () { self.cancel(); }
+      down: function (e) { self.giuMouse(e); },
+      wmove: function (e) { self.muovi(e); },
+      wup: function (e) { self.su(e); },
+      wcancel: function () { self.annulla(); }
     };
-    host.addEventListener('pointermove', this.on.move);
-    host.addEventListener('pointerleave', this.on.leave);
     host.addEventListener('pointerdown', this.on.down);
     this.attach();
     gocce.push(this);
   }
   Goccia.prototype.strato = function () { return (this.o.layer && this.o.layer()) || this.host; };
-  Goccia.prototype.attach = function () { var ly = this.strato(); if (this.d.parentNode !== ly) ly.appendChild(this.d); };
+  Goccia.prototype.attach = function () {
+    var ly = this.strato();
+    if (this.d.parentNode !== ly) ly.appendChild(this.d);
+    if (this.r.parentNode !== this.host) this.host.insertBefore(this.r, this.host.firstChild);
+  };
   /* di quanto spostare la goccia quando sta in un altro strato */
   Goccia.prototype.scarto = function () {
     var ly = this.strato();
@@ -449,13 +493,107 @@
   };
   Goccia.prototype.nearest = function (it, x) {
     var best = 0, bd = 1e9;
-    for (var i = 0; i < it.length; i++) { var d = Math.abs(x - (it[i].x + it[i].w / 2)); if (d < bd) { bd = d; best = i; } }
+    for (var i = 0; i < it.length; i++) {
+      if (x >= it[i].x && x <= it[i].x + it[i].w) return i;
+      var d = Math.min(Math.abs(x - it[i].x), Math.abs(x - it[i].x - it[i].w));
+      if (d < bd) { bd = d; best = i; }
+    }
     return best;
   };
   Goccia.prototype.at = function (it, x) {
     for (var i = 0; i < it.length; i++) if (x >= it[i].x - 2 && x <= it[i].x + it[i].w + 2) return i;
     return -1;
   };
+  /* dove riposa la selezione: la voce scelta */
+  Goccia.prototype.riposo = function (it) {
+    var i = this.o.sel ? this.o.sel() : -1;
+    if (i < 0 || i >= it.length) return null;
+    return { x: it[i].x, y: it[i].y, w: it[i].w, h: it[i].h };
+  };
+
+  /* ---- lo stato, come GlassDropletState ---- */
+  Goccia.prototype.setRest = function (rect, anima) {
+    this.rest = rect;
+    if (rect && (!this.has || anima === false)) {
+      this.left = rect.x; this.top = rect.y; this.width = rect.w; this.height = rect.h; this.alpha = 1;
+      this.vl = this.vt = this.vw = this.vh = this.va = 0;
+      this.has = true;
+    }
+    this.kick();
+  };
+  Goccia.prototype.premi = function (x, spec) {
+    clearTimeout(this.tRel);
+    this.spec = spec; this.px = x; this.downX = x; this.moved = false;
+    if (!this.has || this.alpha < 0.05) {
+      /* nascosta: la goccia compare sotto il mouse, un po' più piccola, e cresce */
+      var cx = Math.max(Math.min(spec.min, spec.max), Math.min(Math.max(spec.min, spec.max), x));
+      this.width = spec.w * 0.6; this.height = spec.h * 0.6;
+      this.left = cx - this.width / 2; this.top = spec.top + (spec.h - this.height) / 2;
+      this.vl = this.vt = this.vw = this.vh = 0;
+      this.has = true;
+    }
+    /* un piccolo colpo, così la goccia trema quando esce */
+    this.vs += 2.6;
+    this.isPressed = true;
+    this.t0 = performance.now();
+    if (!LENTE) this.lente(this.rects());
+    this.kick();
+  };
+  Goccia.prototype.trascina = function (x) {
+    this.px = x;
+    if (Math.abs(x - this.downX) > SPOSTA) this.moved = true;
+  };
+  Goccia.prototype.lascia = function () {
+    if (!this.isPressed) return;
+    clearTimeout(this.tRel);
+    var tenuta = performance.now() - this.t0, self = this;
+    /* un clic veloce mostra comunque la goccia per un momento */
+    if (tenuta >= MIN_PREMUTA) { this.isPressed = false; this.kick(); }
+    else this.tRel = setTimeout(function () { self.isPressed = false; self.kick(); }, MIN_PREMUTA - tenuta);
+  };
+  Goccia.prototype.step = function (dt) {
+    var it = this.rects(), rest = this.riposo(it);
+    /* la voce scelta si è spostata (o è cambiata): la selezione ci va con la molla */
+    if (rest && (!this.rest || Math.abs(rest.x - this.rest.x) > 0.5 || Math.abs(rest.y - this.rest.y) > 0.5 || Math.abs(rest.w - this.rest.w) > 0.5 || Math.abs(rest.h - this.rest.h) > 0.5)) {
+      this.rest = rest;
+      if (!this.has) { this.left = rest.x; this.top = rest.y; this.width = rest.w; this.height = rest.h; this.alpha = 1; this.has = true; }
+    } else if (!rest) this.rest = null;
+    var spec = this.isPressed ? this.spec : null, cur = this.rest;
+    var tl, tt, tw, th, ta, tp;
+    if (spec) {
+      var cx = Math.max(Math.min(spec.min, spec.max), Math.min(Math.max(spec.min, spec.max), this.px));
+      tw = spec.w; th = spec.h; tl = cx - spec.w / 2; tt = spec.top; ta = 1; tp = 1;
+    } else if (cur) {
+      tl = cur.x; tt = cur.y; tw = cur.w; th = cur.h; ta = 1; tp = 0;
+    } else {
+      tl = this.left; tt = this.top; tw = this.width; th = this.height; ta = 0; tp = 0;
+    }
+    if (reduced) { this.left = tl; this.top = tt; this.width = tw; this.height = th; this.alpha = ta; this.press = tp; this.stretch = 0; return false; }
+    /* più ferma mentre la tiene il mouse, più elastica quando la lascia */
+    var k = spec ? 700 : 380, c = spec ? 30 : 19;
+    this.vl += (-k * (this.left - tl) - c * this.vl) * dt; this.left += this.vl * dt;
+    this.vt += (-k * (this.top - tt) - c * this.vt) * dt; this.top += this.vt * dt;
+    this.vw += (-k * (this.width - tw) - c * this.vw) * dt; this.width += this.vw * dt;
+    this.vh += (-k * (this.height - th) - c * this.vh) * dt; this.height += this.vh * dt;
+    this.va += (-260 * (this.alpha - ta) - 30 * this.va) * dt; this.alpha += this.va * dt;
+    this.vp += (-300 * (this.press - tp) - 22 * this.vp) * dt; this.press += this.vp * dt;
+    /* gelatina: più va veloce, più si allunga; la molla dell'allungamento è molto morbida */
+    var ts = Math.min(Math.abs(this.vl) / 1500, 0.42);
+    this.vs += (-340 * (this.stretch - ts) - 9 * this.vs) * dt; this.stretch += this.vs * dt;
+    var pe = 0.25, ve = 3;
+    var moving = Math.abs(this.left - tl) > pe || Math.abs(this.vl) > ve || Math.abs(this.top - tt) > pe || Math.abs(this.vt) > ve ||
+      Math.abs(this.width - tw) > pe || Math.abs(this.vw) > ve || Math.abs(this.height - th) > pe || Math.abs(this.vh) > ve ||
+      Math.abs(this.alpha - ta) > 0.005 || Math.abs(this.va) > 0.05 || Math.abs(this.press - tp) > 0.005 || Math.abs(this.vp) > 0.05 ||
+      Math.abs(this.stretch - ts) > 0.004 || Math.abs(this.vs) > 0.04;
+    if (!moving && !spec) {
+      this.left = tl; this.top = tt; this.width = tw; this.height = th; this.alpha = ta; this.press = tp; this.stretch = 0;
+      this.vl = this.vt = this.vw = this.vh = this.va = this.vp = this.vs = 0;
+      return false;
+    }
+    return true;
+  };
+
+  /* ---- il mouse, come glassDropletGestures ---- */
   Goccia.prototype.ascolta = function (on) {
     var f = on ? 'addEventListener' : 'removeEventListener';
     window[f]('pointermove', this.on.wmove, true);
@@ -463,65 +601,60 @@
     window[f]('pointercancel', this.on.wcancel, true);
     window[f]('blur', this.on.wcancel);
   };
-  Goccia.prototype.cancel = function () {
-    if (!this.down) return;
-    this.down = false; this.lens = false; clearTimeout(this.tLens);
-    this.ascolta(false);
-    if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
-    this.kick();
-  };
-  Goccia.prototype.move = function (e) {
-    /* il tasto è già stato lasciato (fuori dalla finestra): la goccia si ferma qui */
-    if (this.down && e.pointerType === 'mouse' && e.buttons === 0) { this.release(e); return; }
-    if (this.down) {
-      this.px = this.local(e);
-      if (!this.moved && Math.abs(this.px - this.x0) > 6) {
-        this.moved = true;
-        try { this.host.setPointerCapture(e.pointerId); this.pid = e.pointerId; } catch (err) {}
-        this.accendi();
-      }
-      this.kick();
+  Goccia.prototype.giuMouse = function (e) {
+    if (e.button) return;
+    var it = this.rects(), x = this.local(e);
+    if (this.at(it, x) < 0) return;
+    this.giu = true; this.preso = false; this.x0 = x; this.pid = e.pointerId;
+    this.ascolta(true);
+    var spec = this.o.spec(it), self = this;
+    if ((this.o.gesture || 'select') === 'hold') {
+      /* un clic la mostra un attimo; tenendo premuto (o trascinando) la goccia si afferra */
+      clearTimeout(this.tHold);
+      this.tHold = setTimeout(function () { if (self.giu && !self.preso) self.afferra(self.o.spec(self.rects()), self.x0); }, TENUTA);
       return;
     }
-    if (e.pointerType === 'touch') return;
-    var it = this.rects(), i = this.at(it, this.local(e)), el = i >= 0 ? it[i].el : null;
-    if (el !== this.hov) {
-      this.hov = el; this.kick();
-      /* una voce tagliata dal bordo: la pillola scorre per mostrarla intera */
-      if (el && this.o.reveal) this.o.reveal(el);
+    this.afferra(spec, x);
+  };
+  Goccia.prototype.afferra = function (spec, x) {
+    /* niente cattura del puntatore: il clic deve arrivare alla voce sotto (tocco veloce), il resto lo seguo dalla finestra */
+    this.preso = true;
+    this.premi(x, spec);
+  };
+  Goccia.prototype.muovi = function (e) {
+    if (!this.giu) return;
+    /* il tasto è già stato lasciato (fuori dalla finestra): la goccia si ferma qui */
+    if (e.pointerType === 'mouse' && e.buttons === 0) { this.su(e); return; }
+    var x = this.local(e);
+    if (!this.preso) {
+      if (Math.abs(x - this.x0) > SPOSTA) { clearTimeout(this.tHold); this.afferra(this.o.spec(this.rects()), this.x0); }
+      else return;
     }
-  };
-  Goccia.prototype.press = function (e) {
-    if (e.button) return;
-    var it = this.rects(), i = this.at(it, this.local(e));
-    if (i < 0) return;
-    this.down = true; this.moved = false; this.lens = false; this.px = this.x0 = this.local(e);
-    this.hov = it[i].el;
-    this.ascolta(true);
-    /* un clic veloce sceglie e basta; tenendo premuto (o trascinando) la goccia diventa una lente */
-    var self = this;
-    clearTimeout(this.tLens);
-    this.tLens = setTimeout(function () { if (self.down) self.accendi(); }, 170);
+    this.trascina(x);
     this.kick();
   };
-  Goccia.prototype.accendi = function () {
-    if (this.lens || !this.down) return;
-    this.lens = true;
-    this.s.vst += 2.6;
-    /* con la lente vera la goccia ingrandisce quello che ha sotto; senza, mostra una copia ingrandita delle voci */
-    if (!LENTE) this.lente(this.rects());
-    this.kick();
-  };
-  Goccia.prototype.release = function () {
-    if (!this.down) return;
-    this.down = false; this.lens = false; clearTimeout(this.tLens);
+  Goccia.prototype.fine = function () {
+    this.giu = false;
+    clearTimeout(this.tHold);
     this.ascolta(false);
-    if (this.pid != null) { try { this.host.releasePointerCapture(this.pid); } catch (err) {} this.pid = null; }
-    if (this.moved) {
+    this.pid = null;
+  };
+  Goccia.prototype.su = function () {
+    if (!this.giu) return;
+    var preso = this.preso;
+    this.fine();
+    var gesto = this.o.gesture || 'select';
+    if (!preso) {
+      /* un clic veloce: la goccia esce un attimo, il clic lo fa la voce */
+      if (gesto === 'hold') { this.premi(this.x0, this.o.spec(this.rects())); this.lascia(); }
+      return;
+    }
+    var moved = this.moved;
+    this.lascia();
+    if (moved && gesto !== 'feedback') {
       var it = this.rects();
       if (it.length) {
         var i = this.nearest(it, this.px);
-        this.hov = it[i].el;
         if (this.o.pick) this.o.pick(i, it[i].el); else it[i].el.click();
         /* il clic vero, che arriva subito dopo, non deve scegliere un'altra voce */
         var stop = function (ev) { ev.stopPropagation(); ev.preventDefault(); window.removeEventListener('click', stop, true); };
@@ -529,9 +662,14 @@
         setTimeout(function () { window.removeEventListener('click', stop, true); }, 350);
       }
     }
-    this.kick();
   };
-  /* dentro la goccia: le stesse voci, ingrandite (si vedono solo mentre è premuta) */
+  Goccia.prototype.annulla = function () {
+    if (!this.giu) return;
+    this.fine();
+    this.lascia();
+  };
+
+  /* senza lente vera: dentro la goccia una copia ingrandita delle voci */
   var COPIA = ['borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle', 'borderColor', 'display', 'flexDirection', 'alignItems', 'justifyContent', 'gap', 'color', 'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing',
     'lineHeight', 'whiteSpace', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'width', 'height', 'borderRadius', 'opacity', 'boxSizing', 'overflow', 'fill', 'stroke', 'maskImage', 'webkitMaskImage', 'backgroundColor'];
   function copiaStile(src, dst, top) {
@@ -551,7 +689,6 @@
     it.forEach(function (r) {
       var c = r.el.cloneNode(true);
       copiaStile(r.el, c, true);
-      /* una copia solo da vedere: niente ruoli, nomi o id doppi */
       [c].concat($$('*', c)).forEach(function (n) {
         ['id', 'role', 'aria-selected', 'aria-hidden', 'aria-label', 'aria-labelledby', 'aria-current', 'aria-pressed', 'data-testid', 'tabindex', 'class'].forEach(function (k) { n.removeAttribute(k); });
       });
@@ -563,90 +700,53 @@
       l.appendChild(c);
     });
   };
-  Goccia.prototype.target = function () {
-    var it = this.rects(), s = this.s, sw = this.o.swell == null ? 6 : this.o.swell, T;
-    if (!it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
-    if (this.down && this.lens) {
-      var n = this.nearest(it, this.px), w = it[n].w + 14, f = it[0], z = it[it.length - 1];
-      var cx = Math.max(f.x + f.w / 2, Math.min(z.x + z.w / 2, this.px));
-      T = { x: cx - w / 2, w: w, t: it[n].y - sw, h: it[n].h + sw * 2, a: 1, g: 1 };
-    } else {
-      var hi = -1;
-      if (this.hov) for (var q = 0; q < it.length; q++) if (it[q].el === this.hov) { hi = q; break; }
-      var i = hi >= 0 ? hi : this.o.sel();
-      if (i < 0 || i >= it.length) return { x: s.x, w: s.w, t: s.t, h: s.h, a: 0, g: 0 };
-      T = { x: it[i].x, w: it[i].w, t: it[i].y, h: it[i].h, a: 1, g: 0 };
-    }
-    var c = this.o.clip && this.o.clip();
-    if (c) {
-      var L = Math.max(T.x, c.l), R = Math.min(T.x + T.w, c.r);
-      if (R - L < 24) { L = Math.min(L, c.r - 24); R = L + 24; }
-      T.x = L; T.w = R - L;
-    }
-    return T;
-  };
-  function molla(o, key, target, k, c, dt, eps, veps) {
-    var vk = 'v' + key;
-    o[vk] += (-k * (o[key] - target) - c * o[vk]) * dt;
-    o[key] += o[vk] * dt;
-    return Math.abs(o[key] - target) > eps || Math.abs(o[vk]) > veps;
-  }
-  Goccia.prototype.step = function (dt) {
-    var s = this.s, T = this.target();
-    if (reduced || (T.a > 0.5 && s.a < 0.05 && !this.down)) { s.x = T.x; s.w = T.w; s.t = T.t; s.h = T.h; s.vx = s.vw = s.vt = s.vh = 0; }
-    var lens = this.down && this.lens, k = lens ? 700 : 380, c = lens ? 30 : 19, m = false;
-    m = molla(s, 'x', T.x, k, c, dt, 0.25, 3) || m;
-    m = molla(s, 'w', T.w, k, c, dt, 0.25, 3) || m;
-    m = molla(s, 't', T.t, k, c, dt, 0.25, 3) || m;
-    m = molla(s, 'h', T.h, k, c, dt, 0.25, 3) || m;
-    m = molla(s, 'a', T.a, 260, 30, dt, 0.005, 0.05) || m;
-    m = molla(s, 'g', T.g, 300, 22, dt, 0.005, 0.05) || m;
-    m = molla(s, 'st', reduced ? 0 : Math.min(Math.abs(s.vx) / 1500, 0.42), 340, 9, dt, 0.004, 0.04) || m;
-    m = molla(s, 'sk', reduced ? 0 : Math.max(-14, Math.min(14, -s.vx / 80)), 280, 12, dt, 0.05, 0.5) || m;
-    if (!m && !this.down) {
-      s.x = T.x; s.w = T.w; s.t = T.t; s.h = T.h; s.a = T.a; s.g = T.g; s.st = 0; s.sk = 0;
-      s.vx = s.vw = s.vt = s.vh = s.va = s.vg = s.vst = s.vsk = 0;
-    }
-    return m || this.down;
-  };
+
+  /* ---- il disegno, come glassDropletRest e GlassDroplet ---- */
   Goccia.prototype.draw = function () {
-    var s = this.s, d = this.d, g = Math.max(0, Math.min(1, s.g)), r = function (n) { return Math.round(n * 100) / 100; };
-    var mix = function (p, q) { return p + (q - p) * g; };
-    var hx = r(Math.max(8, Math.min(62, 32 - s.sk * 1.6))), bg, sh;
-    if (!chiaro()) {
-      bg = 'radial-gradient(90% 70% at ' + hx + '% 14%, rgba(255,255,255,' + r(0.06 + 0.32 * g) + '), rgba(255,255,255,0) 62%), radial-gradient(70% 55% at ' + r(100 - hx) + '% 106%, rgba(255,255,255,' + r(0.03 + 0.22 * g) + '), rgba(255,255,255,0) 66%), rgba(' + Math.round(mix(255, 64)) + ',' + Math.round(mix(255, 68)) + ',' + Math.round(mix(255, 78)) + ',' + r(mix(0.11, 0.93)) + ')';
-      sh = 'inset 0 0 0 1px rgba(255,255,255,' + r(0.06 + 0.3 * g) + '), inset 1.5px 1.5px 2px rgba(255,255,255,' + r(0.4 + 0.45 * g) + '), inset -1px -1px 2px rgba(255,255,255,' + r(0.14 + 0.26 * g) + '), inset 0 -6px 12px rgba(0,0,0,' + r(0.18 * g) + '), 0 ' + r(4 + 10 * g) + 'px ' + r(12 + 18 * g) + 'px rgba(0,0,0,' + r(0.3 + 0.15 * g) + ')';
-    } else {
-      var c = Math.round(mix(0, 255));
-      bg = 'radial-gradient(90% 70% at ' + hx + '% 14%, rgba(255,255,255,' + r(0.45 + 0.4 * g) + '), rgba(255,255,255,0) 62%), rgba(' + c + ',' + c + ',' + c + ',' + r(mix(0.07, 0.9)) + ')';
-      sh = 'inset 0 0 0 1px rgba(0,0,0,' + r(0.04 + 0.03 * g) + '), inset 1.5px 1.5px 2px rgba(255,255,255,.95), inset -1px -1px 2px rgba(0,0,0,' + r(0.08 + 0.04 * g) + '), 0 ' + r(3 + 8 * g) + 'px ' + r(10 + 16 * g) + 'px rgba(0,0,0,' + r(0.08 + 0.12 * g) + ')';
+    var r = function (n) { return Math.round(n * 100) / 100; };
+    var scuro = !chiaro(), st = Math.max(-0.2, Math.min(0.45, this.stretch)), p = Math.max(0, Math.min(1, this.press));
+    var a = Math.max(0, Math.min(1, this.alpha));
+    /* la selezione a riposo: piatta, sparisce mentre la goccia è premuta */
+    var R = this.r, ra = this.rest ? a * (1 - p) : 0;
+    if (ra > 0.001 && this.width > 0 && this.height > 0) {
+      var rw = this.width * (1 + st), rh = this.height * (1 - st * 0.55);
+      var cx = this.left + this.width / 2, cy = this.top + this.height / 2;
+      R.style.left = r(cx - rw / 2) + 'px'; R.style.top = r(cy - rh / 2) + 'px';
+      R.style.width = r(rw) + 'px'; R.style.height = r(rh) + 'px';
+      R.style.borderRadius = r(rh / 2) + 'px';
+      R.style.background = this.o.rest || (scuro ? 'rgba(255,255,255,.13)' : 'rgba(0,0,0,.08)');
+      R.style.opacity = r(ra);
+    } else R.style.opacity = '0';
+    /* la goccia premuta */
+    var d = this.d, l = this.l, da = p * a;
+    if (da <= 0.002 || this.width <= 4 || this.height <= 4) {
+      d.style.opacity = '0';
+      if (d.__filtro) { d.__filtro = ''; d.style.webkitBackdropFilter = ''; d.style.backdropFilter = ''; }
+      if (l.firstChild && !this.isPressed) l.textContent = '';
+      return;
     }
-    var W = r(Math.max(0, s.w)), H = r(Math.max(0, s.h)), filtro = '';
-    if (LENTE && g > 0.02 && s.w > 8 && s.h > 8) {
-      /* premuta: la lente vera, come la goccia dell'app (lente 10dp/14dp, ingrandimento 1,22, colori separati ai bordi) */
-      W = Math.round(s.w); H = Math.round(s.h);
-      var f = filtroGoccia(W, H, Math.max(0.1, Math.round(g * 10) / 10));
+    var W = Math.round(this.width), H = Math.round(this.height), sc = this.scarto(), filtro = '', bg, sh;
+    if (LENTE) {
+      var f = filtroGoccia(W, H, Math.max(0.1, Math.round(p * 10) / 10));
       filtro = 'url(#' + f.id + ')';
-      var scuro = !chiaro();
-      var vr = scuro ? [255, 42] : [0, 255], va = scuro ? [0.11, 0.22] : [0.07, 0.18];
-      var c0 = Math.round(vr[0] + (vr[1] - vr[0]) * g), c1 = scuro ? Math.round(255 + (45 - 255) * g) : c0, c2 = scuro ? Math.round(255 + (53 - 255) * g) : c0;
-      bg = 'url("' + f.luce + '") 0 0 / 100% 100% no-repeat, rgba(' + c0 + ',' + c1 + ',' + c2 + ',' + r(va[0] + (va[1] - va[0]) * g) + ')';
-      sh = '0 ' + r(6 * g) + 'px ' + r(16 * g) + 'px rgba(0,0,0,' + r((scuro ? 0.35 : 0.16) * g) + '), inset 0 0 ' + r(8 * g) + 'px rgba(0,0,0,' + r((scuro ? 0.25 : 0.1) * g) + ')';
+      bg = 'url("' + f.luce + '") 0 0 / 100% 100% no-repeat, ' + (scuro ? 'rgba(42,45,53,.22)' : 'rgba(255,255,255,.18)');
+      sh = '0 6px 16px rgba(0,0,0,' + (scuro ? '.35' : '.16') + '), inset 0 0 ' + r(8 * p) + 'px rgba(0,0,0,' + (scuro ? '.25' : '.1') + ')';
+      l.style.opacity = '0';
+    } else {
+      bg = scuro ? 'radial-gradient(90% 70% at 32% 14%, rgba(255,255,255,.38), rgba(255,255,255,0) 62%), rgba(64,68,78,.93)'
+        : 'radial-gradient(90% 70% at 32% 14%, rgba(255,255,255,.85), rgba(255,255,255,0) 62%), rgba(255,255,255,.9)';
+      sh = scuro ? 'inset 0 0 0 1px rgba(255,255,255,.36), inset 1.5px 1.5px 2px rgba(255,255,255,.85), 0 14px 30px rgba(0,0,0,.45)'
+        : 'inset 0 0 0 1px rgba(0,0,0,.07), inset 1.5px 1.5px 2px #fff, 0 11px 26px rgba(0,0,0,.2)';
+      l.style.opacity = '1';
+      l.style.transform = 'translate(' + r(-this.left) + 'px, ' + r(-this.top) + 'px) scale(' + r(1 + 0.22 * p) + ')';
+      l.style.transformOrigin = r(this.left + this.width / 2) + 'px ' + r(this.top + this.height / 2) + 'px';
     }
     if (d.__filtro !== filtro) { d.__filtro = filtro; d.style.webkitBackdropFilter = filtro; d.style.backdropFilter = filtro; }
-    var sc = this.scarto();
-    d.style.left = r(s.x + sc.x) + 'px'; d.style.top = r(s.t + sc.y) + 'px';
+    d.style.left = r(this.left + sc.x) + 'px'; d.style.top = r(this.top + sc.y) + 'px';
     d.style.width = W + 'px'; d.style.height = H + 'px';
-    d.style.opacity = r(Math.max(0, Math.min(1, s.a)));
-    d.style.transform = 'scale(' + r(1 + s.st) + ', ' + r(1 - s.st * 0.55) + ')';
+    d.style.opacity = r(da);
+    d.style.transform = 'scale(' + r(1 + st) + ', ' + r(1 - st * 0.55) + ')';
     d.style.background = bg; d.style.boxShadow = sh;
-    var l = this.l;
-    if (g < 0.01 && !this.down && l.firstChild) l.textContent = '';
-    l.style.opacity = r(g);
-    l.style.transform = 'translate(' + r(-s.x) + 'px, ' + r(-s.t) + 'px) scale(1.22)';
-    l.style.transformOrigin = r(s.x + s.w / 2) + 'px ' + r(s.t + s.h / 2) + 'px';
-    var pill = this.o.pill && this.o.pill();
-    if (pill) pill.style.transform = g > 0.01 ? 'scale(' + r(1 + 0.02 * g) + ')' : '';
   };
   Goccia.prototype.kick = function () {
     if (this.raf) return;
@@ -671,6 +771,61 @@
     gocce = gocce.filter(function (g) { return g.alive(); });
     gocce.forEach(function (g) { g.attach(); g.kick(); });
   }
+
+  /* ---------- le bolle di vetro (il + e i tasti tondi): premute crescono con un rimbalzo e si illuminano sotto il mouse,
+     come Glass.Regular.interactive() dell'app (molla 0,5 / 380 premendo, 0,42 / 300 lasciando) ---------- */
+  function Bolla(el, senzaLuce) {
+    this.el = el;
+    el.classList.add('orizon-bolla');
+    if (senzaLuce) el.__ozBagliore = false; this.p = 0; this.v = 0; this.giu = false; this.x = 0; this.y = 0; this.raf = 0; this.last = 0;
+    var g = document.createElement('span');
+    g.className = 'orizon-bagliore';
+    g.setAttribute('aria-hidden', 'true');
+    if (el.__ozBagliore !== false) el.appendChild(g);
+    this.g = g;
+    var self = this;
+    var su = function () { if (!self.giu) return; self.giu = false; window.removeEventListener('pointerup', su, true); window.removeEventListener('pointercancel', su, true); self.kick(); };
+    el.addEventListener('pointerdown', function (e) {
+      if (e.button || el.getAttribute('aria-disabled') === 'true' || el.disabled) return;
+      self.giu = true; self.pos(e);
+      window.addEventListener('pointerup', su, true);
+      window.addEventListener('pointercancel', su, true);
+      self.kick();
+    });
+    el.addEventListener('pointermove', function (e) { if (self.giu) { self.pos(e); self.draw(); } });
+    el.style.transform = 'scale(1)';
+  }
+  Bolla.prototype.pos = function (e) {
+    var r = this.el.getBoundingClientRect(), k = (r.width && this.el.offsetWidth) ? r.width / this.el.offsetWidth : 1;
+    this.x = (e.clientX - r.left) / k; this.y = (e.clientY - r.top) / k;
+  };
+  Bolla.prototype.kick = function () {
+    if (this.raf) return;
+    var self = this;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(function frame(now) {
+      var dt = Math.max(0.001, Math.min(0.032, (now - self.last) / 1000));
+      self.last = now;
+      var t = self.giu ? 1 : 0, k = self.giu ? 380 : 300, z = self.giu ? 0.5 : 0.42, c = 2 * z * Math.sqrt(k);
+      if (reduced) { self.p = t; self.v = 0; }
+      else { self.v += (-k * (self.p - t) - c * self.v) * dt; self.p += self.v * dt; }
+      var fermo = Math.abs(self.p - t) < 0.002 && Math.abs(self.v) < 0.02;
+      if (fermo) { self.p = t; self.v = 0; }
+      self.draw();
+      self.raf = fermo ? 0 : requestAnimationFrame(frame);
+    });
+  };
+  Bolla.prototype.draw = function () {
+    var el = this.el, w = el.offsetWidth || 1, h = el.offsetHeight || 1, s = 1 + 6 / w * this.p;
+    el.style.transform = 'scale(' + (Math.round(s * 1000) / 1000) + ')';
+    var a = Math.max(0, Math.min(1, this.p)) * (chiaro() ? 0.35 : 0.16);
+    this.g.style.opacity = a > 0.002 ? '1' : '0';
+    this.g.style.background = 'radial-gradient(circle ' + Math.round(Math.min(w, h) * 1.2) + 'px at ' + Math.round(this.x) + 'px ' + Math.round(this.y) + 'px, rgba(255,255,255,' + (Math.round(a * 1000) / 1000) + '), rgba(255,255,255,0))';
+  };
+  function bolle(sel, senzaLuce) {
+    $$(sel).forEach(function (el) { if (!el.__ozBolla) el.__ozBolla = new Bolla(el, senzaLuce); });
+  }
+
 
   /* ---------- colonna di sinistra: titolo + pillola con ricerca e foto ---------- */
   var testa = null, fotoKey = '';
@@ -775,21 +930,16 @@
     filtri.hl.to(target.offsetLeft, target.offsetWidth);
     if (wrap) {
       list.classList.add('orizon-con-goccia');
-      var visibili = function () { var lr = list.getBoundingClientRect(); return $$('[role="option"]', list).filter(function (b) { var r = b.getBoundingClientRect(); return r.width > 0 && r.right > lr.left + 2 && r.left < lr.right - 2; }); };
-      goccia(wrap, {
-        items: visibili,
-        sel: function () { return visibili().findIndex(function (b) { return b.getAttribute('aria-selected') === 'true'; }); },
-        pill: function () { return fondo; },
-        /* la goccia resta dentro la pillola dei filtri */
-        clip: function () {
-          var wr = wrap.getBoundingClientRect(), lr = list.getBoundingClientRect(), fr = fondo ? fondo.getBoundingClientRect() : lr;
-          return { l: Math.max(lr.left, fr.left) - wr.left + 3, r: Math.min(lr.right, fr.right) - wr.left - 3 };
-        },
-        reveal: function (el) {
-          var pad = 24, x = el.offsetLeft, w = el.offsetWidth, sl = list.scrollLeft, cw = list.clientWidth, to = sl;
-          if (x - pad < sl) to = Math.max(0, x - pad);
-          else if (x + w + pad > sl + cw) to = x + w + pad - cw;
-          if (Math.abs(to - sl) > 1) list.scrollTo({ left: to, behavior: reduced ? 'auto' : 'smooth' });
+      var opzioni = function () { return $$('[role="option"]', list); };
+      /* come RoomListFiltersView: goccia larga 100 (alta come il filtro più 4+5 sopra e sotto), si afferra tenendo premuto */
+      goccia(list, {
+        items: opzioni,
+        sel: function () { return opzioni().findIndex(function (b) { return b.getAttribute('aria-selected') === 'true'; }); },
+        gesture: 'hold',
+        layer: function () { return wrap; },
+        spec: function (it) {
+          var h = it.length ? it[0].h : 34, y = it.length ? it[0].y : 0, pad = 4, k = h / 36;
+          return { w: Math.round(100 * k), h: h + (pad + 5) * 2, top: y - pad - 5, min: list.scrollLeft + 26, max: list.scrollLeft + list.clientWidth - 26 };
         }
       });
     }
@@ -874,11 +1024,20 @@
     }
     var tr = $('.orizon-tabs', basso);
     tr.classList.add('orizon-con-goccia');
+    /* come OrizonBottomPill: goccia di misura fissa (84dp, 62 quando è piccola, in proporzione alle schede di qui),
+       alta come la pillola più 5 sopra e sotto; il centro resta tra la prima e l'ultima scheda */
     goccia(tr, {
       items: function () { return $$('.orizon-tab', basso); },
       sel: function () { return scheda; },
-      pill: function () { return $('.orizon-pillola', basso); },
-      layer: function () { return basso; }
+      gesture: 'select',
+      layer: function () { return basso; },
+      spec: function (it) {
+        var pill = $('.orizon-pillola', basso), pad = pill ? (parseFloat(getComputedStyle(pill).paddingTop) || 4) : 4;
+        var h = it.length ? it[0].h : 44, y = it.length ? it[0].y : 0, k = h / 52, m = Math.max(0, Math.min(1, bassoTabs ? bassoTabs.mini.x : 0));
+        var f = it[0], z = it[it.length - 1];
+        return { w: Math.round((84 + (62 - 84) * m) * k), h: h + pad * 2 + 10, top: y - pad - 5,
+          min: f ? f.x + h / 2 - 2 : 0, max: z ? z.x + z.w - h / 2 + 2 : 0 };
+      }
     });
   }
 
@@ -917,9 +1076,15 @@
     });
     var btns = $$(':scope > button[class*="_icon-button_"]:not(.orizon-via), :scope > .mx_FacePile, :scope > div[class*="_typography_"]', h);
     if (!btns.length) { h.style.setProperty('--orizon-azioni-w', '0px'); h.__aw = 0; return; }
+    /* come GlassActionsPill: la goccia (58 x alta la pillola + 10) segue soltanto, i tasti fanno da soli */
     goccia(h, {
       items: function () { return $$(':scope > button[class*="_icon-button_"]:not(.orizon-via)', h).filter(function (b) { return b.offsetWidth > 0; }); },
-      sel: function () { return -1; }
+      sel: function () { return -1; },
+      gesture: 'feedback',
+      spec: function () {
+        var ax = h.__ax || 0, aw = h.__aw || 0, ay = h.__ay || 0;
+        return { w: 58, h: 46 + 10, top: ay - 5, min: ax + 24, max: ax + aw - 24 };
+      }
     });
     var hr = h.getBoundingClientRect();
     var a = btns[0].getBoundingClientRect(), b = btns[btns.length - 1].getBoundingClientRect();
@@ -950,9 +1115,13 @@
     goccia(ul, {
       items: function () { return $$(':scope > .mx_TabbedView_tabLabel', ul); },
       sel: function () { return $$(':scope > .mx_TabbedView_tabLabel', ul).findIndex(function (li) { return li.classList.contains('mx_TabbedView_tabLabel_active'); }); },
-      swell: 2,
+      gesture: 'select',
       layer: function () { return ul.parentElement; },
-      clip: function () { return { l: ul.scrollLeft + 2, r: ul.scrollLeft + ul.clientWidth - 2 }; }
+      spec: function (it) {
+        var hh = it.length ? it[0].h : 40, y = it.length ? it[0].y : 0, f = it[0], z = it[it.length - 1];
+        return { w: Math.round(84 * hh / 52), h: hh + 4 * 2 + 10, top: y - 4 - 5,
+          min: Math.max(f ? f.x + hh / 2 - 2 : 0, ul.scrollLeft + 26), max: Math.min(z ? z.x + z.w - hh / 2 + 2 : 0, ul.scrollLeft + ul.clientWidth - 26) };
+      }
     });
     var active = $(':scope > .mx_TabbedView_tabLabel_active', ul);
     if (active && active !== setSel) {
@@ -998,6 +1167,8 @@
       settingsTabs();
       if (scheda === 1) posizionaSpazi();
       vetri(VETRI);
+      bolle('#orizon-basso .orizon-piu, #orizon-testa .orizon-tasto, .ozf-tondo, .orizon-azione-tondo');
+      bolle('.mx_MessageComposer_buttonMenu, .mx_Dialog_cancelButton, .mx_MessageComposer_sendMessage', true);
       kickGocce();
     } catch (e) {
       if (window.console) console.warn('orizon', e);
