@@ -6,7 +6,9 @@
   'use strict';
   if (window.__orizonChiamata) return;
   window.__orizonChiamata = true;
-  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* le animazioni dell'app (goccia, gelatina, rimbalzi) ci sono sempre, anche se il computer dice di ridurle:
+     Orizon è fatto per muoversi come sul telefono. Chi le vuole spente: localStorage orizon.animazioni = '0' */
+  var reduced = (function () { try { return window.localStorage && localStorage.getItem('orizon.animazioni') === '0'; } catch (e) { return false; } })();
   function $(s, root) { return (root || document).querySelector(s); }
   function $$(s, root) { return Array.prototype.slice.call((root || document).querySelectorAll(s)); }
 

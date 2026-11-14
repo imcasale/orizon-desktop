@@ -4004,8 +4004,10 @@ html body .mx_IncomingCallToast_actionButton svg {
   from { scale: 1; }
   to { scale: 1.07; }
 }
-@media (prefers-reduced-motion: reduce) {
-  html body .mx_IncomingCallToast_actionButton[data-kind="primary"] { animation: none; }
+/* anche le animazioni di Element restano accese quando il computer dice di ridurle (come il resto di Orizon) */
+html:root {
+  --transition-short: .1s;
+  --transition-standard: .3s;
 }
 
 /* ---------- finestre di Orizon: crescono con la molla dell'app (0,62 / 420) ---------- */
