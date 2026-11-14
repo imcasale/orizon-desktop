@@ -3583,7 +3583,7 @@ html body .mx_RoomHeader_heading {
 /* ---------- la barra per scrivere (TextComposer): + di vetro 40, campo di vetro alto 42, niente ombre ---------- */
 html body .mx_MessageComposer_row {
   min-height: 42px !important;
-  padding: 0 1px 0 56px !important;
+  padding: 0 10px 0 56px !important;
   align-items: flex-end !important;
 }
 html body .mx_MessageComposer_row::before {
@@ -3629,9 +3629,14 @@ html body .mx_MessageComposer_row .mx_MessageComposer_button,
 html body .mx_MessageComposer_row button[class*="_icon-button_"] {
   align-self: center;
 }
+/* invia: tondo 36 dentro al campo, 3 dal bordo tutto intorno */
 html body .mx_MessageComposer_sendMessage {
   box-shadow: none !important;
-  margin: 0 0 1px 2px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  padding: 8px !important;
+  margin: 0 -7px 3px 4px !important;
   align-self: flex-end !important;
 }
 /* gli allegati sono nel menu del + (come sull'app): via la graffetta dal campo */
@@ -3646,6 +3651,11 @@ html body .oz-menu > [role="menu"] {
   padding: 8px !important;
   animation: none !important;
   will-change: transform;
+}
+/* i menu che non sono un elenco di voci (per esempio "Crea uno spazio") tengono il loro spazio dentro, e angoli 28 */
+html body .oz-menu > .mx_ContextualMenu:not(:has(.mx_IconizedContextMenu)):not(:has([class*="_picker_"])) {
+  padding: 24px !important;
+  border-radius: 28px !important;
 }
 html body .oz-menu > [role="menu"][class*="_menu_"] {
   gap: 0 !important;
@@ -3711,6 +3721,18 @@ html body .oz-menu-piu > .mx_ContextualMenu_background {
   background: rgba(0, 0, 0, .28) !important;
   opacity: 1 !important;
 }
+/* "Crea uno spazio" sopra la pillola in basso: il riquadro sta dove lo mette Orizon, senza spostamenti di Element */
+html body .oz-menu-spazio > .mx_ContextualMenu {
+  position: relative !important;
+  inset: auto !important;
+  margin: 0 !important;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+html body .oz-menu-spazio .mx_ContextualMenu_chevron_bottom,
+html body .oz-menu-spazio .mx_ContextualMenu_chevron_top,
+html body .oz-menu-spazio .mx_ContextualMenu_chevron_left,
+html body .oz-menu-spazio .mx_ContextualMenu_chevron_right,
 html body .oz-menu-piu .mx_ContextualMenu_chevron_bottom,
 html body .oz-menu-piu .mx_ContextualMenu_chevron_top,
 html body .oz-menu-piu .mx_ContextualMenu_chevron_left,
@@ -4025,3 +4047,50 @@ html body .ozf-foto.ozf-foto {
 /* senza linee tra le righe delle isole (come sull'app) */
 .ozf-riga:hover { background: transparent !important; }
 .ozf-campo + .ozf-campo::before { opacity: .6; }
+
+/* ---------- filtri: in Orizon scorrono di lato, non vanno mai a capo: nessun filtro va nascosto ---------- */
+html body [data-testid="primary-filters"] [role="listbox"] > .wrapping {
+  display: inline-flex !important;
+}
+
+/* ---------- "Crea uno spazio": il velo scuro su tutta la finestra, il tasto indietro di vetro, le scelte in isole ---------- */
+html body .mx_SpaceCreateMenu_wrapper > .mx_ContextualMenu_background {
+  left: 0 !important;
+  background: rgba(0, 0, 0, .28) !important;
+  opacity: 1 !important;
+}
+html body .mx_SpaceCreateMenu_wrapper .mx_ContextualMenu .mx_SpaceCreateMenu_back {
+  position: relative;
+  box-sizing: border-box !important;
+  width: 46px !important;
+  height: 46px !important;
+  margin: 0 0 14px !important;
+  padding: 12px !important;
+  border-radius: 999px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: var(--o-luce, none) 0 0 / 100% 100% no-repeat, var(--o-lq-bg) !important;
+  -webkit-backdrop-filter: var(--o-lente, var(--o-lq-filter));
+  backdrop-filter: var(--o-lente, var(--o-lq-filter));
+  box-shadow: var(--o-lq-shadow) !important;
+}
+html body .mx_SpaceCreateMenu_wrapper .mx_ContextualMenu .mx_SpaceCreateMenu_back svg {
+  width: 22px !important;
+  height: 22px !important;
+  color: var(--o-text) !important;
+}
+html body .mx_SpaceCreateMenu_wrapper .mx_ContextualMenu > div > h2 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  margin: 2px 0 8px !important;
+}
+body[class*="cpd-theme"] .mx_SpacePillButton.oz-isola.oz-isola.oz-isola {
+  margin: 0 0 12px !important;
+  cursor: pointer;
+}
+body[class*="cpd-theme"] .mx_SpacePillButton.oz-isola.oz-isola.oz-isola:hover,
+body[class*="cpd-theme"] .mx_SpacePillButton.oz-isola.oz-isola.oz-isola:focus-visible {
+  background: linear-gradient(var(--oz-velo), var(--oz-velo)), var(--oz-isola-fondo) !important;
+  outline: none !important;
+}

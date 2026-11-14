@@ -539,7 +539,11 @@
     if (ra > 0.001 && this.width > 0 && this.height > 0) {
       var rw = this.width * (1 + st), rh = this.height * (1 - st * 0.55);
       var cx = this.left + this.width / 2, cy = this.top + this.height / 2;
-      R.style.left = r(cx - rw / 2) + 'px'; R.style.top = r(cy - rh / 2) + 'px';
+      /* posizione con transform e non con left: così il suo offsetLeft resta 0. Element guarda l'offsetLeft dei figli
+         della lista dei filtri per capire se vanno a capo: con left la selezione sembrava "prima" dei filtri e
+         Element li nascondeva tutti (restava una pillola vuota, sottile, dopo aver cambiato misura alla finestra) */
+      R.style.left = '0'; R.style.top = '0';
+      R.style.transform = 'translate(' + r(cx - rw / 2) + 'px, ' + r(cy - rh / 2) + 'px)';
       R.style.width = r(rw) + 'px'; R.style.height = r(rh) + 'px';
       R.style.borderRadius = r(rh / 2) + 'px';
       R.style.background = this.o.rest || (scuro ? 'rgba(255,255,255,.13)' : 'rgba(0,0,0,.08)');
@@ -734,6 +738,14 @@
     try { pillola(); sezioni(); vetri(VETRI); kickGocce(); } catch (e) { if (window.console) console.warn('orizon-chiamata', e); }
   }
   function schedule() { if (!queued) { queued = true; requestAnimationFrame(sync); } }
+  /* la barra per scorrere si vede mentre scorri (come sull'app), poi sparisce */
+  document.addEventListener('scroll', function (e) {
+    var el = e.target;
+    if (!el || !el.classList || !el.closest || !el.closest('[role="dialog"]')) return;
+    el.classList.add('oz-scorre');
+    clearTimeout(el.__ozScorre);
+    el.__ozScorre = setTimeout(function () { el.classList.remove('oz-scorre'); }, 900);
+  }, true);
   function start() {
     new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-checked', 'aria-selected', 'aria-expanded', 'data-state'] });
     window.addEventListener('resize', schedule);

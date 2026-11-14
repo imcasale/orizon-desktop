@@ -735,7 +735,11 @@
     if (ra > 0.001 && this.width > 0 && this.height > 0) {
       var rw = this.width * (1 + st), rh = this.height * (1 - st * 0.55);
       var cx = this.left + this.width / 2, cy = this.top + this.height / 2;
-      R.style.left = r(cx - rw / 2) + 'px'; R.style.top = r(cy - rh / 2) + 'px';
+      /* posizione con transform e non con left: così il suo offsetLeft resta 0. Element guarda l'offsetLeft dei figli
+         della lista dei filtri per capire se vanno a capo: con left la selezione sembrava "prima" dei filtri e
+         Element li nascondeva tutti (restava una pillola vuota, sottile, dopo aver cambiato misura alla finestra) */
+      R.style.left = '0'; R.style.top = '0';
+      R.style.transform = 'translate(' + r(cx - rw / 2) + 'px, ' + r(cy - rh / 2) + 'px)';
       R.style.width = r(rw) + 'px'; R.style.height = r(rh) + 'px';
       R.style.borderRadius = r(rh / 2) + 'px';
       R.style.background = this.o.rest || (scuro ? 'rgba(255,255,255,.13)' : 'rgba(0,0,0,.08)');
@@ -1243,7 +1247,8 @@
   var ISOLE = '.ozf-isola, .orizon-info-isola, .mx_SettingsSubsection:not(.mx_SettingsSubsection .mx_SettingsSubsection), .mx_UserProfileSettings, ' +
     '.mx_SettingsTab .mx_SettingsSection_subSections:not(:has(.mx_SettingsSubsection)):not(:has(.mx_BetaCard)):not(:has(.mx_UserProfileSettings)):not(:empty), ' +
     '.mx_SettingsTab form.mx_SetIntegrationManager, .mx_SettingsTab .mx_SettingsSection_newUi:not(.mx_SettingsSection_newUi .mx_SettingsSection_newUi), ' +
-    '.mx_SettingsTab .mx_BetaCard, .mx_UserInfo .mx_UserInfo_container:not(.mx_UserInfo_header), .mx_InviteDialog_userSections ul[role="listbox"]';
+    '.mx_SettingsTab .mx_BetaCard, .mx_UserInfo .mx_UserInfo_container:not(.mx_UserInfo_header), .mx_InviteDialog_userSections ul[role="listbox"], ' +
+    '.mx_SpaceCreateMenu_wrapper .mx_SpacePillButton';
   function angolo(el) {
     var w = el.offsetWidth, h = el.offsetHeight;
     if (!w || !h) return;
@@ -1509,6 +1514,19 @@
       }
     });
   }
+  /* "Crea uno spazio" esce dal + della pillola in basso (come il menu del + della chat): sopra la pillola, a sinistra
+     come lei; Element lo metterebbe vicino al tasto nascosto della colonna degli spazi, in alto */
+  function menuSpazio(w, p) {
+    var piu = $('#orizon-basso .orizon-piu'), pill = $('#orizon-basso .orizon-pillola');
+    if (!piu || !pill) return null;
+    var a = piu.getBoundingClientRect(), b = pill.getBoundingClientRect(), pw = p.offsetWidth || 400;
+    var x = Math.round(Math.max(8, Math.min(b.left, window.innerWidth - pw - 8)));
+    w.style.setProperty('left', x + 'px', 'important');
+    w.style.setProperty('right', 'auto', 'important');
+    w.style.setProperty('top', 'auto', 'important');
+    w.style.setProperty('bottom', Math.round(window.innerHeight - b.top + 10) + 'px', 'important');
+    return Math.round(a.left + a.width / 2 - x) + 'px 100%';
+  }
   function menu() {
     $$('.mx_ContextualMenu_wrapper, [data-radix-popper-content-wrapper]').forEach(function (w) {
       if (w.__ozMenu || w.classList.contains('oz-fantasma')) return;
@@ -1516,12 +1534,17 @@
       var p = radix ? $(':scope > [role="menu"]', w) : $(':scope > .mx_ContextualMenu', w);
       if (!p) return;
       w.__ozMenu = true;
-      var tipo = w.classList.contains('mx_MessageComposer_Menu') ? 'piu' : $('[class*="_picker_"]', p) ? 'emoji' : 'menu';
+      var tipo = w.classList.contains('mx_MessageComposer_Menu') ? 'piu' : w.classList.contains('mx_SpaceCreateMenu_wrapper') && $('#orizon-basso') ? 'spazio' :
+        $('[class*="_picker_"]', p) ? 'emoji' : 'menu';
       w.classList.add('oz-menu', 'oz-menu-' + tipo);
       if (tipo === 'piu') menuPiu(w, p);
       if (tipo === 'emoji') menuEmoji(w, p);
       var bg = $(':scope > .mx_ContextualMenu_background', w);
-      if (tipo === 'piu') {
+      if (tipo === 'spazio') {
+        animaMolla(p, 'scale(.18)', 'scale(1)', 0.62, 420, menuSpazio(w, p) || '10% 100%');
+        dissolvi(p, 0, 1, 160);
+        if (bg) dissolvi(bg, 0, 1, 220);
+      } else if (tipo === 'piu') {
         animaMolla(p, 'scale(.18)', 'scale(1)', 0.62, 420, '8% 100%');
         dissolvi(p, 0, 1, 160);
         if (bg) dissolvi(bg, 0, 1, 220);
@@ -1533,6 +1556,7 @@
     });
     /* il menu del + segue il + (se la finestra cambia misura) */
     $$('.oz-menu-piu').forEach(function (w) { var p = $(':scope > .mx_ContextualMenu', w); if (p && !w.classList.contains('oz-fantasma')) menuPiu(w, p); });
+    $$('.oz-menu-spazio').forEach(function (w) { var p = $(':scope > .mx_ContextualMenu', w); if (p && !w.classList.contains('oz-fantasma')) menuSpazio(w, p); });
     var piuAperto = !!$('.oz-menu-piu:not(.oz-fantasma)');
     var tasto = $('.mx_MessageComposer_buttonMenu');
     if (tasto && tasto.classList.contains('oz-aperto') !== piuAperto) tasto.classList.toggle('oz-aperto', piuAperto);
@@ -1553,7 +1577,7 @@
   function esceMenu(m) {
     if (reduced || !m.p.animate) return;
     fantasma(m.w);
-    var piu = m.tipo === 'piu';
+    var piu = m.tipo === 'piu' || m.tipo === 'spazio';
     m.p.animate([{ transform: 'scale(1)' }, { transform: piu ? 'scale(.4)' : 'scale(.9)' }], { duration: 160, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' });
     dissolvi(m.p, 1, 0, piu ? 140 : 130, function () { m.w.remove(); });
     var bg = $(':scope > .mx_ContextualMenu_background', m.w);
@@ -1607,7 +1631,7 @@
   var BOLLE = '.ozf-bianco, .orizon-azione-tondo, .mx_JumpToBottomButton_scrollDown, .mx_TopUnreadMessagesBar_scrollUp, ' +
     '.mx_InviteDialog_editor [class*="_pill_"], .mx_InviteDialog_goButton, .mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"], ' +
     '.mx_Dialog_buttons button[class*="_button_"], .mx_Dialog_buttons .mx_Dialog_primary, .mx_Dialog_buttons button, .mx_IncomingCallToast_actionButton, ' +
-    '.mx_IncomingLegacyCallToast_buttons [role="button"]';
+    '.mx_IncomingLegacyCallToast_buttons [role="button"], .mx_SpaceCreateMenu_back';
   function tutto() {
     var su = $('.mx_MessageComposer_actions > button[class*="_icon-button_"]');
     if (su && !su.classList.contains('oz-allegato')) su.classList.add('oz-allegato');
@@ -1627,7 +1651,7 @@
       '[class*="_container_1opqj_"], .mx_LegacyCallEvent, .mx_ReplyPreview, .mx_Dialog_cancelButton, ' +
       '.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels, .ozf-vetro, .orizon-azione-tondo, .oz-cerca, .ozf-bianco, ' +
       '.mx_JumpToBottomButton_scrollDown, .mx_TopUnreadMessagesBar_scrollUp, .mx_InviteDialog_editor [class*="_pill_"], .mx_InviteDialog_goButton, .mx_IncomingCallToast_actionButton, ' +
-      '.mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"], .mx_Dialog_buttons button', 'v'],
+      '.mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"], .mx_Dialog_buttons button, .mx_SpaceCreateMenu_back', 'v'],
     ['.mx_MessageComposer_row', 'v', true],
     ['.mx_Dialog, .mx_ContextualMenu, .mx_IconizedContextMenu, [role="menu"][data-state="open"], .mx_Toast_toast, ' +
       '.mx_MessageActionBar, .ozf-dialogo, #orizon-avviso', 'p']

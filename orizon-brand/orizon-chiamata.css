@@ -17,6 +17,7 @@ body.cpd-theme-dark {
   --oz-off: #C3C8D2;
   --oz-ring: #8C94A3;
   --oz-sw-off: rgba(255, 255, 255, .16);
+  --oz-scroll: rgba(255, 255, 255, .26);
 }
 body.cpd-theme-light {
   --oz-glass: rgba(255, 255, 255, .34);
@@ -34,6 +35,7 @@ body.cpd-theme-light {
   --oz-text-2: #555B66;
   --oz-off: #4A505C;
   --oz-ring: #7A808B;
+  --oz-scroll: rgba(0, 0, 0, .24);
   --oz-sw-off: rgba(0, 0, 0, .14);
 }
 
@@ -181,6 +183,10 @@ body.cpd-theme-light {
   --cpd-switch-button-size: 44px;
   --cpd-switch-gap: 8px;
 }
+/* tra i due tasti c'è già il margine di Element (8): niente spazio in più, così la goccia sta proprio sul tasto scelto */
+html body [data-testid="footer-container"] fieldset[class*="_layout_"] {
+  gap: 0 !important;
+}
 [data-testid="footer-container"] fieldset[class*="_layout_"]::before {
   content: "";
   position: absolute;
@@ -218,6 +224,9 @@ body.cpd-theme-light {
 /* ---------- i riquadri delle persone ---------- */
 [data-testid="videoTile"] {
   border-radius: 24px !important;
+  /* nome e tasto "..." staccati dagli angoli tondi del riquadro (Element Call li mette a raggio - 12) */
+  --media-view-border-radius: 24px;
+  --media-view-fg-inset: 12px;
 }
 [data-testid="videoTile"] [class*="_nameTag_"] {
   border-radius: 999px !important;
@@ -626,4 +635,38 @@ html.oz-lente body.cpd-theme-light {
 [role="dialog"] [class*="_close_"] svg {
   inline-size: 22px !important;
   block-size: 22px !important;
+}
+
+/* ---------- impostazioni della chiamata: un po' più larghe; la barra per scorrere come nell'app:
+   sottile, senza frecce, staccata dagli angoli, si vede solo mentre scorri o col mouse sopra ---------- */
+html body [class*="_modal_"][class*="_dialog_"][role="dialog"] {
+  inline-size: 640px !important;
+  max-inline-size: calc(100vw - 32px) !important;
+}
+[role="dialog"] [class*="_body_"]::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+[role="dialog"] [class*="_body_"]::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+[role="dialog"] [class*="_body_"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 18px 0;
+}
+[role="dialog"] [class*="_body_"]::-webkit-scrollbar-thumb {
+  border: 4px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  background-color: transparent;
+}
+[role="dialog"] [class*="_body_"]:hover::-webkit-scrollbar-thumb,
+[role="dialog"] [class*="_body_"].oz-scorre::-webkit-scrollbar-thumb {
+  background-color: var(--oz-scroll, rgba(255, 255, 255, .26));
+}
+[role="dialog"] [class*="_body_"]::-webkit-scrollbar-corner {
+  background: transparent;
 }
