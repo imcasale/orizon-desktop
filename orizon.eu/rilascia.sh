@@ -3,6 +3,7 @@
 #   bash ~/dev/orizon-desktop/orizon.eu/rilascia.sh 1.12.28      nuova versione
 #   bash ~/dev/orizon-desktop/orizon.eu/rilascia.sh 1.12.28-2    stessa versione, pacchetti rifatti (revisione 2)
 #   bash ~/dev/orizon-desktop/orizon.eu/rilascia.sh --prova      prova generale: prepara tutto, non pubblica niente
+#   bash ~/dev/orizon-desktop/orizon.eu/rilascia.sh --pagina     solo la pagina di download: versione attuale e data
 # In ordine:
 #   1. versione in package.json, electron-builder.ts e PKGBUILD
 #   2. compila deb, rpm, pacman e tar.gz                (scatola orizon-pacchetti)
@@ -11,11 +12,14 @@
 #   5. Flatpak firmato
 #   6. pubblica il repository su https://4orizon.eu/repo  (apt, dnf, pacman, flatpak lo vedono da qui)
 #   7. sito: file in /dl, impronte, versione e data nella pagina di download
-#   8. salva in git (senza inviare)
-#   9. Snap Store: costruzione sui server di Canonical e caricamento sul canale stable
+#   8. salva in git
+#   9. GitHub: invia il codice e pubblica la release con gli stessi pacchetti del sito
+#  10. Snap Store: costruzione sui server di Canonical e caricamento sul canale stable
 # Se un passo si ferma, rilancia lo stesso comando: riparte da dove si era fermato.
 # Per saltare dei passi:  SALTA="snap flatpak" bash .../rilascia.sh 1.12.28
-#   (nomi: versione compila repo arch flatpak pubblica sito git snap)
+#   (nomi: versione compila repo arch flatpak pubblica sito git github snap)
+# Le novità della release su GitHub: dal file orizon.eu/novita/<versione>.md se c'è,
+# altrimenti i titoli dei commit dall'ultimo rilascio.
 # La passphrase della chiave ssh la chiede una volta sola. Si lancia dal PC, FUORI dalle scatole.
 set -euo pipefail
 D="${D:-$HOME/dev/orizon-desktop}"
@@ -32,6 +36,8 @@ export GNUPGHOME="${ORIZON_GNUPG:-$HOME/orizon-credenziali/gnupg-pacchetti}"
 NOME_CHIAVE="Orizon Pacchetti <info@4orizon.eu>"
 APP=eu._4orizon.Orizon
 SNAP_NOME="${SNAP_NOME:-orizon}"
+GH_REPO="${GH_REPO:-imcasale/orizon-desktop}"
+RAMO="${RAMO:-orizon}"
 CACHE="$HOME/.cache/orizon-flatpak"
 STATI="$HOME/.cache/orizon-rilascio"
 SALTA="${SALTA:-}"
@@ -41,9 +47,9 @@ mkdir -p "$HOME/.ssh"; chmod 700 "$HOME/.ssh"
 SSH="ssh -i $CHIAVE_SSH ${ORIZON_SSH_OPZ:-} -o ControlMaster=auto -o ControlPath=$HOME/.ssh/oz-%C -o ControlPersist=600"
 TMP=$(mktemp -d)
 INIZIO=$(date +%s)
-PROVA=0; ARG="${1:-}"; STATO=""; AGENTE=""
+PROVA=0; PAGINA=0; ARG="${1:-}"; STATO=""; AGENTE=""
 
-uso() { sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; }
+uso() { sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//'; }
 fine() {
   c=$?
   $SSH -O exit "$SERVER" >/dev/null 2>&1 || true
@@ -58,6 +64,7 @@ trap fine EXIT
 
 case "$ARG" in
   --prova) PROVA=1;;
+  --pagina) PAGINA=1;;
   [0-9]*) [[ "$ARG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(-([1-9][0-9]*))?$ ]] || { uso; exit 1; }
           VER=${BASH_REMATCH[1]}; REV=${BASH_REMATCH[3]:-1};;
   *) uso; exit 1;;
@@ -66,11 +73,20 @@ esac
 echo "== 0. Controlli"
 if [ -n "${CONTAINER_ID:-}" ] || [ -e /run/.containerenv ]; then echo "   va lanciato FUORI dalle scatole"; exit 1; fi
 salta() { [[ " $SALTA " == *" $1 "* ]]; }
+if [ $PAGINA = 1 ]; then
+  # solo la pagina di download: niente pacchetti, scatole, firme o Snap
+  for c in git python3 curl ssh ssh-agent ssh-add sha256sum; do command -v $c >/dev/null || { echo "   manca $c"; exit 1; }; done
+  cd "$D" 2>/dev/null || { echo "   non trovo $D"; exit 1; }
+  [ -f "$CHIAVE_SSH" ] || { echo "   non trovo la chiave ssh $CHIAVE_SSH"; exit 1; }
+  SALTA="$SALTA versione compila repo arch flatpak pubblica git github snap"
+fi
 mancano=""
+if [ $PAGINA = 0 ]; then
 for c in distrobox git python3 curl ssh ssh-agent ssh-add gpg flatpak flatpak-builder sha256sum; do
   command -v $c >/dev/null || mancano="$mancano $c"
 done
 salta snap || command -v snapcraft >/dev/null || mancano="$mancano snapcraft"
+salta github || command -v gh >/dev/null || mancano="$mancano gh"
 [ -z "$mancano" ] || { echo "   mancano:$mancano"; exit 1; }
 cd "$D" 2>/dev/null || { echo "   non trovo $D"; exit 1; }
 for f in package.json electron-builder.ts webapp.asar orizon.eu/release/build.json \
@@ -87,21 +103,29 @@ FPR=$(gpg --batch --with-colons --list-secret-keys "$NOME_CHIAVE" 2>/dev/null | 
 [ -n "$FPR" ] || { echo "   non trovo la chiave dei pacchetti in $GNUPGHOME"; exit 1; }
 [ -f "$CHIAVE_SSH" ] || { echo "   non trovo la chiave ssh $CHIAVE_SSH"; exit 1; }
 if ! salta snap; then
-  snapcraft whoami 2>/dev/null | grep -q '^email:' || { echo "   non sei collegato allo Snap Store: lancia  snapcraft login  (oppure SALTA=snap)"; exit 1; }
+  grep -q '^email:' <<<"$(snapcraft whoami 2>/dev/null || true)" || { echo "   non sei collegato allo Snap Store: lancia  snapcraft logout  e poi  snapcraft login  (oppure SALTA=snap)"; exit 1; }
+fi
+if ! salta github && [ $PROVA = 0 ]; then
+  gh auth status >/dev/null 2>&1 || { echo "   gh non è collegato a GitHub: lancia  gh auth login  (oppure SALTA=github)"; exit 1; }
+  grep -qi "$GH_REPO" <<<"$(git remote get-url origin 2>/dev/null)" || { echo "   il repository origin non è $GH_REPO (oppure SALTA=github)"; exit 1; }
 fi
 libero=$(df -Pk "$HOME" | awk 'NR==2{print int($4/1048576)}')
 [ "$libero" -ge 5 ] || echo "   ATTENZIONE: solo $libero GB liberi nella home (ne servono circa 5)"
+fi
 
 ATTUALE=$(python3 -c "import json;print(json.load(open('package.json'))['version'])")
 REV_ATTUALE=$(grep -o '"--iteration", "[0-9]*"' electron-builder.ts | head -1 | sed 's/.*"\([0-9]*\)"$/\1/')
 [ -n "$REV_ATTUALE" ] || { echo "   electron-builder.ts: non trovo --iteration"; exit 1; }
-if [ $PROVA = 1 ]; then VER=$ATTUALE; REV=$REV_ATTUALE; fi
+if [ $PROVA = 1 ] || [ $PAGINA = 1 ]; then VER=$ATTUALE; REV=$REV_ATTUALE; fi
 DEBVER="$VER-$REV"
 [ "$REV" = 1 ] && VR=$VER || VR="$VER-$REV"
 PACCHETTI=("orizon-desktop_${VER}_amd64.deb" "orizon-desktop-${VER}.x86_64.rpm" "orizon-desktop-${VER}.pacman" "orizon-desktop-${VER}.tar.gz")
-ULTIMA=$(sed -n 's/^Version: //p' "$REPO_VERO/deb/dists/stable/main/binary-amd64/Packages" 2>/dev/null | sort -V | tail -1)
+ULTIMA=$(sed -n 's/^Version: //p' "$REPO_VERO/deb/dists/stable/main/binary-amd64/Packages" 2>/dev/null | sort -V | tail -1 || true)
 
-if [ $PROVA = 1 ]; then
+if [ $PAGINA = 1 ]; then
+  OUT="$REPO_VERO"
+  echo "   solo la pagina di download: versione $VR e data di oggi (i file in /dl restano com'è)"
+elif [ $PROVA = 1 ]; then
   OUT="$HOME/orizon-repo-prova"
   echo "   PROVA GENERALE con la versione attuale $VR: preparo tutto in $OUT, non pubblico niente"
 else
@@ -124,10 +148,12 @@ else
   fi
   STATO="$STATI/$DEBVER"
 fi
+if [ $PAGINA = 0 ]; then
 echo "   versione $VR (pacchetti $DEBVER) | nel repository: ${ULTIMA:-nessuna} | cartella $D"
 cambiati=$(git status --porcelain | grep -v -E ' (package\.json|electron-builder\.ts|orizon\.eu/repo/arch/PKGBUILD|orizon\.eu/flatpak/.*|orizon\.eu/rilascia\.sh)$' || true)
 [ -z "$cambiati" ] || { echo "   modifiche non salvate in git (finiranno nei pacchetti):"; echo "$cambiati" | head -10 | sed 's/^/     /'; }
 [ -z "$SALTA" ] || echo "   salto: $SALTA"
+fi
 if [ "${SI:-}" != 1 ]; then
   read -r -p "   Procedo? [s/N] " R
   [ "$R" = s ] || [ "$R" = S ] || { echo "   Non faccio niente."; STATO=""; exit 0; }
@@ -138,7 +164,7 @@ fatto_gia() { [ -n "$STATO" ] && grep -qx "$1" "$STATO"; }
 N=0; SALTATI=""
 passo() {  # passo <nome> <titolo> <funzione>
   N=$((N + 1))
-  if salta "$1"; then echo "== $N. $2: saltato"; SALTATI="$SALTATI $1"; return 0; fi
+  if salta "$1"; then [ $PAGINA = 1 ] || echo "== $N. $2: saltato"; SALTATI="$SALTATI $1"; return 0; fi
   if fatto_gia "$1"; then echo "== $N. $2: già fatto"; return 0; fi
   echo "== $N. $2"
   "$3"
@@ -257,7 +283,9 @@ p_pubblica() {
 
 p_sito() {
   agente
-  if [ $PROVA = 0 ]; then
+  if [ $PAGINA = 1 ]; then
+    echo "   aggiorno solo la pagina"
+  elif [ $PROVA = 0 ]; then
     echo "   carico pacman e tar.gz in $W/dl (circa 270 MB)"
     if command -v rsync >/dev/null && $SSH "$SERVER" "command -v rsync" >/dev/null 2>&1; then
       rsync -a --partial --chmod=F644 -e "$SSH" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}" "$SERVER:$W/dl/"
@@ -267,9 +295,10 @@ p_sito() {
   else
     echo "   prova: guardo la pagina di download senza cambiarla"
   fi
-  $SSH "$SERVER" "VER='$VER' VR='$VR' W='$W' DRY='$PROVA' python3 -" <<'PY'
+  $SSH "$SERVER" "VER='$VER' VR='$VR' W='$W' DRY='$PROVA' PAGINA='$PAGINA' python3 -" <<'PY'
 import datetime, hashlib, os, pathlib, re, sys, tarfile
 ver = os.environ["VER"]; vr = os.environ["VR"]; w = pathlib.Path(os.environ["W"]); dry = os.environ.get("DRY") == "1"
+solo_pagina = os.environ.get("PAGINA") == "1"
 dl = w / "dl"
 if not dl.is_dir(): sys.exit(f"   manca {dl}")
 if not dry and not os.access(dl, os.W_OK): sys.exit(f"   non posso scrivere in {dl}")
@@ -307,7 +336,7 @@ print(f"   sul sito ora: versione {vecchia or '?'}, {len(vecchi)} impronte in SH
 
 # indirizzi fissi e SHA256SUMS
 nuovi = {}
-if not dry:
+if not dry and not solo_pagina:
     for nome, dest in FISSI.items():
         vero = (dl / dest).resolve()
         if not vero.is_file(): sys.exit(f"   manca {dest} sul server")
@@ -328,7 +357,7 @@ for f in sorted(w.rglob("*.html")):
     if 'href="/dl/orizon-desktop-linux-' in f.read_text(encoding="utf-8", errors="replace"): pagine.append(f)
 if not pagine: sys.exit("   ERRORE: non trovo le pagine di download")
 if not dry:
-    copia = w.parent / f"www-prima-del-rilascio-{vr}.tgz"
+    copia = w.parent / (f"www-prima-della-pagina-{datetime.datetime.now():%Y%m%d-%H%M%S}.tgz" if solo_pagina else f"www-prima-del-rilascio-{vr}.tgz")
     if not copia.exists():
         with tarfile.open(copia, "w:gz") as tf:
             for f in pagine: tf.add(f, arcname=str(f.relative_to(w)))
@@ -348,11 +377,23 @@ def nuova_data(s, lingua):
         t = re.sub(r"(?<!\d)20\d\d(?!\d)", str(oggi.year), t, count=1)
         return m.group(1) + t + m.group(3)
     return re.sub(r'(<div class="agg">)(.*?)(</div>)', data, s, count=1, flags=re.S)
+VERSIONE = {"it": "Versione", "en": "Version", "fr": "Version", "es": "Versión", "de": "Version"}
+RX_VDIV = re.compile(r'<div class="agg versione">[^<]*</div>')
 avvisi = 0
 for f in pagine:
     rel = f.relative_to(w); s = f.read_text(encoding="utf-8"); prima = s; note = []
     m = re.search(r'<html[^>]*\blang="([a-zA-Z]{2})', s)
     lingua = m.group(1).lower() if m else (rel.parts[0] if len(rel.parts) > 1 else "it")
+    # versione mostrata sotto la data, nella testata della pagina
+    tv = '<div class="agg versione">' + VERSIONE.get(lingua, "Versione") + " " + vr + "</div>"
+    if RX_VDIV.search(s):
+        s3 = RX_VDIV.sub(lambda m: tv, s, count=1)
+        note.append(("versione " + vr) if s3 != s else ("versione " + vr + " (c'era già)"))
+        s = s3
+    else:
+        s3, k = re.subn(r'(<div class="agg">.*?</div>)', lambda m: m.group(1) + tv, s, count=1, flags=re.S)
+        if k: s = s3; note.append("versione " + vr + " aggiunta sotto la data")
+        else: note.append("versione: non trovo la data, non la aggiungo"); avvisi += 1
     # versione: ovunque tranne nel riquadro "Aggiornamenti automatici" (lì la 1.12.27 è quella da cui partono gli aggiornamenti)
     if rx_ver:
         a = s.find('<h3 id="aggiornamenti"')
@@ -363,8 +404,7 @@ for f in pagine:
             if b < 0: b = len(s)
         n = len(rx_ver.findall(s[:a])) + len(rx_ver.findall(s[b:]))
         s = rx_ver.sub(ver, s[:a]) + s[a:b] + rx_ver.sub(ver, s[b:])
-        note.append(f"versione {vecchia} -> {ver}: {n} volte")
-        if n == 0: avvisi += 1
+        if n: note.append(f"versione {vecchia} -> {ver}: {n} volte")
     # impronte del .deb (e degli altri, se la pagina le mostra)
     nh = 0
     for nome, h in vecchi.items():
@@ -385,7 +425,7 @@ if vecchia == ver: print(f"   stessa versione {ver}: cambiano solo impronte e da
 
 # file vecchi in /dl: tengo la versione nuova e quella di prima
 tenere = {ver} | ({vecchia} if vecchia else set())
-for p in sorted(dl.iterdir()):
+for p in ([] if solo_pagina else sorted(dl.iterdir())):
     m = re.fullmatch(r"orizon-desktop-(\d+\.\d+\.\d+)\.(pacman|tar\.gz)", p.name)
     if m and p.is_file() and not p.is_symlink() and m.group(1) not in tenere:
         mb = p.stat().st_size // 1048576
@@ -393,7 +433,12 @@ for p in sorted(dl.iterdir()):
         else: p.unlink(); print(f"   tolto /dl/{p.name} ({mb} MB)")
 if avvisi: print(f"   ATTENZIONE: {avvisi} cose da controllare nella pagina (vedi sopra)")
 PY
-  if [ $PROVA = 0 ]; then
+  if [ $PAGINA = 1 ]; then
+    for l in "" en/ fr/ es/ de/; do
+      grep -q "agg versione\">[^<]* $VR<" <<<"$(curl -fsS --max-time 30 "$SITO/${l}download" 2>/dev/null || true)" \
+        && echo "   $SITO/${l}download: versione $VR ok" || echo "   ATTENZIONE: $SITO/${l}download non mostra ancora la $VR"
+    done
+  elif [ $PROVA = 0 ]; then
     curl -fsS --max-time 30 "$SITO/dl/SHA256SUMS" > "$TMP/somme"
     attese=("$(sha256sum "$OUT/deb/pool/main/${PACCHETTI[0]}" | cut -d' ' -f1)" "$(sha256sum "$OUT/rpm/${PACCHETTI[1]}" | cut -d' ' -f1)"
             "$(sha256sum "dist/${PACCHETTI[2]}" | cut -d' ' -f1)" "$(sha256sum "dist/${PACCHETTI[3]}" | cut -d' ' -f1)")
@@ -412,10 +457,91 @@ p_git() {
   [ -f orizon.eu/rilascia.sh ] && git add orizon.eu/rilascia.sh
   if git -c user.name="$(git config user.name || echo 'Gianluca Casale')" -c user.email="$(git config user.email || echo info@4orizon.eu)" \
        commit -q -m "Orizon desktop $VR"; then
-    echo "   fatto: $(git log -1 --format='%h %s') (non inviato)"
+    echo "   fatto: $(git log -1 --format='%h %s')"
   else
     echo "   niente da salvare"
   fi
+}
+
+p_github() {
+  TAG="v$VR"
+  if [ $PROVA = 1 ]; then echo "   prova: non invio niente (sarebbe la release $TAG su $GH_REPO)"; return 0; fi
+  [ "$(git rev-parse --abbrev-ref HEAD)" = "$RAMO" ] || { echo "   sei sul ramo $(git rev-parse --abbrev-ref HEAD), serve $RAMO"; return 1; }
+  LA=$(gh api "repos/$GH_REPO/branches/$RAMO" --jq .commit.sha)
+  if ! git cat-file -e "$LA^{commit}" 2>/dev/null; then
+    echo "   scarico da GitHub quello che manca qui (può chiedere la passphrase della chiave ssh di GitHub)"
+    git fetch -q origin "$RAMO"
+  fi
+  git merge-base --is-ancestor "$LA" HEAD || { echo "   su GitHub ci sono commit che qui non hai: non invio niente"; return 1; }
+  NC=$(git rev-list --count "$LA..HEAD")
+  if [ "$NC" = 0 ]; then
+    echo "   codice: su GitHub c'è già"
+  else
+    GRANDI=$(git rev-list --objects "$LA..HEAD" | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' \
+             | awk '$1=="blob" && $2 > 95*1048576 {printf "     %d MB  %s\n", $2/1048576, $3}')
+    [ -z "$GRANDI" ] || { echo "   FERMO: file troppo grandi per GitHub:"; echo "$GRANDI"; return 1; }
+    NOMI=$(git diff --name-only "$LA" HEAD | grep -iE '\.(jks|keystore|p12|pfx|pem|key)$|(^|/)id_(rsa|ed25519|ecdsa)$|orizon-credenziali|gnupg|secring|\.env$' || true)
+    [ -z "$NOMI" ] || { echo "   FERMO: file che sembrano chiavi o credenziali:"; echo "$NOMI" | sed 's/^/     /'; return 1; }
+    CHIAVI=$(git diff "$LA" HEAD | grep -aE '^\+.*-----BEGIN ([A-Z]+ )*PRIVATE KEY( BLOCK)?-----' | head -3 || true)
+    [ -z "$CHIAVI" ] || { echo "   FERMO: nelle modifiche c'è una chiave privata"; return 1; }
+    echo "   invio $NC commit (niente file troppo grandi, niente chiavi; può chiedere la passphrase della chiave ssh di GitHub)"
+    git push -q origin "$RAMO"
+  fi
+  SHA=$(git rev-parse HEAD)
+  for i in 1 2 3 4 5 6; do
+    [ "$(gh api "repos/$GH_REPO/branches/$RAMO" --jq .commit.sha)" = "$SHA" ] && break
+    [ $i = 6 ] && { echo "   GitHub non vede ancora il commit ${SHA:0:7}: rilancia tra un minuto"; return 1; }
+    sleep 5
+  done
+  # gli stessi pacchetti del sito, con la versione nel nome
+  RD="$HOME/orizon-release-$VR"; mkdir -p "$RD"
+  SORG=("$OUT/deb/pool/main/${PACCHETTI[0]}" "$OUT/rpm/${PACCHETTI[1]}" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}")
+  NREL=("orizon-desktop_${VR}_amd64.deb" "orizon-desktop-${VR}.x86_64.rpm" "orizon-desktop-${VR}-x86_64.pacman" "orizon-desktop-${VR}.tar.gz")
+  SOMME=$(curl -fsS --max-time 30 "$SITO/dl/SHA256SUMS") || { echo "   non riesco a leggere $SITO/dl/SHA256SUMS"; return 1; }
+  : > "$RD/SHA256SUMS.txt"
+  for i in 0 1 2 3; do
+    [ -f "${SORG[$i]}" ] || { echo "   non trovo ${SORG[$i]}"; return 1; }
+    ln -f "${SORG[$i]}" "$RD/${NREL[$i]}" 2>/dev/null || cp -f "${SORG[$i]}" "$RD/${NREL[$i]}"
+    h=$(sha256sum "$RD/${NREL[$i]}" | cut -d' ' -f1)
+    grep -q "^$h " <<<"$SOMME" || { echo "   FERMO: ${NREL[$i]} non è quello del sito (impronta diversa)"; return 1; }
+    echo "$h  ${NREL[$i]}" >> "$RD/SHA256SUMS.txt"
+  done
+  echo "   pacchetti uguali al sito: ${NREL[*]}"
+  # novità: dal file, oppure dai titoli dei commit dall'ultimo rilascio
+  if [ -f "orizon.eu/novita/$VR.md" ]; then
+    NOVITA=$(cat "orizon.eu/novita/$VR.md")
+  else
+    PREC=$(git log --format='%H %s' | awk -v v="$VR" '$2=="Orizon" && $3=="desktop" && $4!=v && !t {print $1; t=1}' || true)
+    NOVITA=$(git log --no-merges --format='- %s' ${PREC:+$PREC..}HEAD | grep -v '^- Orizon desktop [0-9]' | head -15 || true)
+    [ -n "$NOVITA" ] || NOVITA="- Correzioni e miglioramenti"
+  fi
+  {
+    printf 'Novità\n%s\n\n' "$NOVITA"
+    printf 'Installazione consigliata, con gli aggiornamenti automatici: %s/download\n\n' "$SITO"
+    printf 'Oppure a mano, con il pacchetto:\n'
+    printf -- '- Debian, Ubuntu, Mint: sudo apt install ./%s\n' "${NREL[0]}"
+    printf -- '- Fedora: sudo dnf install ./%s\n' "${NREL[1]}"
+    printf -- '- openSUSE: sudo zypper install ./%s\n' "${NREL[1]}"
+    printf -- '- Arch, Manjaro: sudo pacman -U %s\n' "${NREL[2]}"
+    printf -- '- Qualsiasi distribuzione: estrai il .tar.gz e avvia orizon-desktop\n\n'
+    printf 'Requisiti: Linux a 64 bit con glibc 2.34 o successiva (Ubuntu 22.04+, Debian 12+, Fedora, Arch).\n'
+    printf 'Le impronte SHA256 sono nel file SHA256SUMS.txt e sono le stesse della pagina di download.\n'
+  } > "$RD/note.md"
+  FILE=("${NREL[@]/#/$RD/}" "$RD/SHA256SUMS.txt")
+  if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+    echo "   la release $TAG c'è già: ricarico i file"
+    gh release upload "$TAG" "${FILE[@]}" --repo "$GH_REPO" --clobber
+  else
+    for id in $(gh api "repos/$GH_REPO/releases" --jq ".[] | select(.draft and .tag_name == \"$TAG\") | .id"); do
+      gh api -X DELETE "repos/$GH_REPO/releases/$id" >/dev/null && echo "   tolta una bozza rimasta da prima"
+    done
+    echo "   creo la release $TAG (circa 500 MB da caricare)"
+    gh release create "$TAG" "${FILE[@]}" --repo "$GH_REPO" --target "$SHA" \
+      --title "Orizon $VR per Linux" --notes-file "$RD/note.md" --latest
+  fi
+  NA=$(gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets | length')
+  [ "$NA" -ge 5 ] || { echo "   sulla release ci sono solo $NA file su 5"; return 1; }
+  echo "   $(gh release view "$TAG" --repo "$GH_REPO" --json url --jq .url)"
 }
 
 p_snap() {
@@ -458,16 +584,20 @@ passo flatpak  "Flatpak firmato"                                p_flatpak
 passo pubblica "Pubblico il repository su $URL"                 p_pubblica
 passo sito     "Sito: /dl, impronte, versione e data"           p_sito
 passo git      "Salvo in git"                                   p_git
+passo github   "GitHub: codice e release"                       p_github
 passo snap     "Snap Store"                                     p_snap
 [ -z "$STATO" ] || [ -n "$SALTATI" ] || echo fine >> "$STATO"
 min=$(( ($(date +%s) - INIZIO) / 60 ))
-if [ $PROVA = 1 ]; then
+if [ $PAGINA = 1 ]; then
+  echo "== Pagina di download aggiornata: $SITO/download"
+elif [ $PROVA = 1 ]; then
   echo "== Prova finita in $min minuti: è andato tutto bene, non ho pubblicato niente."
   echo "   (la copia di prova del repository è in $OUT: puoi cancellarla con  rm -rf $OUT)"
 else
   echo "== Orizon $VR rilasciata in $min minuti"
   echo "   sito:    $SITO/download"
   echo "   apt, dnf, pacman e flatpak la vedono al prossimo aggiornamento; lo Snap Store la distribuisce da solo"
+  salta github || echo "   github:  https://github.com/$GH_REPO/releases/tag/v$VR"
   salta snap || echo "   snap:    https://snapcraft.io/$SNAP_NOME"
   [ -z "$SALTATI" ] || echo "   saltati:$SALTATI. Per farli dopo: bash $0 $ARG"
 fi

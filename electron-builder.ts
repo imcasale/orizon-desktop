@@ -150,10 +150,12 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         recommends: ["libsqlcipher0"],
         fpm: ["--deb-pre-depends", "libc6 (>= 2.34)", "--iteration", "1"],
         afterInstall: "build/linux/after-install.tpl",
+        afterRemove: "build/linux/after-remove.tpl",
     },
     rpm: {
         fpm: ["--iteration", "1"],
         afterInstall: "build/linux/after-install.tpl",
+        afterRemove: "build/linux/after-remove.tpl",
     },
     pacman: {
         depends: [
@@ -170,6 +172,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "mesa",
         ],
         fpm: ["--iteration", "1"],
+        afterRemove: "build/linux/after-remove.tpl",
     },
     mac: {
         target: ["dmg", "zip"],
