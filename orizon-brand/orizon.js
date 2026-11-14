@@ -70,6 +70,7 @@
     tutte: { it: 'Tutte', en: 'All', de: 'Alle', fr: 'Toutes', es: 'Todas', pt: 'Todas', nl: 'Alle', pl: 'Wszystkie', sv: 'Alla', da: 'Alle', fi: 'Kaikki', cs: 'Vše', sk: 'Všetky', hu: 'Összes', ro: 'Toate', bg: 'Всички', el: 'Όλες', hr: 'Sve', sl: 'Vse', et: 'Kõik', lv: 'Visas', lt: 'Visi', uk: 'Усі' },
     cerca: { it: 'Cerca', en: 'Search', de: 'Suchen', fr: 'Rechercher', es: 'Buscar', pt: 'Pesquisar', nl: 'Zoeken', pl: 'Szukaj', sv: 'Sök', da: 'Søg', fi: 'Hae', cs: 'Hledat', sk: 'Hľadať', hu: 'Keresés', ro: 'Caută', bg: 'Търсене', el: 'Αναζήτηση', hr: 'Traži', sl: 'Iskanje', et: 'Otsi', lv: 'Meklēt', lt: 'Ieškoti', uk: 'Пошук' },
     nuova: { it: 'Nuova chat', en: 'New chat', de: 'Neuer Chat', fr: 'Nouvelle discussion', es: 'Nuevo chat', pt: 'Nova conversa', nl: 'Nieuwe chat', pl: 'Nowy czat', sv: 'Ny chatt', da: 'Ny chat', fi: 'Uusi keskustelu', cs: 'Nový chat', sk: 'Nový chat', hu: 'Új csevegés', ro: 'Chat nou', bg: 'Нов чат', el: 'Νέα συνομιλία', hr: 'Novi chat', sl: 'Nov klepet', et: 'Uus vestlus', lv: 'Jauna tērzēšana', lt: 'Naujas pokalbis', uk: 'Новий чат' },
+    cancella: { it: 'Cancella', en: 'Clear', de: 'Löschen', fr: 'Effacer', es: 'Borrar', pt: 'Limpar', nl: 'Wissen', pl: 'Wyczyść', sv: 'Rensa', da: 'Ryd', fi: 'Tyhjennä', cs: 'Vymazat', sk: 'Vymazať', hu: 'Törlés', ro: 'Șterge', bg: 'Изчисти', el: 'Εκκαθάριση', hr: 'Očisti', sl: 'Počisti', et: 'Tühjenda', lv: 'Notīrīt', lt: 'Išvalyti', uk: 'Очистити' },
     profilo: { it: 'Profilo e impostazioni', en: 'Profile and settings', de: 'Profil und Einstellungen', fr: 'Profil et paramètres', es: 'Perfil y ajustes', pt: 'Perfil e definições', nl: 'Profiel en instellingen', pl: 'Profil i ustawienia', sv: 'Profil och inställningar', da: 'Profil og indstillinger', fi: 'Profiili ja asetukset', cs: 'Profil a nastavení', sk: 'Profil a nastavenia', hu: 'Profil és beállítások', ro: 'Profil și setări', bg: 'Профил и настройки', el: 'Προφίλ και ρυθμίσεις', hr: 'Profil i postavke', sl: 'Profil in nastavitve', et: 'Profiil ja seaded', lv: 'Profils un iestatījumi', lt: 'Profilis ir nustatymai', uk: 'Профіль і налаштування' }
   };
   function lang() { return (document.documentElement.lang || 'it').slice(0, 2).toLowerCase(); }
@@ -124,71 +125,85 @@
     this.el.style.setProperty('--orizon-hl-w', Math.max(0, this.R.x - this.L.x).toFixed(1) + 'px');
   };
 
-  /* schede che si allargano quando sono scelte (pillola in basso, sezioni delle impostazioni) */
-  function Tabs(track, items, opts) {
-    this.track = track; this.items = items; this.opts = opts;
-    /* come l'app: le schede si allargano con un piccolo rimbalzo (0,72 / 420), la pillola si fa piccola con 0,75 / 380 */
-    this.pos = new Spring(420, 0.72); this.lead = new Spring(900); this.mini = new Spring(380, 0.75); this.raf = 0; this.sel = -1;
-    this.measure();
+  /* ---------- la pillola in basso, come OrizonBottomPill.kt: le misure e le molle dell'app ----------
+     schede tonde alte 52 (44 quando la pillola è piccola); quella scelta si allarga e mostra il nome; dopo le schede,
+     dentro la stessa pillola, il + (48, piccolo 44). La scelta scorre con una molla 0,72 / 420, la pillola si fa
+     piccola con 0,75 / 380. */
+  var PB = { pad: 6, padMini: 5, h: 52, hMini: 44, gap: 4, dentro: 14, icona: 24, spazio: 8, piu: 48, piuMini: 44,
+    piuSp: 8, piuSpMini: 4, goccia: 84, gocciaMini: 62, fuori: 5, bordo: 2 };
+  function mix(a, b, f) { return a + (b - a) * f; }
+  function Pillola(basso) {
+    this.basso = basso;
+    this.pill = basso.querySelector('.orizon-pillola');
+    this.track = basso.querySelector('.orizon-tabs');
+    this.tabs = Array.prototype.slice.call(basso.querySelectorAll('.orizon-tab'));
+    this.spazio = basso.querySelector('.oz-piu-spazio');
+    this.piu = basso.querySelector('.orizon-piu');
+    this.pos = new Spring(420, 0.72); this.mini = new Spring(380, 0.75);
+    this.sel = -1; this.raf = 0; this.larghe = []; this.last = 0;
+    this.misura();
   }
-  Tabs.prototype.measure = function () {
-    var o = this.opts;
-    this.collapsed = this.items.map(function (it) { return o.collapsed(it); });
-    this.expanded = this.items.map(function (it) { return o.expanded(it); });
-    this.gap = o.gap || 0;
-  };
-  Tabs.prototype.width = function (i, p) {
-    var w = Math.max(0, Math.min(1, 1 - Math.abs(p - i)));
-    var full = this.collapsed[i] + (this.expanded[i] - this.collapsed[i]) * w;
-    var m = Math.max(0, Math.min(1, this.mini.x)), small = this.opts.miniW || full;
-    return full + (small - full) * m;
-  };
-  Tabs.prototype.start = function (i, p) { var x = 0; for (var k = 0; k < i; k++) x += this.width(k, p) + this.gap; return x; };
-  Tabs.prototype.edge = function (e, p, right) {
-    var n = this.items.length - 1, self = this;
-    function at(k) { return self.start(k, p) + (right ? self.width(k, p) : 0); }
-    if (n <= 0) return at(0);
-    var i = Math.max(0, Math.min(n - 1, Math.floor(e))), f = Math.max(0, Math.min(1, e - i));
-    return at(i) + (at(i + 1) - at(i)) * f;
-  };
-  Tabs.prototype.draw = function () {
-    var p = this.pos.x, lead = this.lead.x, self = this;
-    this.items.forEach(function (it, i) {
-      it.style.width = self.width(i, p).toFixed(1) + 'px';
-      var lb = self.opts.label(it);
-      if (lb) lb.style.opacity = (Math.max(0, 1 - Math.abs(p - i)) * (1 - Math.max(0, Math.min(1, self.mini.x)))).toFixed(3);
+  Pillola.prototype.m = function () { return Math.max(0, Math.min(1, this.mini.x)); };
+  Pillola.prototype.pad = function (m) { return mix(PB.pad, PB.padMini, m); };
+  Pillola.prototype.alta = function (m) { return mix(PB.h, PB.hMini, m); };
+  Pillola.prototype.peso = function (i, p) { return Math.max(0, Math.min(1, 1 - Math.abs(p - i))); };
+  Pillola.prototype.nome = function (i, p, m) { return this.peso(i, p) * (1 - m); };
+  Pillola.prototype.larga = function (i, p, m) { var c = this.alta(m); return c + ((this.larghe[i] || c) - c) * this.nome(i, p, m); };
+  /* dove comincia la scheda i, dal bordo della pillola */
+  Pillola.prototype.inizio = function (i, p, m) { var x = this.pad(m); for (var k = 0; k < i; k++) x += this.larga(k, p, m) + PB.gap; return x; };
+  Pillola.prototype.fine = function (p, m) { var n = this.tabs.length - 1; return this.inizio(n, p, m) + this.larga(n, p, m); };
+  Pillola.prototype.misura = function () {
+    /* scheda aperta: 14 + icona 24 + 8 + nome + 14, più 1 perché l'arrotondamento non tagli l'ultima lettera */
+    this.larghe = this.tabs.map(function (t) {
+      var b = t.querySelector('b'); if (!b) return PB.h;
+      var w = b.scrollWidth || b.getBoundingClientRect().width;
+      return PB.dentro * 2 + PB.icona + PB.spazio + 1 + Math.ceil(w);
     });
-    var fwd = lead >= p;
-    var L = this.edge(fwd ? p : lead, p, false), R = this.edge(fwd ? lead : p, p, true);
-    var off = this.opts.offset || 0;
-    this.track.style.setProperty('--orizon-hl-x', (L + off).toFixed(1) + 'px');
-    this.track.style.setProperty('--orizon-hl-w', Math.max(0, R - L).toFixed(1) + 'px');
   };
-  Tabs.prototype.select = function (i, instant) {
+  Pillola.prototype.draw = function () {
+    var p = this.pos.x, m = this.m(), self = this, pad = this.pad(m), h = this.alta(m), ic = (h - PB.icona) / 2;
+    var r = function (n) { return (Math.round(n * 100) / 100) + 'px'; };
+    this.pill.style.padding = r(pad);
+    this.tabs.forEach(function (t, i) {
+      t.style.width = r(self.larga(i, p, m));
+      t.style.height = r(h);
+      var d = t.firstElementChild;
+      if (d) {
+        d.style.left = r(ic);
+        var w = self.peso(i, p), sv = d.querySelector('svg'), b = d.querySelector('b');
+        if (sv) sv.style.color = 'color-mix(in srgb, var(--o-text) ' + Math.round(w * 100) + '%, var(--o-text-2))';
+        if (b) b.style.opacity = self.nome(i, p, m).toFixed(3);
+      }
+    });
+    this.spazio.style.width = r(mix(PB.piuSp, PB.piuSpMini, m));
+    var ps = r(mix(PB.piu, PB.piuMini, m));
+    this.piu.style.width = ps; this.piu.style.height = ps;
+    if (this.track.__goccia) this.track.__goccia.kick();
+  };
+  Pillola.prototype.select = function (i, instant) {
     if (i < 0) return;
-    if (this.sel === -1 || instant) {
-      this.sel = i; this.pos.x = this.pos.t = this.lead.x = this.lead.t = i; this.pos.v = this.lead.v = 0; this.draw(); return;
-    }
+    if (this.sel === -1 || instant || reduced) { this.sel = i; this.pos.x = this.pos.t = i; this.pos.v = 0; this.draw(); return; }
     if (i === this.sel) return;
-    this.sel = i; this.pos.t = i; this.lead.t = i;
+    this.sel = i; this.pos.t = i;
     this.run();
   };
-  Tabs.prototype.setMini = function (on) {
+  Pillola.prototype.setMini = function (on) {
     var t = on ? 1 : 0;
     if (this.mini.t === t) return;
     this.mini.t = t;
     if (reduced) { this.mini.x = t; this.draw(); return; }
     this.run();
   };
-  Tabs.prototype.run = function () {
-    var self = this, last = performance.now();
-    cancelAnimationFrame(this.raf);
-    (function frame(now) {
-      var dt = Math.min(0.034, (now - last) / 1000); last = now;
-      self.pos.step(dt); self.lead.step(dt); self.mini.step(dt); self.draw();
-      if (!(self.pos.settled() && self.lead.settled() && self.mini.settled())) self.raf = requestAnimationFrame(frame);
-      else { self.pos.x = self.lead.x = self.sel; self.mini.x = self.mini.t; self.draw(); }
-    })(last);
+  Pillola.prototype.run = function () {
+    if (this.raf) return;
+    var self = this;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(function f(now) {
+      var dt = Math.max(0.001, Math.min(0.032, (now - self.last) / 1000)); self.last = now;
+      self.pos.step(dt); self.mini.step(dt); self.draw();
+      if (self.pos.settled() && self.mini.settled()) { self.pos.x = self.pos.t; self.pos.v = 0; self.mini.x = self.mini.t; self.mini.v = 0; self.draw(); self.raf = 0; return; }
+      self.raf = requestAnimationFrame(f);
+    });
   };
 
   var gocce = [];
@@ -508,6 +523,7 @@
   Goccia.prototype.riposo = function (it) {
     var i = this.o.sel ? this.o.sel() : -1;
     if (i < 0 || i >= it.length) return null;
+    if (this.o.riposo) return this.o.riposo(i);
     return { x: it[i].x, y: it[i].y, w: it[i].w, h: it[i].h };
   };
 
@@ -619,6 +635,7 @@
   Goccia.prototype.afferra = function (spec, x) {
     /* niente cattura del puntatore: il clic deve arrivare alla voce sotto (tocco veloce), il resto lo seguo dalla finestra */
     this.preso = true;
+    this.mi = -1;
     this.premi(x, spec);
   };
   Goccia.prototype.muovi = function (e) {
@@ -631,6 +648,11 @@
       else return;
     }
     this.trascina(x);
+    /* trascinando, la voce sotto la goccia (EmojiCategoryPill: la lista segue la goccia) */
+    if (this.o.move && this.spec) {
+      var it = this.rects(), cx = Math.max(Math.min(this.spec.min, this.spec.max), Math.min(Math.max(this.spec.min, this.spec.max), x));
+      if (it.length) { var i = this.nearest(it, cx); if (i !== this.mi) { this.mi = i; this.o.move(i, it[i].el); } }
+    }
     this.kick();
   };
   Goccia.prototype.fine = function () {
@@ -774,8 +796,8 @@
 
   /* ---------- le bolle di vetro (il + e i tasti tondi): premute crescono con un rimbalzo e si illuminano sotto il mouse,
      come Glass.Regular.interactive() dell'app (molla 0,5 / 380 premendo, 0,42 / 300 lasciando) ---------- */
-  function Bolla(el, senzaLuce) {
-    this.el = el;
+  function Bolla(el, senzaLuce, compagni) {
+    this.el = el; this.compagni = compagni;
     el.classList.add('orizon-bolla');
     if (senzaLuce) el.__ozBagliore = false; this.p = 0; this.v = 0; this.giu = false; this.x = 0; this.y = 0; this.raf = 0; this.last = 0;
     var g = document.createElement('span');
@@ -818,6 +840,16 @@
   Bolla.prototype.draw = function () {
     var el = this.el, w = el.offsetWidth || 1, h = el.offsetHeight || 1, s = 1 + 6 / w * this.p;
     el.style.transform = 'scale(' + (Math.round(s * 1000) / 1000) + ')';
+    /* chi sta dentro la pillola ma non è suo figlio (la foto della chat) cresce con lei, dallo stesso centro */
+    if (this.compagni) {
+      var b = el.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+      this.compagni().forEach(function (c) {
+        if (s === 1) { c.style.transform = ''; c.style.transformOrigin = ''; return; }
+        var o = c.getBoundingClientRect(), k = Math.round(s * 1000) / 1000;
+        if (!c.style.transform) c.style.transformOrigin = Math.round(cx - o.left) + 'px ' + Math.round(cy - o.top) + 'px';
+        c.style.transform = 'scale(' + k + ')';
+      });
+    }
     var a = Math.max(0, Math.min(1, this.p)) * (chiaro() ? 0.35 : 0.16);
     this.g.style.opacity = a > 0.002 ? '1' : '0';
     this.g.style.background = 'radial-gradient(circle ' + Math.round(Math.min(w, h) * 1.2) + 'px at ' + Math.round(this.x) + 'px ' + Math.round(this.y) + 'px, rgba(255,255,255,' + (Math.round(a * 1000) / 1000) + '), rgba(255,255,255,0))';
@@ -838,9 +870,10 @@
     if (!testa) {
       testa = document.createElement('div');
       testa.id = 'orizon-testa';
-      testa.innerHTML = '<h1></h1><div class="orizon-pillola orizon-vetro">' +
-        '<button type="button" class="orizon-tasto" data-a="cerca">' + ICON.cerca + '</button>' +
-        '<button type="button" class="orizon-tasto orizon-foto" data-a="profilo"></button></div>';
+      /* come HomeTopBar: la foto e le azioni insieme in una pillola di vetro (GlassActionsPill) */
+      testa.innerHTML = '<h1></h1><div class="orizon-pillola orizon-vetro oz-azioni">' +
+        '<button type="button" class="orizon-tasto orizon-foto" data-a="profilo"></button>' +
+        '<button type="button" class="orizon-tasto" data-a="cerca">' + ICON.cerca + '</button></div>';
       testa.querySelector('[data-a="cerca"]').onclick = function () {
         var b = $('[data-testid="room-list-search"] button');
         if (b) b.click();
@@ -854,8 +887,17 @@
     }
     if (testa.parentNode !== panel || panel.firstChild !== testa) {
       panel.insertBefore(testa, panel.firstChild);
-      liquid(testa.querySelector('.orizon-pillola'), { scale: -70 });
     }
+    /* GlassActionsPill: premendo esce la goccia (58 x alta la pillola + 10, 5 sopra), segue soltanto il mouse:
+       il centro resta tra 24 e la larghezza - 24; i tasti sotto fanno da soli */
+    var azioni = testa.querySelector('.oz-azioni');
+    goccia(azioni, {
+      items: function () { return $$('.orizon-tasto', azioni); },
+      sel: function () { return -1; },
+      gesture: 'feedback',
+      layer: function () { return testa; },
+      spec: function () { var w = azioni.offsetWidth, h = azioni.offsetHeight; return { w: 58, h: h + 10, top: -5, min: 24, max: w - 24 }; }
+    });
     var h1 = testa.querySelector('h1');
     var title = scheda === 1 ? t('spazi') : inHome() ? t('conv') : (($('[data-testid="room-list-header"] h1') || {}).textContent || t('conv'));
     if (h1.textContent !== title) h1.textContent = title;
@@ -955,8 +997,8 @@
     filtri.bordi();
   }
 
-  /* ---------- pillola in basso: Chat / Spazi / + ---------- */
-  var basso = null, bassoTabs = null, scheda = 0;
+  /* ---------- pillola in basso: Chat / Spazi e il + dentro la stessa pillola (OrizonBottomPill) ---------- */
+  var basso = null, pillola = null, scheda = 0;
   function apriSpazi(on) {
     scheda = on ? 1 : 0;
     document.body.classList.toggle('orizon-spazi', !!on);
@@ -965,7 +1007,7 @@
       if (sp && sp.classList.contains('collapsed')) { var tg = $('.mx_SpacePanel_toggleCollapse', sp); if (tg) tg.click(); }
       posizionaSpazi();
     }
-    if (bassoTabs) bassoTabs.select(scheda);
+    if (pillola) pillola.select(scheda);
     if (basso) $$('.orizon-tab', basso).forEach(function (b, i) { b.classList.toggle('on', i === scheda); b.setAttribute('aria-selected', i === scheda ? 'true' : 'false'); });
     schedule();
   }
@@ -984,11 +1026,12 @@
     if (!basso) {
       basso = document.createElement('div');
       basso.id = 'orizon-basso';
-      basso.innerHTML = '<div class="orizon-pillola orizon-vetro" role="tablist">' +
-        '<div class="orizon-tabs">' +
+      basso.innerHTML = '<div class="orizon-pillola orizon-vetro">' +
+        '<div class="orizon-tabs" role="tablist">' +
         '<button type="button" class="orizon-tab on" role="tab" aria-selected="true"><span>' + ICON.chat + '<b data-t="chat"></b></span></button>' +
         '<button type="button" class="orizon-tab" role="tab" aria-selected="false"><span>' + ICON.spazi + '<b data-t="spazi"></b></span></button>' +
-        '</div></div><button type="button" class="orizon-piu orizon-vetro">' + ICON.piu + '</button>';
+        '</div><span class="oz-piu-spazio" aria-hidden="true"></span>' +
+        '<button type="button" class="orizon-piu oz-annidato">' + ICON.piu + '</button></div>';
       var tabs = $$('.orizon-tab', basso);
       tabs[0].onclick = function () {
         var wasSpaces = scheda === 1;
@@ -1003,40 +1046,30 @@
     }
     if (basso.parentNode !== panel) {
       panel.appendChild(basso);
-      liquid($('.orizon-pillola', basso), { scale: -90 });
-      bassoTabs = null;
+      pillola = null;
     }
-    $$('[data-t]', basso).forEach(function (b) { var v = t(b.getAttribute('data-t')); if (b.textContent !== v) b.textContent = v; });
+    var cambiate = false;
+    $$('[data-t]', basso).forEach(function (b) { var v = t(b.getAttribute('data-t')); if (b.textContent !== v) { b.textContent = v; cambiate = true; } });
     $('.orizon-piu', basso).setAttribute('aria-label', scheda === 1 ? t('spazi') : t('nuova'));
-    var tabs = $$('.orizon-tab', basso);
-    var key = lang();
-    if (!bassoTabs || bassoTabs.key !== key) {
-      bassoTabs = new Tabs($('.orizon-tabs', basso), tabs, {
-        gap: 0,
-        miniW: 40,
-        collapsed: function (it) { var s = it.firstChild; return 13 + s.firstChild.getBoundingClientRect().width + 13; },
-        expanded: function (it) { var s = it.firstChild; s.style.width = 'max-content'; var w = s.getBoundingClientRect().width; s.style.width = ''; return Math.ceil(w) + 1; },
-        label: function (it) { return it.querySelector('b'); }
-      });
-      bassoTabs.key = key;
-      bassoTabs.select(scheda, true);
-      if (mini) { bassoTabs.mini.x = bassoTabs.mini.t = 1; bassoTabs.draw(); }
-    }
-    var tr = $('.orizon-tabs', basso);
+    if (!pillola) {
+      pillola = new Pillola(basso);
+      pillola.select(scheda, true);
+      if (mini) { pillola.mini.x = pillola.mini.t = 1; pillola.draw(); }
+    } else if (cambiate) { pillola.misura(); pillola.draw(); }
+    var tr = pillola.track;
     tr.classList.add('orizon-con-goccia');
-    /* come OrizonBottomPill: goccia di misura fissa (84dp, 62 quando è piccola, in proporzione alle schede di qui),
-       alta come la pillola più 5 sopra e sotto; il centro resta tra la prima e l'ultima scheda */
+    /* la goccia come OrizonBottomPill: larga 84 (62 quando è piccola), alta come la pillola più 5 sopra e sotto;
+       il centro resta tra la prima e l'ultima scheda; a riposo è la selezione sotto la scheda scelta */
     goccia(tr, {
       items: function () { return $$('.orizon-tab', basso); },
       sel: function () { return scheda; },
       gesture: 'select',
       layer: function () { return basso; },
-      spec: function (it) {
-        var pill = $('.orizon-pillola', basso), pad = pill ? (parseFloat(getComputedStyle(pill).paddingTop) || 4) : 4;
-        var h = it.length ? it[0].h : 44, y = it.length ? it[0].y : 0, k = h / 52, m = Math.max(0, Math.min(1, bassoTabs ? bassoTabs.mini.x : 0));
-        var f = it[0], z = it[it.length - 1];
-        return { w: Math.round((84 + (62 - 84) * m) * k), h: h + pad * 2 + 10, top: y - pad - 5,
-          min: f ? f.x + h / 2 - 2 : 0, max: z ? z.x + z.w - h / 2 + 2 : 0 };
+      riposo: function (i) { var m = pillola.m(), pad = pillola.pad(m); return { x: pillola.inizio(i, i, m) - pad, y: 0, w: pillola.larga(i, i, m), h: pillola.alta(m) }; },
+      spec: function () {
+        var m = pillola.m(), pad = pillola.pad(m), h = pillola.alta(m);
+        return { w: mix(PB.goccia, PB.gocciaMini, m), h: h + pad * 2 + PB.fuori * 2, top: -pad - PB.fuori,
+          min: h / 2 - PB.bordo, max: pillola.fine(pillola.pos.x, m) - pad - h / 2 + PB.bordo };
       }
     });
   }
@@ -1047,7 +1080,7 @@
     if (on === mini) return;
     mini = on;
     if (basso) basso.classList.toggle('orizon-mini', on);
-    if (bassoTabs) bassoTabs.setMini(on);
+    if (pillola) pillola.setMini(on);
     kickGocce();
     segui(520);
   }
@@ -1144,11 +1177,455 @@
     } catch (e) { /* niente: resta la disposizione scelta */ }
   }
 
+  /* ================================================================
+     9. TUTTO IL VETRO DELL'APP
+     Gli stessi pezzi dell'app Android (libraries/designsystem/.../orizon/glass), uno per uno, su tutto il computer:
+       le isole (GlassIsland) con il bordo di luce, e il velo che sale sotto la riga (rememberGlassRowIndication);
+       i campi di ricerca (GlassSearchField); le pillole (GlassPillButton); i tasti tondi (GlassIconButton);
+       il + della chat e il suo menu che esce dal + (AttachmentsBottomSheet); le emoji con la goccia (EmojiPanel);
+       i tasti grandi delle info (MainActionButton); e come si aprono e si chiudono finestre e menu.
+     Le misure, i colori e le molle sono quelli dell'app; qui i dp diventano pixel.
+     ================================================================ */
+
+  /* ---------- 9a. le molle anche nel CSS ----------
+     spring(dampingRatio, stiffness) di Compose: la curva esatta, campionata a 60 fotogrammi, diventa un easing linear().
+     Nel CSS si usano come var(--oz-m-<smorzamento x 100>-<rigidità>), per esempio var(--oz-m-50-420). */
+  var LINEARE = !!(window.CSS && CSS.supports && CSS.supports('transition-timing-function', 'linear(0, 1)'));
+  function molla(z, k) {
+    if (reduced) return { ms: 1, easing: 'linear' };
+    if (!LINEARE) return { ms: 460, easing: z < 0.7 ? 'cubic-bezier(.3, 1.6, .45, 1)' : 'cubic-bezier(.25, 1.1, .35, 1)' };
+    var w = Math.sqrt(k), dt = 1 / 60, xs = [], fine = 0;
+    for (var i = 0; i <= 240; i++) {
+      var t = i * dt, x;
+      if (z < 1) { var wd = w * Math.sqrt(1 - z * z); x = 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + z * w / wd * Math.sin(wd * t)); }
+      else x = 1 - Math.exp(-w * t) * (1 + w * t);
+      xs.push(x);
+      if (Math.abs(1 - x) > 0.003) fine = i;
+    }
+    var n = Math.min(xs.length, fine + 2), p = xs.slice(0, n).map(function (x) { return Math.round(x * 1000) / 1000; });
+    p[0] = 0; p[n - 1] = 1;
+    return { ms: Math.round((n - 1) * dt * 1000), easing: 'linear(' + p.join(',') + ')' };
+  }
+  (function () {
+    var css = ':root{';
+    [[0.5, 420], [0.5, 520], [0.4, 500], [0.42, 520], [0.62, 420], [0.55, 420], [0.45, 380], [0.6, 380], [0.62, 380],
+      [0.55, 520], [0.7, 300], [0.72, 420], [0.75, 380]].forEach(function (m) {
+      var c = molla(m[0], m[1]);
+      css += '--oz-m-' + Math.round(m[0] * 100) + '-' + m[1] + ':' + c.ms + 'ms ' + c.easing + ';';
+    });
+    var st = document.createElement('style');
+    st.id = 'oz-molle';
+    st.textContent = css + '}';
+    (document.head || document.documentElement).appendChild(st);
+  })();
+  /* un'animazione con la molla (trasformazione) e la dissolvenza lineare, come le transizioni di Compose */
+  function animaMolla(el, da, a, z, k, origine) {
+    if (reduced || !el.animate) return null;
+    var m = molla(z, k);
+    if (origine) el.style.transformOrigin = origine;
+    return el.animate([{ transform: da }, { transform: a }], { duration: m.ms, easing: m.easing });
+  }
+  function dissolvi(el, da, a, ms, poi) {
+    if (reduced || !el.animate) { if (poi) poi(); return null; }
+    var x = el.animate([{ opacity: da }, { opacity: a }], { duration: ms, easing: 'linear', fill: 'forwards' });
+    if (poi) x.onfinish = poi;
+    return x;
+  }
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var r2 = function (n) { return Math.round(n * 100) / 100; };
+
+  /* ---------- 9b. le isole (GlassIsland) ----------
+     fondo pieno (5% di bianco nello scuro, 3,5% di nero nel chiaro), ombra (elevazione 10), una luce larga dentro al
+     bordo e il bordo di luce: tutti e due con la sfumatura dall'angolo in alto a sinistra a quello in basso a destra,
+     cioè lungo la diagonale: l'angolo dipende dalla forma, lo mette qui --oz-ang. */
+  var ISOLE = '.ozf-isola, .orizon-info-isola, .mx_SettingsSubsection:not(.mx_SettingsSubsection .mx_SettingsSubsection), .mx_UserProfileSettings, ' +
+    '.mx_SettingsTab .mx_SettingsSection_subSections:not(:has(.mx_SettingsSubsection)):not(:has(.mx_BetaCard)):not(:has(.mx_UserProfileSettings)):not(:empty), ' +
+    '.mx_SettingsTab form.mx_SetIntegrationManager, .mx_SettingsTab .mx_SettingsSection_newUi:not(.mx_SettingsSection_newUi .mx_SettingsSection_newUi), ' +
+    '.mx_SettingsTab .mx_BetaCard, .mx_UserInfo .mx_UserInfo_container:not(.mx_UserInfo_header), .mx_InviteDialog_userSections ul[role="listbox"]';
+  function angolo(el) {
+    var w = el.offsetWidth, h = el.offsetHeight;
+    if (!w || !h) return;
+    var a = (90 + Math.atan(h / w) * 180 / Math.PI).toFixed(1) + 'deg';
+    if (el.__ozAng !== a) { el.__ozAng = a; el.style.setProperty('--oz-ang', a); }
+  }
+  var roAngolo = window.ResizeObserver ? new ResizeObserver(function (v) { v.forEach(function (x) { angolo(x.target); }); }) : null;
+  function isola(el) {
+    if (el.__ozIsola) return;
+    /* un'isola dentro un'isola no: resta quella fuori */
+    if (el.parentElement && el.parentElement.closest('.oz-isola')) return;
+    el.__ozIsola = true;
+    el.classList.add('oz-isola');
+    angolo(el);
+    if (roAngolo) roAngolo.observe(el);
+  }
+  /* nel pannello delle info Element non mette le voci in un contenitore: l'isola si disegna dietro a ogni gruppo
+     di voci una sopra l'altra (tra un gruppo e l'altro c'è uno spazio) */
+  function isoleDietro(cont, sel) {
+    var righe = $$(sel, cont).filter(function (r) { return r.offsetHeight > 0; });
+    var cr = cont.getBoundingClientRect(), gruppi = [], g = null, prec = null;
+    righe.forEach(function (r) {
+      var b = r.getBoundingClientRect();
+      if (g && Math.abs(b.top - prec.bottom) < 1.5 && Math.abs(b.left - prec.left) < 1.5) { g.b = b.bottom; g.righe.push(r); }
+      else { g = { t: b.top, b: b.bottom, l: b.left, w: b.width, righe: [r] }; gruppi.push(g); }
+      prec = b;
+    });
+    var vecchie = $$(':scope > .oz-isola-dietro', cont);
+    gruppi.forEach(function (g, i) {
+      var d = vecchie[i];
+      if (!d) {
+        d = document.createElement('div');
+        d.className = 'oz-isola oz-isola-dietro';
+        d.setAttribute('aria-hidden', 'true');
+        cont.appendChild(d);
+      }
+      var x = g.l - cr.left + cont.scrollLeft - cont.clientLeft, y = g.t - cr.top + cont.scrollTop - cont.clientTop;
+      var k = Math.round(x) + ',' + Math.round(y) + ',' + Math.round(g.w) + ',' + Math.round(g.b - g.t);
+      if (d.__k !== k) {
+        d.__k = k;
+        d.style.left = Math.round(x) + 'px'; d.style.top = Math.round(y) + 'px';
+        d.style.width = Math.round(g.w) + 'px'; d.style.height = Math.round(g.b - g.t) + 'px';
+        d.style.setProperty('--oz-ang', (90 + Math.atan((g.b - g.t) / g.w) * 180 / Math.PI).toFixed(1) + 'deg');
+      }
+      var rossa = g.righe.every(function (r) { return r.getAttribute('data-kind') === 'critical'; });
+      if (d.classList.contains('oz-rossa') !== rossa) d.classList.toggle('oz-rossa', rossa);
+    });
+    vecchie.slice(gruppi.length).forEach(function (d) { d.remove(); });
+  }
+  function isole() {
+    $$(ISOLE).forEach(isola);
+    /* l'isola delle azioni che tolgono qualcosa (rimuovi, blocca...) è appena rossa */
+    $$('.mx_UserInfo .oz-isola').forEach(function (el) {
+      var v = $$('[class*="_item_"]', el), rossa = v.length > 0 && v.every(function (r) { return r.getAttribute('data-kind') === 'critical'; });
+      if (el.classList.contains('oz-rossa') !== rossa) el.classList.toggle('oz-rossa', rossa);
+    });
+    $$('.mx_RightPanel [role="menubar"]').forEach(function (m) {
+      if (!m.classList.contains('oz-con-isole')) m.classList.add('oz-con-isole');
+      isoleDietro(m, '[class*="_item_"][role^="menuitem"]');
+    });
+  }
+
+  /* ---------- 9c. il velo sotto la riga (rememberGlassRowIndication) ----------
+     Premendo una riga sale un velo di vetro: compare in 60 ms e cresce con un rimbalzo (0,55 / 520) da 90% x 80%;
+     resta almeno 110 ms, poi si spegne in 280 ms e torna piccolo (0,7 / 300). Sul computer c'è anche il mouse:
+     passandoci sopra il velo sale a metà, premendo si accende tutto. */
+  var RIGHE = '.ozf-riga, .orizon-info-riga, .mx_RightPanel [role="menubar"] [class*="_item_"][role^="menuitem"], ' +
+    '.mx_UserInfo [class*="_item_"][role="button"], [role="menu"] [class*="_item_"][role^="menuitem"], .mx_IconizedContextMenu_item, ' +
+    '.mx_SpotlightDialog_option:not(.mx_SpotlightDialog_recentlyViewed .mx_SpotlightDialog_option), [role="listbox"] > [class*="_richItem_"][role="option"], ' +
+    '.mx_SettingsTab [class*="_inline-field_"]:not(.mx_ThemeChoicePanel_themeSelector):has(> [class*="_inline-field-control_"] input), .mx_SettingsFlag';
+  var VELO_SOPRA = 0.55, MIN_VELO = 110;
+  function Velo(r) {
+    this.r = r; this.v = 0; this.g = new Spring(520, 0.55); this.sopra = false; this.giu = false; this.t0 = 0; this.tm = 0; this.raf = 0; this.last = 0;
+    r.classList.add('oz-riga');
+    r.__ozVelo = this;
+  }
+  Velo.prototype.forma = function () {
+    var r = this.r, w = r.offsetWidth - 12, h = r.offsetHeight - 5;
+    if (w <= 0 || h <= 0) return;
+    r.style.setProperty('--oz-vr', Math.min(20, h / 2).toFixed(1) + 'px');
+    r.style.setProperty('--oz-vang', (90 + Math.atan(h / w) * 180 / Math.PI).toFixed(1) + 'deg');
+  };
+  Velo.prototype.meta = function () { return this.giu ? 1 : this.sopra ? VELO_SOPRA : 0; };
+  Velo.prototype.vai = function () {
+    if (this.v < 0.01) this.forma();
+    if (this.raf) return;
+    var self = this;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(function f(now) {
+      var dt = clamp((now - self.last) / 1000, 0.001, 0.032);
+      self.last = now;
+      var m = self.meta();
+      if (reduced) { self.v = m; self.g.x = m > 0 ? 1 : 0; }
+      else {
+        /* visibilità: su in 60 ms, giù in 280 ms; crescita: molla, più morbida quando si spegne */
+        if (self.v < m) self.v = Math.min(m, self.v + dt / 0.06);
+        else if (self.v > m) self.v = Math.max(m, self.v - dt / 0.28);
+        self.g.t = m > 0 ? 1 : 0;
+        if (m > 0) { self.g.k = 520; self.g.z = 0.55; } else { self.g.k = 300; self.g.z = 0.7; }
+        self.g.step(dt);
+      }
+      self.r.style.setProperty('--oz-v', self.v.toFixed(3));
+      self.r.style.setProperty('--oz-g', self.g.x.toFixed(3));
+      var fermo = Math.abs(self.v - m) < 0.001 && self.g.settled();
+      if (fermo || !self.r.isConnected) { self.raf = 0; if (m === 0) { self.g.x = 0; self.r.style.setProperty('--oz-g', '0'); } return; }
+      self.raf = requestAnimationFrame(f);
+    });
+  };
+  Velo.prototype.entra = function () { this.sopra = true; this.vai(); };
+  Velo.prototype.esci = function () { this.sopra = false; if (!this.giu) this.vai(); };
+  Velo.prototype.premi = function () { clearTimeout(this.tm); this.giu = true; this.t0 = performance.now(); this.vai(); };
+  Velo.prototype.lascia = function () {
+    if (!this.giu) return;
+    var self = this, d = performance.now() - this.t0;
+    clearTimeout(this.tm);
+    var fai = function () { self.giu = false; self.vai(); };
+    if (d < MIN_VELO) this.tm = setTimeout(fai, MIN_VELO - d); else fai();
+  };
+  function veloDi(r) {
+    if (!r || r.disabled || r.getAttribute('aria-disabled') === 'true') return null;
+    return r.__ozVelo || new Velo(r);
+  }
+  var veloSopra = null, veliGiu = [];
+  document.addEventListener('pointerover', function (e) {
+    var r = e.target && e.target.closest ? e.target.closest(RIGHE) : null;
+    if (r === veloSopra) return;
+    if (veloSopra && veloSopra.__ozVelo) veloSopra.__ozVelo.esci();
+    veloSopra = r;
+    var v = veloDi(r);
+    if (v) v.entra();
+  }, true);
+  document.addEventListener('pointerout', function (e) {
+    if (e.relatedTarget || !veloSopra) return;
+    if (veloSopra.__ozVelo) veloSopra.__ozVelo.esci();
+    veloSopra = null;
+  }, true);
+  document.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    var v = veloDi(e.target && e.target.closest ? e.target.closest(RIGHE) : null);
+    if (v) { v.premi(); veliGiu.push(v); }
+  }, true);
+  var lasciaVeli = function () { veliGiu.forEach(function (v) { v.lascia(); }); veliGiu = []; };
+  window.addEventListener('pointerup', lasciaVeli, true);
+  window.addEventListener('pointercancel', lasciaVeli, true);
+  window.addEventListener('blur', lasciaVeli);
+
+  /* ---------- 9d. i campi di ricerca (GlassSearchField) ----------
+     pillola di vetro alta 52; con il cursore dentro cresce un po' (1,025) con un rimbalzo (0,5 / 420);
+     a destra la x per cancellare, che entra con un rimbalzo (0,5 / 520) quando c'è qualcosa scritto */
+  var CERCHE = '.ozf-cerca, .mx_SpotlightDialog_searchBox, .mx_RoomSummaryCard_search > label, [class*="_picker_"] > [class*="_search_"], .mx_InviteDialog_editor';
+  var X_ICONA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>';
+  function svuota(inp) {
+    try {
+      var d = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      d.set.call(inp, '');
+    } catch (e) { inp.value = ''; }
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function cerche() {
+    $$(CERCHE).forEach(function (c) {
+      if (c.__ozCerca) return;
+      var inp = $('input', c);
+      if (!inp) return;
+      c.__ozCerca = true;
+      c.classList.add('oz-cerca');
+      /* senza la sua lente, la lente la disegna il CSS a sinistra */
+      if (!$(':scope > svg, :scope > .ozf-ic, :scope > [class*="_searchIcon_"]', c)) c.classList.add('oz-icona-finta');
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'oz-cancella';
+      x.tabIndex = -1;
+      x.setAttribute('aria-label', t('cancella'));
+      x.innerHTML = X_ICONA;
+      x.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      x.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); svuota(inp); inp.focus(); });
+      c.appendChild(x);
+      c.__ozInp = inp;
+      inp.addEventListener('input', function () { pieno(c); });
+    });
+    $$('.oz-cerca').forEach(pieno);
+  }
+  function pieno(c) {
+    var inp = c.__ozInp;
+    if (!inp) return;
+    var on = !!inp.value;
+    if (c.classList.contains('oz-pieno') !== on) c.classList.toggle('oz-pieno', on);
+  }
+
+  /* ---------- 9e. menu e finestre: come entrano e come escono ----------
+     Il menu del + esce dal + (scala da 0,18, perno in basso a sinistra, molla 0,62 / 420, dissolvenza 160 ms) e la
+     conversazione dietro si scurisce (nero al 28%); chiudendo rimpicciolisce a 0,4 in 160 ms. Gli altri menu escono
+     dal punto dove si è cliccato, le finestre crescono dal centro. Element toglie subito menu e finestre chiusi:
+     una copia (ferma, non cliccabile) fa l'uscita al loro posto. */
+  var ultimoClic = { x: 0, y: 0, t: 0 };
+  document.addEventListener('pointerdown', function (e) { ultimoClic = { x: e.clientX, y: e.clientY, t: performance.now() }; }, true);
+  var aperti = [];
+  function origineDalClic(p) {
+    var b = p.getBoundingClientRect();
+    if (performance.now() - ultimoClic.t > 1200 || !b.width) return '50% 0';
+    var x = clamp(ultimoClic.x - b.left, 0, b.width), y = clamp(ultimoClic.y - b.top, 0, b.height);
+    return Math.round(x) + 'px ' + Math.round(y) + 'px';
+  }
+  function menuPiu(w, p) {
+    var tasto = $('.mx_MessageComposer_buttonMenu'), riga = $('.mx_MessageComposer_row');
+    if (tasto && riga) {
+      var a = tasto.getBoundingClientRect(), c = riga.getBoundingClientRect();
+      /* come AttachmentsBottomSheet: a sinistra sopra il +, 6 sopra la barra per scrivere */
+      w.style.setProperty('left', Math.round(a.left) + 'px', 'important');
+      w.style.setProperty('right', 'auto', 'important');
+      w.style.setProperty('top', 'auto', 'important');
+      w.style.setProperty('bottom', Math.round(window.innerHeight - c.top + 6) + 'px', 'important');
+    }
+    /* il velo scuro copre solo la conversazione */
+    var bg = $(':scope > .mx_ContextualMenu_background', w), rv = $('.mx_RoomView');
+    if (bg && rv) {
+      var r = rv.getBoundingClientRect();
+      bg.style.clipPath = 'inset(' + Math.round(r.top) + 'px ' + Math.round(window.innerWidth - r.right) + 'px ' + Math.round(window.innerHeight - r.bottom) + 'px ' + Math.round(r.left) + 'px)';
+    }
+    /* come sull'app, gli allegati stanno nel menu del +: in cima la voce "Allegato" (fa lo stesso del tasto con la graffetta) */
+    var lista = $('.mx_IconizedContextMenu_optionList', p), su = $('.mx_MessageComposer_actions > .oz-allegato');
+    if (lista && su && !$('.oz-voce-allegato', lista)) {
+      var nome = su.getAttribute('aria-label') || '';
+      var li = document.createElement('li');
+      li.className = 'mx_AccessibleButton mx_IconizedContextMenu_item oz-voce-allegato';
+      li.setAttribute('role', 'menuitem');
+      li.tabIndex = -1;
+      li.setAttribute('aria-label', nome);
+      var ic = $('svg', su);
+      if (ic) li.appendChild(ic.cloneNode(true));
+      var s = document.createElement('span');
+      s.className = 'mx_IconizedContextMenu_label';
+      s.textContent = nome;
+      li.appendChild(s);
+      var vai = function (e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        var b = $(':scope > .mx_ContextualMenu_background', w);
+        if (b) b.click();
+        setTimeout(function () { su.click(); }, 0);
+      };
+      li.addEventListener('click', vai);
+      li.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') vai(e); });
+      lista.insertBefore(li, lista.firstChild);
+    }
+  }
+  /* la goccia nelle categorie delle emoji (EmojiCategoryPill): larga 1,3 schede, alta 36 + 16, esce 4 sopra;
+     trascinandola la lista va alla categoria sotto la goccia */
+  function menuEmoji(w, p) {
+    var picker = $('[class*="_picker_"]', p), nav = picker && $(':scope > nav[role="tablist"]', picker);
+    if (!nav) return;
+    nav.classList.add('oz-pillola-annidata', 'orizon-con-goccia');
+    var tasti = function () { return $$(':scope > button', nav); };
+    goccia(nav, {
+      items: tasti,
+      sel: function () { return tasti().findIndex(function (b) { return b.getAttribute('aria-selected') === 'true'; }); },
+      gesture: 'select',
+      layer: function () { return picker; },
+      move: function (i, el) { if (!el.disabled) el.click(); },
+      pick: function (i, el) { if (!el.disabled) el.click(); },
+      spec: function (it) {
+        var f = it[0], z = it[it.length - 1], tw = f ? f.w : 40, pad = 4;
+        return { w: tw * 1.3, h: (f ? f.h : 36) + pad * 4, top: (f ? f.y : pad) - pad * 2, min: f ? f.x + f.w / 2 : 0, max: z ? z.x + z.w / 2 : 0 };
+      }
+    });
+  }
+  function menu() {
+    $$('.mx_ContextualMenu_wrapper, [data-radix-popper-content-wrapper]').forEach(function (w) {
+      if (w.__ozMenu || w.classList.contains('oz-fantasma')) return;
+      var radix = !w.classList.contains('mx_ContextualMenu_wrapper');
+      var p = radix ? $(':scope > [role="menu"]', w) : $(':scope > .mx_ContextualMenu', w);
+      if (!p) return;
+      w.__ozMenu = true;
+      var tipo = w.classList.contains('mx_MessageComposer_Menu') ? 'piu' : $('[class*="_picker_"]', p) ? 'emoji' : 'menu';
+      w.classList.add('oz-menu', 'oz-menu-' + tipo);
+      if (tipo === 'piu') menuPiu(w, p);
+      if (tipo === 'emoji') menuEmoji(w, p);
+      var bg = $(':scope > .mx_ContextualMenu_background', w);
+      if (tipo === 'piu') {
+        animaMolla(p, 'scale(.18)', 'scale(1)', 0.62, 420, '8% 100%');
+        dissolvi(p, 0, 1, 160);
+        if (bg) dissolvi(bg, 0, 1, 220);
+      } else {
+        animaMolla(p, tipo === 'emoji' ? 'scale(.5)' : 'scale(.6)', 'scale(1)', 0.62, 420, tipo === 'emoji' ? '92% 100%' : origineDalClic(p));
+        dissolvi(p, 0, 1, 160);
+      }
+      aperti.push({ w: w, p: p, tipo: tipo });
+    });
+    /* il menu del + segue il + (se la finestra cambia misura) */
+    $$('.oz-menu-piu').forEach(function (w) { var p = $(':scope > .mx_ContextualMenu', w); if (p && !w.classList.contains('oz-fantasma')) menuPiu(w, p); });
+    var piuAperto = !!$('.oz-menu-piu:not(.oz-fantasma)');
+    var tasto = $('.mx_MessageComposer_buttonMenu');
+    if (tasto && tasto.classList.contains('oz-aperto') !== piuAperto) tasto.classList.toggle('oz-aperto', piuAperto);
+    aperti = aperti.filter(function (m) {
+      if (m.w.isConnected) return true;
+      esceMenu(m);
+      return false;
+    });
+  }
+  function fantasma(w) {
+    w.classList.add('oz-fantasma');
+    w.setAttribute('aria-hidden', 'true');
+    try { w.inert = true; } catch (e) {}
+    w.style.pointerEvents = 'none';
+    document.body.appendChild(w);
+    setTimeout(function () { if (w.isConnected) w.remove(); }, 600);
+  }
+  function esceMenu(m) {
+    if (reduced || !m.p.animate) return;
+    fantasma(m.w);
+    var piu = m.tipo === 'piu';
+    m.p.animate([{ transform: 'scale(1)' }, { transform: piu ? 'scale(.4)' : 'scale(.9)' }], { duration: 160, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' });
+    dissolvi(m.p, 1, 0, piu ? 140 : 130, function () { m.w.remove(); });
+    var bg = $(':scope > .mx_ContextualMenu_background', m.w);
+    if (bg) dissolvi(bg, 1, 0, 180);
+  }
+  /* le finestre di Element: crescono dal centro con la molla e il fondo si scurisce; chiudendo rimpiccioliscono */
+  var finestreAperte = [];
+  function finestre() {
+    $$('.mx_Dialog_wrapper').forEach(function (w) {
+      if (w.__ozFin || w.classList.contains('oz-fantasma')) return;
+      var d = $('.mx_Dialog', w);
+      if (!d) return;
+      w.__ozFin = true;
+      animaMolla(d, 'scale(.92)', 'scale(1)', 0.62, 420, '50% 50%');
+      dissolvi(d, 0, 1, 160);
+      var bg = $('.mx_Dialog_background', w);
+      if (bg && !w.previousElementSibling) dissolvi(bg, 0, 1, 220);
+      finestreAperte.push({ w: w, d: d, bg: bg });
+    });
+    finestreAperte = finestreAperte.filter(function (f) {
+      if (f.w.isConnected) return true;
+      if (reduced || !f.d.animate) return false;
+      /* se ne è appena entrata un'altra al suo posto (finestra dopo finestra) esce solo la finestra, non il fondo */
+      fantasma(f.w);
+      f.d.animate([{ transform: 'scale(1)' }, { transform: 'scale(.94)' }], { duration: 180, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' });
+      dissolvi(f.d, 1, 0, 160, function () { f.w.remove(); });
+      if (f.bg) { if ($('.mx_Dialog_wrapper:not(.oz-fantasma)')) f.bg.style.opacity = '0'; else dissolvi(f.bg, 1, 0, 200); }
+      return false;
+    });
+  }
+
+  /* ---------- 9f. il tasto per tornare in fondo alla chat: entra con un rimbalzo (scala da 0,3, 0,45 / 380) ---------- */
+  function tastiTimeline() {
+    $$('.mx_JumpToBottomButton, .mx_TopUnreadMessagesBar').forEach(function (b) {
+      if (b.__ozEntrato) return;
+      b.__ozEntrato = true;
+      var x = $('.mx_JumpToBottomButton_scrollDown, .mx_TopUnreadMessagesBar_scrollUp', b) || b;
+      animaMolla(x, 'translateY(' + (b.classList.contains('mx_TopUnreadMessagesBar') ? '-' : '') + '22px) scale(.3)', 'translateY(0) scale(1)', 0.45, 380, '50% 50%');
+      dissolvi(x, 0, 1, 160);
+    });
+  }
+
+  /* ---------- 9g. la pillola col nome nella chat: preme come vetro interattivo, la foto va con lei ---------- */
+  function nomeChat() {
+    var p = $('.mx_RoomHeader_infoWrapper');
+    if (!p || p.__ozBolla) return;
+    p.__ozBolla = new Bolla(p, false, function () { return $$('.mx_RoomHeader > .mx_WithPresenceIndicator, .mx_RoomHeader > .mx_BaseAvatar'); });
+  }
+
+  /* ---------- tutto insieme ---------- */
+  var BOLLE = '.ozf-bianco, .orizon-azione-tondo, .mx_JumpToBottomButton_scrollDown, .mx_TopUnreadMessagesBar_scrollUp, ' +
+    '.mx_InviteDialog_editor [class*="_pill_"], .mx_InviteDialog_goButton, .mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"], ' +
+    '.mx_Dialog_buttons button[class*="_button_"], .mx_Dialog_buttons .mx_Dialog_primary, .mx_Dialog_buttons button, .mx_IncomingCallToast_actionButton, ' +
+    '.mx_IncomingLegacyCallToast_buttons [role="button"]';
+  function tutto() {
+    var su = $('.mx_MessageComposer_actions > button[class*="_icon-button_"]');
+    if (su && !su.classList.contains('oz-allegato')) su.classList.add('oz-allegato');
+    isole();
+    /* le righe hanno subito il loro velo (spento): così niente fondi e righe di Element sotto */
+    $$(RIGHE).forEach(function (r) { if (!r.classList.contains('oz-riga')) r.classList.add('oz-riga'); });
+    cerche();
+    menu();
+    finestre();
+    tastiTimeline();
+    nomeChat();
+    bolle(BOLLE);
+  }
   /* ---------- quali vetri hanno la lente: 'v' pillole e tasti (Glass.Regular), 'p' finestre e menu (Glass.Thick) ---------- */
   var VETRI = [
     ['.orizon-vetro, .mx_RoomHeader_infoWrapper, .mx_TimelineSeparator > [class*="_content_"], .mx_MessageComposer_buttonMenu, ' +
       '[class*="_container_1opqj_"], .mx_LegacyCallEvent, .mx_ReplyPreview, .mx_Dialog_cancelButton, ' +
-      '.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels, .ozf-vetro, .orizon-azione-tondo', 'v'],
+      '.mx_TabbedView_tabsOnLeft .mx_TabbedView_tabLabels, .ozf-vetro, .orizon-azione-tondo, .oz-cerca, .ozf-bianco, ' +
+      '.mx_JumpToBottomButton_scrollDown, .mx_TopUnreadMessagesBar_scrollUp, .mx_InviteDialog_editor [class*="_pill_"], .mx_InviteDialog_goButton, .mx_IncomingCallToast_actionButton, ' +
+      '.mx_RightPanel .mx_BaseCard_header > button[class*="_icon-button_"], .mx_Dialog_buttons button', 'v'],
     ['.mx_MessageComposer_row', 'v', true],
     ['.mx_Dialog, .mx_ContextualMenu, .mx_IconizedContextMenu, [role="menu"][data-state="open"], .mx_Toast_toast, ' +
       '.mx_MessageActionBar, .ozf-dialogo, #orizon-avviso', 'p']
@@ -1166,9 +1643,10 @@
       headerActions();
       settingsTabs();
       if (scheda === 1) posizionaSpazi();
+      tutto();
       vetri(VETRI);
-      bolle('#orizon-basso .orizon-piu, #orizon-testa .orizon-tasto, .ozf-tondo, .orizon-azione-tondo');
-      bolle('.mx_MessageComposer_buttonMenu, .mx_Dialog_cancelButton, .mx_MessageComposer_sendMessage', true);
+      bolle('#orizon-basso .orizon-piu, .ozf-tondo, .orizon-azione-tondo');
+      bolle('.mx_MessageComposer_buttonMenu, .mx_Dialog_cancelButton', true);
       kickGocce();
     } catch (e) {
       if (window.console) console.warn('orizon', e);

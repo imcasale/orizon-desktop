@@ -600,3 +600,30 @@ html.oz-lente body.cpd-theme-light {
 .orizon-bolla {
   transition-property: width, height, background, background-color, color, box-shadow, opacity, padding !important;
 }
+
+/* ---------- come nel resto dell'app (v6): scelte tonde 24 col pallino che entra con la molla 0,4 / 500,
+   la x della finestra è un tasto tondo di vetro 46 ---------- */
+[role="dialog"] [class*="_container_"]:has(> input[type="radio"]) {
+  --size: 24px !important;
+}
+[role="dialog"] input[type="radio"] + [class*="_ui_"]::after {
+  inline-size: 10px !important;
+  block-size: 10px !important;
+  border: 0 !important;
+  transform: scale(0);
+  transition: transform 667ms linear(0,0.062,0.22,0.429,0.653,0.86,1.03,1.153,1.226,1.253,1.243,1.207,1.156,1.099,1.045,1,0.966,0.945,0.936,0.937,0.945,0.958,0.972,0.986,0.998,1.007,1.013,1.016,1.016,1.014,1.011,1.008,1.004,1.001,0.999,0.997,0.996,0.996,0.996,0.997,1) !important;
+}
+[role="dialog"] input[type="radio"]:checked + [class*="_ui_"]::after {
+  transform: scale(1);
+}
+[role="dialog"] [class*="_close_"] {
+  box-sizing: border-box !important;
+  inline-size: 46px !important;
+  block-size: 46px !important;
+  padding: 12px !important;
+  color: var(--oz-text) !important;
+}
+[role="dialog"] [class*="_close_"] svg {
+  inline-size: 22px !important;
+  block-size: 22px !important;
+}

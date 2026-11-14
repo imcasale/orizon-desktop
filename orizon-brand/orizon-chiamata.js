@@ -327,6 +327,7 @@
   Goccia.prototype.riposo = function (it) {
     var i = this.o.sel ? this.o.sel() : -1;
     if (i < 0 || i >= it.length) return null;
+    if (this.o.riposo) return this.o.riposo(i);
     return { x: it[i].x, y: it[i].y, w: it[i].w, h: it[i].h };
   };
 
@@ -438,6 +439,7 @@
   Goccia.prototype.afferra = function (spec, x) {
     /* niente cattura del puntatore: il clic deve arrivare alla voce sotto (tocco veloce), il resto lo seguo dalla finestra */
     this.preso = true;
+    this.mi = -1;
     this.premi(x, spec);
   };
   Goccia.prototype.muovi = function (e) {
@@ -450,6 +452,11 @@
       else return;
     }
     this.trascina(x);
+    /* trascinando, la voce sotto la goccia (EmojiCategoryPill: la lista segue la goccia) */
+    if (this.o.move && this.spec) {
+      var it = this.rects(), cx = Math.max(Math.min(this.spec.min, this.spec.max), Math.min(Math.max(this.spec.min, this.spec.max), x));
+      if (it.length) { var i = this.nearest(it, cx); if (i !== this.mi) { this.mi = i; this.o.move(i, it[i].el); } }
+    }
     this.kick();
   };
   Goccia.prototype.fine = function () {
@@ -593,8 +600,8 @@
 
   /* ---------- le bolle di vetro (il + e i tasti tondi): premute crescono con un rimbalzo e si illuminano sotto il mouse,
      come Glass.Regular.interactive() dell'app (molla 0,5 / 380 premendo, 0,42 / 300 lasciando) ---------- */
-  function Bolla(el, senzaLuce) {
-    this.el = el;
+  function Bolla(el, senzaLuce, compagni) {
+    this.el = el; this.compagni = compagni;
     el.classList.add('orizon-bolla');
     if (senzaLuce) el.__ozBagliore = false; this.p = 0; this.v = 0; this.giu = false; this.x = 0; this.y = 0; this.raf = 0; this.last = 0;
     var g = document.createElement('span');
@@ -637,6 +644,16 @@
   Bolla.prototype.draw = function () {
     var el = this.el, w = el.offsetWidth || 1, h = el.offsetHeight || 1, s = 1 + 6 / w * this.p;
     el.style.transform = 'scale(' + (Math.round(s * 1000) / 1000) + ')';
+    /* chi sta dentro la pillola ma non è suo figlio (la foto della chat) cresce con lei, dallo stesso centro */
+    if (this.compagni) {
+      var b = el.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+      this.compagni().forEach(function (c) {
+        if (s === 1) { c.style.transform = ''; c.style.transformOrigin = ''; return; }
+        var o = c.getBoundingClientRect(), k = Math.round(s * 1000) / 1000;
+        if (!c.style.transform) c.style.transformOrigin = Math.round(cx - o.left) + 'px ' + Math.round(cy - o.top) + 'px';
+        c.style.transform = 'scale(' + k + ')';
+      });
+    }
     var a = Math.max(0, Math.min(1, this.p)) * (chiaro() ? 0.35 : 0.16);
     this.g.style.opacity = a > 0.002 ? '1' : '0';
     this.g.style.background = 'radial-gradient(circle ' + Math.round(Math.min(w, h) * 1.2) + 'px at ' + Math.round(this.x) + 'px ' + Math.round(this.y) + 'px, rgba(255,255,255,' + (Math.round(a * 1000) / 1000) + '), rgba(255,255,255,0))';
