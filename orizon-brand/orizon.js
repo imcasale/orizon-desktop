@@ -2408,3 +2408,301 @@
     try { c.on('accountData', function () { infoKey = ''; schedule(); }); c.on('Room.accountData', function () { infoKey = ''; schedule(); }); c.on('Room.receipt', function () { infoKey = ''; schedule(); }); } catch (e) {}
   })();
 })();
+
+/* ================================================================
+   10. SPUNTE DEGLI ACCOUNT VERIFICATI
+   La lista sta sul server di Orizon (brand/verificati.json):
+   { "account": { "@gian:4orizon.eu": "fondatore", ... }, "stanze": { "!idDelGruppo:4orizon.eu": "noprofit", ... } }.
+   I gruppi si segnano con l'ID interno della stanza (Impostazioni > Avanzato), che non cambia mai.
+   Tipi: fondatore (bianca nel tema scuro, nera nel chiaro), ufficiale (rosso Orizon), persona (blu),
+   noprofit (verde), azienda (oro), governo (grigio).
+   La rosetta va accanto al nome: elenco delle chat, intestazione, info della chat, profilo, mittenti e persone.
+   Cliccandola si apre una bolla di vetro che dice cos'è. Le misure sono quelle provate:
+   alta quanto le maiuscole (0,92 em), centrata sulle maiuscole, a 0,3 em dal nome.
+   ================================================================ */
+(function () {
+  'use strict';
+  if (window.__orizonSpunte) return;
+  window.__orizonSpunte = true;
+
+  /* ---------- la lista: dal server, con una copia nel browser per quando si è senza rete ---------- */
+  var WEB = location.protocol === 'http:' || location.protocol === 'https:';
+  var URL_LISTA = WEB ? 'brand/verificati.json' : 'https://app.4orizon.eu/brand/verificati.json';
+  var TIPI_OK = { fondatore: 1, ufficiale: 1, persona: 1, noprofit: 1, azienda: 1, governo: 1 };
+  var lista = {};
+  /* una sola mappa: le persone hanno la @ davanti, i gruppi il ! */
+  function pulisci(j) {
+    var out = {}, a = j && j.account, st = j && j.stanze;
+    if (!a || typeof a !== 'object') return null;
+    Object.keys(a).forEach(function (u) {
+      var t = a[u];
+      if (typeof t === 'string' && TIPI_OK[t] && /^@[^:\s]+:[^\s]+$/.test(u)) out[u] = t;
+    });
+    if (st && typeof st === 'object') Object.keys(st).forEach(function (r) {
+      var t = st[r];
+      if (typeof t === 'string' && TIPI_OK[t] && /^![^:\s]+(:[^\s]+)?$/.test(r)) out[r] = t;
+    });
+    return out;
+  }
+  function perCopia(l) {
+    var a = {}, st = {};
+    Object.keys(l).forEach(function (k) { (k.charAt(0) === '!' ? st : a)[k] = l[k]; });
+    return { account: a, stanze: st };
+  }
+  try { lista = pulisci(JSON.parse(localStorage.getItem('orizon.verificati') || 'null')) || {}; } catch (e) { lista = {}; }
+  function carica() {
+    if (!window.fetch) return;
+    fetch(URL_LISTA, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      var l = pulisci(j);
+      if (!l) return;
+      lista = l;
+      try { localStorage.setItem('orizon.verificati', JSON.stringify(perCopia(l))); } catch (e) { /* niente copia: va bene uguale */ }
+      tutti = true; schedule();
+    }).catch(function () { /* senza rete resta la copia di prima */ });
+  }
+  carica();
+  setInterval(carica, 30 * 60 * 1000);
+
+  /* ---------- parole nelle 23 lingue ---------- */
+  var P = {
+    fondatore: { it: 'Fondatore di Orizon', en: 'Founder of Orizon', de: 'Gründer von Orizon', fr: "Fondateur d'Orizon", es: 'Fundador de Orizon', pt: 'Fundador da Orizon', nl: 'Oprichter van Orizon', pl: 'Założyciel Orizon', sv: 'Grundare av Orizon', da: 'Grundlægger af Orizon', fi: 'Orizonin perustaja', cs: 'Zakladatel Orizonu', sk: 'Zakladateľ Orizonu', hu: 'Az Orizon alapítója', ro: 'Fondatorul Orizon', bg: 'Основател на Orizon', el: 'Ιδρυτής του Orizon', hr: 'Osnivač Orizona', sl: 'Ustanovitelj Orizona', et: 'Orizoni asutaja', lv: 'Orizon dibinātājs', lt: 'Orizon įkūrėjas', uk: 'Засновник Orizon' },
+    ufficiale: { it: 'Account ufficiale di Orizon', en: 'Official Orizon account', de: 'Offizielles Orizon-Konto', fr: 'Compte officiel Orizon', es: 'Cuenta oficial de Orizon', pt: 'Conta oficial da Orizon', nl: 'Officieel Orizon-account', pl: 'Oficjalne konto Orizon', sv: 'Officiellt Orizon-konto', da: 'Officiel Orizon-konto', fi: 'Orizonin virallinen tili', cs: 'Oficiální účet Orizonu', sk: 'Oficiálny účet Orizonu', hu: 'Hivatalos Orizon-fiók', ro: 'Cont oficial Orizon', bg: 'Официален профил на Orizon', el: 'Επίσημος λογαριασμός του Orizon', hr: 'Službeni račun Orizona', sl: 'Uradni račun Orizona', et: 'Orizoni ametlik konto', lv: 'Oficiālais Orizon konts', lt: 'Oficiali Orizon paskyra', uk: 'Офіційний акаунт Orizon' },
+    persona: { it: 'Persona verificata', en: 'Verified person', de: 'Verifizierte Person', fr: 'Personne vérifiée', es: 'Persona verificada', pt: 'Pessoa verificada', nl: 'Geverifieerd persoon', pl: 'Zweryfikowana osoba', sv: 'Verifierad person', da: 'Verificeret person', fi: 'Vahvistettu henkilö', cs: 'Ověřená osoba', sk: 'Overená osoba', hu: 'Ellenőrzött személy', ro: 'Persoană verificată', bg: 'Потвърдено лице', el: 'Επαληθευμένο πρόσωπο', hr: 'Provjerena osoba', sl: 'Preverjena oseba', et: 'Kinnitatud isik', lv: 'Pārbaudīta persona', lt: 'Patvirtintas asmuo', uk: 'Підтверджена особа' },
+    noprofit: { it: 'Associazione no profit registrata', en: 'Registered non-profit', de: 'Eingetragener gemeinnütziger Verein', fr: 'Association à but non lucratif enregistrée', es: 'Asociación sin ánimo de lucro registrada', pt: 'Associação sem fins lucrativos registada', nl: 'Geregistreerde non-profitorganisatie', pl: 'Zarejestrowana organizacja non-profit', sv: 'Registrerad ideell förening', da: 'Registreret nonprofitforening', fi: 'Rekisteröity voittoa tavoittelematon yhdistys', cs: 'Registrovaná nezisková organizace', sk: 'Registrovaná nezisková organizácia', hu: 'Bejegyzett nonprofit szervezet', ro: 'Asociație non-profit înregistrată', bg: 'Регистрирано сдружение с нестопанска цел', el: 'Εγγεγραμμένος μη κερδοσκοπικός οργανισμός', hr: 'Registrirana neprofitna udruga', sl: 'Registrirano neprofitno združenje', et: 'Registreeritud mittetulundusühing', lv: 'Reģistrēta bezpeļņas organizācija', lt: 'Registruota ne pelno organizacija', uk: 'Зареєстрована неприбуткова організація' },
+    azienda: { it: 'Azienda verificata', en: 'Verified company', de: 'Verifiziertes Unternehmen', fr: 'Entreprise vérifiée', es: 'Empresa verificada', pt: 'Empresa verificada', nl: 'Geverifieerd bedrijf', pl: 'Zweryfikowana firma', sv: 'Verifierat företag', da: 'Verificeret virksomhed', fi: 'Vahvistettu yritys', cs: 'Ověřená firma', sk: 'Overená firma', hu: 'Ellenőrzött cég', ro: 'Companie verificată', bg: 'Потвърдена фирма', el: 'Επαληθευμένη εταιρεία', hr: 'Provjerena tvrtka', sl: 'Preverjeno podjetje', et: 'Kinnitatud ettevõte', lv: 'Pārbaudīts uzņēmums', lt: 'Patvirtinta įmonė', uk: 'Підтверджена компанія' },
+    governo: { it: 'Ente governativo', en: 'Government body', de: 'Behörde', fr: 'Organisme public', es: 'Organismo público', pt: 'Organismo público', nl: 'Overheidsinstantie', pl: 'Instytucja rządowa', sv: 'Myndighet', da: 'Offentlig myndighed', fi: 'Viranomainen', cs: 'Státní instituce', sk: 'Štátna inštitúcia', hu: 'Kormányzati szerv', ro: 'Instituție publică', bg: 'Държавна институция', el: 'Δημόσιος φορέας', hr: 'Državno tijelo', sl: 'Državni organ', et: 'Valitsusasutus', lv: 'Valsts iestāde', lt: 'Valstybinė institucija', uk: 'Державна установа' },
+    utente: { it: 'Utente verificato', en: 'Verified user', de: 'Verifizierter Nutzer', fr: 'Utilisateur vérifié', es: 'Usuario verificado', pt: 'Utilizador verificado', nl: 'Geverifieerde gebruiker', pl: 'Zweryfikowany użytkownik', sv: 'Verifierad användare', da: 'Verificeret bruger', fi: 'Vahvistettu käyttäjä', cs: 'Ověřený uživatel', sk: 'Overený používateľ', hu: 'Ellenőrzött felhasználó', ro: 'Utilizator verificat', bg: 'Потвърден потребител', el: 'Επαληθευμένος χρήστης', hr: 'Provjereni korisnik', sl: 'Preverjen uporabnik', et: 'Kinnitatud kasutaja', lv: 'Pārbaudīts lietotājs', lt: 'Patvirtintas naudotojas', uk: 'Підтверджений користувач' },
+    daGruppo: { it: 'Gruppo verificato da Orizon', en: 'Group verified by Orizon', de: 'Von Orizon verifizierte Gruppe', fr: 'Groupe vérifié par Orizon', es: 'Grupo verificado por Orizon', pt: 'Grupo verificado pela Orizon', nl: 'Groep geverifieerd door Orizon', pl: 'Grupa zweryfikowana przez Orizon', sv: 'Grupp verifierad av Orizon', da: 'Gruppe verificeret af Orizon', fi: 'Orizonin vahvistama ryhmä', cs: 'Skupina ověřená Orizonem', sk: 'Skupina overená Orizonom', hu: 'Az Orizon által ellenőrzött csoport', ro: 'Grup verificat de Orizon', bg: 'Група, потвърдена от Orizon', el: 'Ομάδα επαληθευμένη από το Orizon', hr: 'Grupa koju je provjerio Orizon', sl: 'Skupina, ki jo je preveril Orizon', et: 'Orizoni kinnitatud grupp', lv: 'Orizon pārbaudīta grupa', lt: 'Orizon patvirtinta grupė', uk: 'Група, підтверджена Orizon' },
+    da: { it: 'Verificato da Orizon', en: 'Verified by Orizon', de: 'Von Orizon verifiziert', fr: 'Vérifié par Orizon', es: 'Verificado por Orizon', pt: 'Verificado pela Orizon', nl: 'Geverifieerd door Orizon', pl: 'Zweryfikowane przez Orizon', sv: 'Verifierat av Orizon', da: 'Verificeret af Orizon', fi: 'Orizonin vahvistama', cs: 'Ověřeno Orizonem', sk: 'Overené Orizonom', hu: 'Az Orizon ellenőrizte', ro: 'Verificat de Orizon', bg: 'Потвърдено от Orizon', el: 'Επαληθεύτηκε από το Orizon', hr: 'Provjerio Orizon', sl: 'Preveril Orizon', et: 'Orizoni kinnitatud', lv: 'Pārbaudījis Orizon', lt: 'Patvirtino Orizon', uk: 'Підтверджено Orizon' }
+  };
+  function lang() { return (document.documentElement.lang || 'it').slice(0, 2).toLowerCase(); }
+  function parola(k) { return P[k][lang()] || P[k].en; }
+
+  /* ---------- la rosetta ---------- */
+  var ROSETTA = (function () {
+    var p = '';
+    for (var i = 0; i <= 360; i += 3) {
+      var a = i * Math.PI / 180, r = 10.6 + 1.25 * Math.cos(12 * a);
+      p += (i ? 'L' : 'M') + (12 + r * Math.cos(a - Math.PI / 2)).toFixed(2) + ' ' + (12 + r * Math.sin(a - Math.PI / 2)).toFixed(2);
+    }
+    return p + 'Z';
+  })();
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function rosetta() {
+    var s = document.createElementNS(SVGNS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
+    var f = document.createElementNS(SVGNS, 'path'); f.setAttribute('d', ROSETTA); f.setAttribute('class', 'oz-sp-fondo');
+    /* due segni di spunta: quello pieno (fondatore nel tema scuro) e quello sottile (tutti gli altri);
+       il CSS mostra quello giusto, così al cambio di tema non serve rifare niente */
+    var a = document.createElementNS(SVGNS, 'path'); a.setAttribute('d', 'M7.2 12.4l3.2 3.2 6.4-7'); a.setAttribute('class', 'oz-sp-segno oz-sp-pieno');
+    var b = document.createElementNS(SVGNS, 'path'); b.setAttribute('d', 'M8.4 12.3l2.5 2.5 4.9-5.4'); b.setAttribute('class', 'oz-sp-segno oz-sp-sottile');
+    s.appendChild(f); s.appendChild(a); s.appendChild(b);
+    return s;
+  }
+  function spunta(tipo, uid) {
+    var el = document.createElement('span');
+    el.className = 'oz-sp oz-sp-' + tipo;
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', parola(tipo));
+    el.setAttribute('data-oz-sp', uid + '|' + tipo);
+    el.appendChild(rosetta());
+    return el;
+  }
+
+  /* metti (o togli, o aggiorna) la spunta dentro a "dove", dopo "dopo" (o in fondo, o in cima) */
+  function metti(dove, uid, posto, dopo) {
+    if (!dove) return;
+    var tipo = uid && lista[uid], vecchia = null;
+    for (var i = 0; i < dove.children.length; i++) if (dove.children[i].classList.contains('oz-sp')) { vecchia = dove.children[i]; break; }
+    var chiave = tipo ? uid + '|' + tipo : '';
+    if (vecchia && vecchia.getAttribute('data-oz-sp') === chiave) return;
+    if (vecchia) vecchia.remove();
+    if (!tipo) { dove.classList.remove('oz-sp-riga', 'oz-sp-elenco'); return; }
+    var s = spunta(tipo, uid);
+    if (posto === 'inizio') dove.insertBefore(s, dove.firstChild);
+    else if (dopo && dopo.parentNode === dove) dove.insertBefore(s, dopo.nextSibling);
+    else dove.appendChild(s);
+    if (posto !== 'testo') dove.classList.add('oz-sp-riga');
+    /* nell'elenco sotto al nome c'è l'ultimo messaggio: nome e spunta sopra, messaggio sotto */
+    if (posto === 'elenco') dove.classList.add('oz-sp-elenco');
+  }
+
+  /* ---------- chi c'è dietro a una chat diretta ---------- */
+  function client() { try { return window.mxMatrixClientPeg && window.mxMatrixClientPeg.get(); } catch (e) { return null; } }
+  /* si rifà la mappa solo quando m.direct cambia (il client dà un evento nuovo ogni volta) */
+  var dirette = {}, diretteEv = null;
+  function aggiornaDirette() {
+    var c = client(); if (!c) return;
+    var ev = c.getAccountData && c.getAccountData('m.direct');
+    if (ev && ev === diretteEv) return;
+    diretteEv = ev || null;
+    var m = ev ? ev.getContent() : {}, d = {};
+    Object.keys(m || {}).forEach(function (u) { (m[u] || []).forEach(function (r) { d[r] = u; }); });
+    dirette = d;
+  }
+  function altroDi(room) {
+    if (!room) return null;
+    if (dirette[room.roomId]) return dirette[room.roomId];
+    /* chat a due non ancora segnata come diretta: l'altra persona, se c'è una sola */
+    try {
+      var io = client().getUserId();
+      var membri = room.getMembers().filter(function (m) { return (m.membership === 'join' || m.membership === 'invite') && m.userId !== io; });
+      if (membri.length === 1 && room.getJoinedMemberCount() <= 2 && room.getDMInviter && room.getDMInviter()) return membri[0].userId;
+    } catch (e) { /* niente */ }
+    return null;
+  }
+  function fibra(el) { for (var k in el) if (k.indexOf('__reactFiber$') === 0) return el[k]; return null; }
+  /* la stanza dietro a un pezzo di pagina: dalle proprietà di React (room, o il "vm" della riga dell'elenco) */
+  function stanzaDi(el, quanti) {
+    var f = el && fibra(el);
+    for (var i = 0; f && i < (quanti || 6); i++, f = f.return) {
+      var p = f.memoizedProps;
+      if (!p) continue;
+      if (p.room && p.room.roomId) return p.room;
+      if (p.vm) {
+        try { var s = p.vm.getSnapshot ? p.vm.getSnapshot() : p.vm.snapshot; if (s && s.room && s.room.roomId) return s.room; } catch (e) { /* niente */ }
+      }
+    }
+    return null;
+  }
+  function stanzaAperta() {
+    var c = client(); if (!c) return null;
+    var m = /#\/room\/([^/?]+)/.exec(location.hash); if (!m) return null;
+    var id = decodeURIComponent(m[1]);
+    if (id.charAt(0) === '!') return c.getRoom(id);
+    var rs = c.getRooms();
+    for (var i = 0; i < rs.length; i++) {
+      var r = rs[i];
+      if (r.getCanonicalAlias && (r.getCanonicalAlias() === id || (r.getAltAliases && r.getAltAliases().indexOf(id) >= 0))) return r;
+    }
+    return null;
+  }
+  var DA_TITOLO = /\((@[^()\s]+:[^()\s]+)\)\s*$/;
+
+  /* ---------- dove vanno le spunte ---------- */
+  var tutti = true;
+  /* la verifica tra due persone (quella con le emoji): niente rosetta, che è solo di Orizon;
+     nel profilo, dove c'era "Verifica utente", resta solo la scritta "Utente verificato" */
+  function verificaTraPersone() {
+    var testo = parola('utente');
+    document.querySelectorAll('.mx_UserInfo_verified_badge').forEach(function (b) {
+      var t = b.querySelector(':scope > .oz-verificato-tu');
+      if (!t) { t = document.createElement('span'); t.className = 'oz-verificato-tu'; b.appendChild(t); }
+      if (t.textContent !== testo) t.textContent = testo;
+    });
+  }
+
+  function giro() {
+    queued = false;
+    verificaTraPersone();
+    var c = client();
+    if (!c) return;
+    if (!c.__orizonSpunte && c.on) {
+      c.__orizonSpunte = true;
+      c.on('accountData', function (e) { if (e && e.getType && e.getType() === 'm.direct') schedule(); });
+    }
+    aggiornaDirette();
+    var nuovi = function (sel) { return document.querySelectorAll(sel); };
+
+    /* 1. elenco delle chat: la stanza dall'avatar, la persona dalle chat dirette */
+    nuovi('.mx_RoomListItemView').forEach(function (li) {
+      var nome = li.querySelector('[class*="_roomName_"]'), av = li.querySelector('.mx_RoomAvatarView');
+      if (!nome) return;
+      /* l'avatar c'è solo quando la persona è entrata; se no la stanza si prende dalla riga */
+      /* chat diretta: la persona dall'altra parte; gruppo: la stanza stessa */
+      var room = (av && stanzaDi(av)) || stanzaDi(li, 24), uid = room && (altroDi(room) || room.roomId);
+      metti(nome.parentElement, uid, 'elenco', nome);
+    });
+
+    /* 2. intestazione e 3. info della chat aperta */
+    var aperta = stanzaAperta(), altro = aperta && (altroDi(aperta) || aperta.roomId);
+    var tit = document.querySelector('.mx_RoomHeader_heading');
+    if (tit) metti(tit, altro, null, tit.querySelector('.mx_RoomHeader_truncated'));
+    var info = document.querySelector('.mx_RoomSummaryCard_roomName');
+    if (info) metti(info, altro, 'testo');
+
+    /* 4. profilo di una persona */
+    var prof = document.querySelector('.mx_UserInfo_profile_name');
+    if (prof) {
+      var idEl = document.querySelector('.mx_UserInfo_profile_mxid .mx_CopyableText');
+      var uid4 = idEl ? (idEl.firstChild && idEl.firstChild.nodeValue || idEl.textContent || '').trim() : null;
+      metti(prof, uid4, 'inizio');   /* il nome è in fila rovesciata: in cima = a destra */
+    }
+
+    /* 5. mittenti dei messaggi e persone della stanza: l'account sta nel titolo "Nome (@account)" */
+    nuovi('.mx_DisambiguatedProfile[title]').forEach(function (d) {
+      var m = DA_TITOLO.exec(d.getAttribute('title') || '');
+      var nomeSp = d.querySelector(':scope > span, :scope > .mx_DisambiguatedProfile_displayName');
+      metti(d, m && m[1], null, nomeSp);
+    });
+    tutti = false;
+  }
+  var queued = false;
+  function schedule() { if (!queued) { queued = true; requestAnimationFrame(giro); } }
+  new MutationObserver(schedule).observe(document.body || document.documentElement, { childList: true, subtree: true, characterData: true });
+  window.addEventListener('hashchange', schedule);
+  schedule();
+
+  /* ---------- la bolla al clic ---------- */
+  var bolla = null;
+  function chiudi() {
+    if (!bolla) return;
+    var b = bolla; bolla = null;
+    b.classList.remove('oz-sp-aperta');
+    setTimeout(function () { b.remove(); }, 180);
+  }
+  function apri(sp) {
+    var dati = (sp.getAttribute('data-oz-sp') || '').split('|'), tipo = dati[1];
+    if (!tipo) return;
+    var gia = bolla && bolla.__sp === sp;
+    chiudi();
+    if (gia) return;
+    var b = document.createElement('div');
+    b.className = 'oz-sp-bolla orizon-vetro oz-sp-' + tipo;
+    b.setAttribute('role', 'dialog');
+    b.__sp = sp;
+    var ic = document.createElement('span'); ic.className = 'oz-sp-icona'; ic.appendChild(rosetta());
+    var tx = document.createElement('div');
+    var t1 = document.createElement('div'); t1.className = 'oz-sp-titolo'; t1.textContent = parola(tipo);
+    var t2 = document.createElement('div'); t2.className = 'oz-sp-sotto'; t2.textContent = parola(dati[0].charAt(0) === '!' ? 'daGruppo' : 'da');
+    tx.appendChild(t1); tx.appendChild(t2);
+    b.appendChild(ic); b.appendChild(tx);
+    document.body.appendChild(b);
+    var r = sp.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight;
+    var x = Math.max(8, Math.min(r.left + r.width / 2 - 34, window.innerWidth - bw - 8));
+    var sotto = r.bottom + 12 + bh < window.innerHeight - 8;
+    var y = sotto ? r.bottom + 12 : r.top - 12 - bh;
+    b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px';
+    b.style.setProperty('--oz-sp-freccia', Math.round(r.left + r.width / 2 - x) + 'px');
+    b.classList.add(sotto ? 'oz-sp-giu' : 'oz-sp-su');
+    b.style.transformOrigin = Math.round(r.left + r.width / 2 - x) + 'px ' + (sotto ? '0' : '100%');
+    b.__x = r.left; b.__y = r.top;
+    bolla = b;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { b.classList.add('oz-sp-aperta'); }); });
+  }
+  function suSpunta(e) { return e.target && e.target.closest && e.target.closest('.oz-sp'); }
+  /* la spunta sta dentro a pulsanti di Element (la riga della chat, il nome): il clic è suo e basta */
+  ['pointerdown', 'mousedown', 'pointerup', 'mouseup'].forEach(function (tipo) {
+    document.addEventListener(tipo, function (e) { if (suSpunta(e)) { e.stopPropagation(); if (tipo.indexOf('down') > 0) e.preventDefault(); } }, true);
+  });
+  document.addEventListener('click', function (e) {
+    var sp = suSpunta(e);
+    if (sp) { e.stopPropagation(); e.preventDefault(); apri(sp); return; }
+    if (bolla && !(e.target.closest && e.target.closest('.oz-sp-bolla'))) chiudi();
+  }, true);
+  document.addEventListener('keydown', function (e) {
+    var sp = suSpunta(e);
+    if (sp && (e.key === 'Enter' || e.key === ' ')) { e.stopPropagation(); e.preventDefault(); apri(sp); return; }
+    if (e.key === 'Escape') chiudi();
+  }, true);
+  window.addEventListener('resize', chiudi);
+  /* si chiude se la spunta si sposta (lista o profilo che scorrono), non per ogni scorrimento della pagina */
+  document.addEventListener('scroll', function () {
+    if (!bolla) return;
+    var sp = bolla.__sp;
+    if (!sp.isConnected) { chiudi(); return; }
+    var r = sp.getBoundingClientRect();
+    if (Math.abs(r.left - bolla.__x) > 2 || Math.abs(r.top - bolla.__y) > 2) chiudi();
+  }, true);
+})();

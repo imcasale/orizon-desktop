@@ -4094,3 +4094,162 @@ body[class*="cpd-theme"] .mx_SpacePillButton.oz-isola.oz-isola.oz-isola:focus-vi
   background: linear-gradient(var(--oz-velo), var(--oz-velo)), var(--oz-isola-fondo) !important;
   outline: none !important;
 }
+/* ================================================================
+   10. SPUNTE DEGLI ACCOUNT VERIFICATI
+   alta quanto le maiuscole (0,92 em), centrata sulle maiuscole, a 0,3 em dal nome; il nome lungo si taglia, la spunta no.
+   Il piccolo spostamento in su si fa con transform (non con top), perché top si ferma ai pixel interi
+   e la spunta finiva mezzo pixel o un pixel sopra o sotto a seconda del posto: misurato sui pixel a schermo x1 e x2.
+   ================================================================ */
+.oz-sp {
+  --oz-sp-fondo: #2f7cf6;
+  --oz-sp-segno: #fff;
+  flex: none;
+  display: inline-block;
+  width: .92em;
+  height: .92em;
+  margin-left: .3em;
+  position: relative;
+  transform: translateY(var(--oz-sp-su, -.025em));
+  cursor: pointer;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+}
+.oz-sp svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.oz-sp:focus-visible { outline: 2px solid var(--cpd-color-border-focused, #fff); outline-offset: 2px; }
+.oz-sp-fondo { fill: var(--oz-sp-fondo); }
+.oz-sp-segno { fill: none; stroke: var(--oz-sp-segno); stroke-linecap: round; stroke-linejoin: round; }
+.oz-sp-pieno { stroke-width: 2.6; display: none; }
+.oz-sp-sottile { stroke-width: 2.1; }
+
+/* i colori */
+.oz-sp-ufficiale { --oz-sp-fondo: #e53a2c; }
+.oz-sp-persona { --oz-sp-fondo: #2f7cf6; }
+.oz-sp-noprofit { --oz-sp-fondo: #1fa65a; }
+.oz-sp-azienda { --oz-sp-fondo: #d9a10a; }
+.oz-sp-governo { --oz-sp-fondo: #7c7f88; }
+/* il fondatore: bianca con il segno pieno nel tema scuro, nera con il segno sottile nel chiaro */
+.oz-sp-fondatore { --oz-sp-fondo: #111; --oz-sp-segno: #fff; }
+body.cpd-theme-dark .oz-sp-fondatore { --oz-sp-fondo: #fff; --oz-sp-segno: #000; }
+body.cpd-theme-dark .oz-sp-fondatore .oz-sp-pieno { display: inline; }
+body.cpd-theme-dark .oz-sp-fondatore .oz-sp-sottile { display: none; }
+
+/* il nome in fila con la spunta: il nome si taglia con i "…", la spunta resta */
+.oz-sp-riga.oz-sp-riga {
+  display: flex !important;
+  align-items: center;
+  min-width: 0;
+}
+.oz-sp-riga > :not(.oz-sp) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* nell'elenco delle chat: nome e spunta sulla prima riga, l'ultimo messaggio sotto */
+.oz-sp-riga.oz-sp-elenco.oz-sp-elenco {
+  display: grid !important;
+  grid-template-columns: minmax(0, max-content) auto minmax(0, 1fr);
+  align-items: center;
+}
+.oz-sp-elenco > .oz-sp ~ * { grid-column: 1 / -1; }
+/* nel profilo il nome è in fila rovesciata (la spunta va in cima per stare a destra) */
+.mx_UserInfo_profile_name.oz-sp-riga > .oz-sp { margin-left: .3em; margin-right: 0; }
+/* in alto nella chat Element mette uno spazio fisso tra le cose del titolo: tra nome e spunta lo tolgo,
+   così la distanza è 0,3 em come negli altri posti; le icone dopo la spunta tengono il loro spazio */
+.mx_RoomHeader_heading.oz-sp-riga { column-gap: 0; }
+.mx_RoomHeader_heading.oz-sp-riga > :not(:first-child):not(.oz-sp) { margin-left: var(--cpd-space-1-5x, 6px); }
+/* dentro a un titolo che va a capo (info della chat): spunta in linea col testo */
+.mx_RoomSummaryCard_roomName > .oz-sp { vertical-align: -.1em; --oz-sp-su: .022em; }
+
+/* ---------- la verifica tra due persone (le emoji) ----------
+   niente rosetta di Element (in alto, nell'elenco delle persone, nel profilo): la rosetta è solo di Orizon.
+   Nel profilo, al posto della pillola "Verificato", la scritta grigia "Utente verificato" dove c'era "Verifica utente" */
+.mx_RoomHeader_icon.mx_Verified,
+.mx_E2EIconView:has(> .mx_E2EIconView_verified),
+.mx_E2EIconView_verified { display: none !important; }
+.mx_UserInfo_verified_badge.mx_UserInfo_verified_badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-width: 0;
+  min-block-size: 36px;
+  padding: 0 !important;
+  gap: 0;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--cpd-color-text-secondary) !important;
+}
+.mx_UserInfo_verified_badge > :not(.oz-verificato-tu) { display: none !important; }
+.oz-verificato-tu {
+  font: var(--cpd-font-body-md-semibold);
+  letter-spacing: var(--cpd-font-letter-spacing-body-md);
+  white-space: nowrap;
+}
+
+/* ---------- la bolla al clic ---------- */
+.oz-sp-bolla {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(340px, calc(100vw - 16px));
+  padding: 12px 16px 12px 12px;
+  border-radius: 20px;
+  font-family: var(--cpd-font-family-sans, Inter, sans-serif);
+  color: var(--cpd-color-text-primary, #fff);
+  background: rgba(38, 38, 44, .82);
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .5);
+  -webkit-backdrop-filter: var(--o-lente, blur(24px) saturate(1.7));
+  backdrop-filter: var(--o-lente, blur(24px) saturate(1.7));
+  opacity: 0;
+  transform: scale(.6);
+  transition: transform var(--oz-m-62-420, 320ms cubic-bezier(.3, 1.4, .45, 1)), opacity 120ms linear;
+  pointer-events: auto;
+}
+body.cpd-theme-light .oz-sp-bolla {
+  background: rgba(255, 255, 255, .88);
+  border-color: rgba(0, 0, 0, .08);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .16);
+}
+.oz-sp-bolla.oz-sp-aperta { opacity: 1; transform: none; }
+.oz-sp-bolla::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--oz-sp-freccia, 34px) - 7px);
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  border: inherit;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transform: rotate(45deg);
+}
+.oz-sp-bolla.oz-sp-giu::before { top: -7px; border-right: 0; border-bottom: 0; }
+.oz-sp-bolla.oz-sp-su::before { bottom: -7px; border-left: 0; border-top: 0; }
+.oz-sp-icona {
+  --oz-sp-fondo: inherit;
+  flex: none;
+  width: 34px;
+  height: 34px;
+}
+.oz-sp-icona svg { display: block; width: 100%; height: 100%; }
+.oz-sp-bolla.oz-sp-ufficiale { --oz-sp-fondo: #e53a2c; }
+.oz-sp-bolla.oz-sp-persona { --oz-sp-fondo: #2f7cf6; }
+.oz-sp-bolla.oz-sp-noprofit { --oz-sp-fondo: #1fa65a; }
+.oz-sp-bolla.oz-sp-azienda { --oz-sp-fondo: #d9a10a; }
+.oz-sp-bolla.oz-sp-governo { --oz-sp-fondo: #7c7f88; }
+.oz-sp-bolla .oz-sp-segno { stroke: #fff; }
+.oz-sp-bolla.oz-sp-fondatore { --oz-sp-fondo: #111; }
+body.cpd-theme-dark .oz-sp-bolla.oz-sp-fondatore { --oz-sp-fondo: #fff; }
+body.cpd-theme-dark .oz-sp-bolla.oz-sp-fondatore .oz-sp-segno { stroke: #000; }
+body.cpd-theme-dark .oz-sp-bolla.oz-sp-fondatore .oz-sp-pieno { display: inline; }
+body.cpd-theme-dark .oz-sp-bolla.oz-sp-fondatore .oz-sp-sottile { display: none; }
+.oz-sp-titolo { font-size: 15px; font-weight: 700; line-height: 20px; }
+.oz-sp-sotto { font-size: 12.5px; line-height: 17px; margin-top: 2px; color: var(--cpd-color-text-secondary, #9a9aa2); }
