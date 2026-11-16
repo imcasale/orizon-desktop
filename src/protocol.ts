@@ -124,17 +124,28 @@ export default class ProtocolHandler {
             (arg) => arg.startsWith(`${this.protocol}:/`) || arg.startsWith(`${LEGACY_PROTOCOL}://`),
         );
         if (deeplinkUrl?.includes(SEARCH_PARAM)) {
-            const parsedUrl = new URL(deeplinkUrl);
-            if (parsedUrl.protocol === `${this.protocol}:` || parsedUrl.protocol === `${LEGACY_PROTOCOL}:`) {
-                const store = this.readStore();
-                let sessionId = parsedUrl.searchParams.get(SEARCH_PARAM);
-                if (!sessionId) {
-                    // In OIDC, we must shuttle the value in the `state` param rather than `element-desktop-ssoid`
-                    // We encode it as a suffix like `:element-desktop-ssoid:XXYYZZ`
-                    sessionId = parsedUrl.searchParams.get("state")!.split(`:${SEARCH_PARAM}:`)[1];
+            // Orizon: never let a malformed link crash the app at start, otherwise the login link
+            // never reaches the window that is already open
+            try {
+                const parsedUrl = new URL(deeplinkUrl);
+                if (parsedUrl.protocol === `${this.protocol}:` || parsedUrl.protocol === `${LEGACY_PROTOCOL}:`) {
+                    const store = this.readStore();
+                    let sessionId = parsedUrl.searchParams.get(SEARCH_PARAM);
+                    if (!sessionId) {
+                        // In OIDC, we must shuttle the value in the `state` param rather than `element-desktop-ssoid`
+                        // We encode it as a suffix like `:element-desktop-ssoid:XXYYZZ`
+                        // Orizon: the web app asks for response_mode=fragment, so the state comes after the #
+                        const state =
+                            parsedUrl.searchParams.get("state") ??
+                            new URLSearchParams(parsedUrl.hash.replace(/^#/, "")).get("state");
+                        sessionId = state?.split(`:${SEARCH_PARAM}:`)[1] ?? null;
+                    }
+                    if (!sessionId) return undefined;
+                    console.log("Forwarding to profile: ", store[sessionId]);
+                    return store[sessionId];
                 }
-                console.log("Forwarding to profile: ", store[sessionId]);
-                return store[sessionId];
+            } catch (e) {
+                console.log("Ignoring a link that could not be read: ", e);
             }
         }
     }
