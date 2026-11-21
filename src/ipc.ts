@@ -11,6 +11,7 @@ import IpcMainEvent = Electron.IpcMainEvent;
 import { randomArray } from "./utils.js";
 import { getDisplayMediaCallback, setDisplayMediaCallback } from "./displayMediaCallback.js";
 import Store, { clearDataAndRelaunch } from "./store.js";
+import * as orizonAppImage from "./orizon-appimage.js";
 
 let focusHandlerAttached = false;
 ipcMain.on("loudNotification", function (): void {
@@ -54,7 +55,7 @@ ipcMain.on("ipcCall", async function (_ev: IpcMainEvent, payload) {
 
     switch (payload.name) {
         case "getUpdateFeedUrl":
-            ret = autoUpdater.getFeedURL();
+            ret = orizonAppImage.isActive() ? orizonAppImage.feedUrl() : autoUpdater.getFeedURL();
             break;
         case "setLanguage":
             global.appLocalization.setAppLocale(args[0]);

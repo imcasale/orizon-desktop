@@ -12,6 +12,7 @@ import os from "node:os";
 import { getSquirrelExecutable } from "./squirrelhooks.js";
 import { _t } from "./language-helper.js";
 import { initialisePromise } from "./ipc.js";
+import * as orizonAppImage from "./orizon-appimage.js";
 
 const UPDATE_POLL_INTERVAL_MS = 60 * 60 * 1000;
 const INITIAL_UPDATE_DELAY_MS = 30 * 1000;
@@ -169,8 +170,9 @@ async function available(): Promise<boolean> {
     return true;
 }
 
-ipcMain.on("install_update", installUpdate);
-ipcMain.on("check_updates", pollForUpdates);
+// Orizon: on Linux the AppImage has its own updater (see orizon-appimage.ts)
+ipcMain.on("install_update", () => (orizonAppImage.isActive() ? orizonAppImage.install() : installUpdate()));
+ipcMain.on("check_updates", () => (orizonAppImage.isActive() ? orizonAppImage.check() : pollForUpdates()));
 
 function ipcChannelSendUpdateStatus(status: boolean | string): void {
     global.mainWindow?.webContents.send("check_updates", status);

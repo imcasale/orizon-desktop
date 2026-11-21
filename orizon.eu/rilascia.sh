@@ -6,7 +6,7 @@
 #   bash ~/dev/orizon-desktop/orizon.eu/rilascia.sh --pagina     solo la pagina di download: versione attuale e data
 # In ordine:
 #   1. versione in package.json, electron-builder.ts e PKGBUILD
-#   2. compila deb, rpm, pacman e tar.gz                (scatola orizon-pacchetti)
+#   2. compila deb, rpm, pacman, tar.gz e AppImage      (scatola orizon-pacchetti)
 #   3. repository deb e rpm firmato                       (scatola orizon-pacchetti)
 #   4. repository pacman firmato, per Arch e CachyOS     (scatola orizon-arch)
 #   5. Flatpak firmato
@@ -119,7 +119,7 @@ REV_ATTUALE=$(grep -o '"--iteration", "[0-9]*"' electron-builder.ts | head -1 | 
 if [ $PROVA = 1 ] || [ $PAGINA = 1 ]; then VER=$ATTUALE; REV=$REV_ATTUALE; fi
 DEBVER="$VER-$REV"
 [ "$REV" = 1 ] && VR=$VER || VR="$VER-$REV"
-PACCHETTI=("orizon-desktop_${VER}_amd64.deb" "orizon-desktop-${VER}.x86_64.rpm" "orizon-desktop-${VER}.pacman" "orizon-desktop-${VER}.tar.gz")
+PACCHETTI=("orizon-desktop_${VER}_amd64.deb" "orizon-desktop-${VER}.x86_64.rpm" "orizon-desktop-${VER}.pacman" "orizon-desktop-${VER}.tar.gz" "orizon-desktop-${VER}.AppImage")
 ULTIMA=$(sed -n 's/^Version: //p' "$REPO_VERO/deb/dists/stable/main/binary-amd64/Packages" 2>/dev/null | sort -V | tail -1 || true)
 
 if [ $PAGINA = 1 ]; then
@@ -205,7 +205,9 @@ p_compila() {
   echo "   qualche minuto (registro: $LOG)"
   nella_scatola "export SQLCIPHER_BUNDLED=1 COREPACK_ENABLE_DOWNLOAD_PROMPT=0; rm -rf dist; VARIANT_PATH=orizon.eu/release/build.json ${BUILD_CMD:-pnpm run build:64} > '$LOG' 2>&1" \
     || { tail -30 "$LOG"; echo "   COMPILAZIONE NON RIUSCITA"; return 1; }
-  for f in "${PACCHETTI[@]}"; do [ -f "dist/$f" ] || { echo "   manca dist/$f"; return 1; }; done
+  for f in "${PACCHETTI[@]}" latest-linux.yml; do [ -f "dist/$f" ] || { echo "   manca dist/$f"; return 1; }; done
+  # elenca tutti i pacchetti Linux: all'AppImage serve la sua riga (la sceglie da sola per estensione)
+  grep -qE "^ *- url: ${PACCHETTI[4]//./\\.} *\$" dist/latest-linux.yml || { echo "   dist/latest-linux.yml non parla di ${PACCHETTI[4]}"; return 1; }
   v=$(nella_scatola "dpkg-deb -f 'dist/${PACCHETTI[0]}' Version" | tail -1 | tr -d '\r')
   [ "$v" = "$DEBVER" ] || { echo "   il .deb ha la versione $v invece di $DEBVER"; return 1; }
   for f in "${PACCHETTI[@]}"; do echo "   $(du -h "dist/$f" | cut -f1)  $f"; done
@@ -286,12 +288,15 @@ p_sito() {
   if [ $PAGINA = 1 ]; then
     echo "   aggiorno solo la pagina"
   elif [ $PROVA = 0 ]; then
-    echo "   carico pacman e tar.gz in $W/dl (circa 270 MB)"
+    echo "   carico pacman, tar.gz e AppImage in $W/dl (circa 440 MB)"
     if command -v rsync >/dev/null && $SSH "$SERVER" "command -v rsync" >/dev/null 2>&1; then
-      rsync -a --partial --chmod=F644 -e "$SSH" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}" "$SERVER:$W/dl/"
+      rsync -a --partial --chmod=F644 -e "$SSH" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}" "dist/${PACCHETTI[4]}" "$SERVER:$W/dl/"
     else
-      for f in "${PACCHETTI[2]}" "${PACCHETTI[3]}"; do $SSH "$SERVER" "cat > '$W/dl/$f.part' && chmod 644 '$W/dl/$f.part' && mv '$W/dl/$f.part' '$W/dl/$f'" < "dist/$f"; done
+      for f in "${PACCHETTI[2]}" "${PACCHETTI[3]}" "${PACCHETTI[4]}"; do $SSH "$SERVER" "cat > '$W/dl/$f.part' && chmod 644 '$W/dl/$f.part' && mv '$W/dl/$f.part' '$W/dl/$f'" < "dist/$f"; done
     fi
+    # le AppImage già installate leggono questo file e si aggiornano da sole: va su per ultimo
+    $SSH "$SERVER" "cat > '$W/dl/latest-linux.yml.part' && chmod 644 '$W/dl/latest-linux.yml.part' && mv '$W/dl/latest-linux.yml.part' '$W/dl/latest-linux.yml'" < dist/latest-linux.yml
+    echo "   AppImage: le copie già installate si aggiorneranno alla $VER"
   else
     echo "   prova: guardo la pagina di download senza cambiarla"
   fi
@@ -307,6 +312,7 @@ FISSI = {
     "orizon-desktop-linux-x86_64.rpm": f"../repo/rpm/orizon-desktop-{ver}.x86_64.rpm",
     "orizon-desktop-linux-x86_64.pacman": f"orizon-desktop-{ver}.pacman",
     "orizon-desktop-linux-x64.tar.gz": f"orizon-desktop-{ver}.tar.gz",
+    "orizon-desktop-linux-x86_64.AppImage": f"orizon-desktop-{ver}.AppImage",
 }
 MESI = {
     "it": "gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre novembre dicembre",
@@ -426,7 +432,7 @@ if vecchia == ver: print(f"   stessa versione {ver}: cambiano solo impronte e da
 # file vecchi in /dl: tengo la versione nuova e quella di prima
 tenere = {ver} | ({vecchia} if vecchia else set())
 for p in ([] if solo_pagina else sorted(dl.iterdir())):
-    m = re.fullmatch(r"orizon-desktop-(\d+\.\d+\.\d+)\.(pacman|tar\.gz)", p.name)
+    m = re.fullmatch(r"orizon-desktop-(\d+\.\d+\.\d+)\.(pacman|tar\.gz|AppImage)", p.name)
     if m and p.is_file() and not p.is_symlink() and m.group(1) not in tenere:
         mb = p.stat().st_size // 1048576
         if dry: print(f"   da togliere: /dl/{p.name} ({mb} MB)")
@@ -441,9 +447,10 @@ PY
   elif [ $PROVA = 0 ]; then
     curl -fsS --max-time 30 "$SITO/dl/SHA256SUMS" > "$TMP/somme"
     attese=("$(sha256sum "$OUT/deb/pool/main/${PACCHETTI[0]}" | cut -d' ' -f1)" "$(sha256sum "$OUT/rpm/${PACCHETTI[1]}" | cut -d' ' -f1)"
-            "$(sha256sum "dist/${PACCHETTI[2]}" | cut -d' ' -f1)" "$(sha256sum "dist/${PACCHETTI[3]}" | cut -d' ' -f1)")
+            "$(sha256sum "dist/${PACCHETTI[2]}" | cut -d' ' -f1)" "$(sha256sum "dist/${PACCHETTI[3]}" | cut -d' ' -f1)"
+            "$(sha256sum "dist/${PACCHETTI[4]}" | cut -d' ' -f1)")
     i=0
-    for n in orizon-desktop-linux-amd64.deb orizon-desktop-linux-x86_64.rpm orizon-desktop-linux-x86_64.pacman orizon-desktop-linux-x64.tar.gz; do
+    for n in orizon-desktop-linux-amd64.deb orizon-desktop-linux-x86_64.rpm orizon-desktop-linux-x86_64.pacman orizon-desktop-linux-x64.tar.gz orizon-desktop-linux-x86_64.AppImage; do
       grep -qx "${attese[$i]}  $n" "$TMP/somme" && online "$SITO/dl/$n" && echo "   $SITO/dl/$n ok" \
         || { echo "   ATTENZIONE: $SITO/dl/$n non risponde o ha un'impronta diversa"; return 1; }
       i=$((i + 1))
@@ -495,11 +502,11 @@ p_github() {
   done
   # gli stessi pacchetti del sito, con la versione nel nome
   RD="$HOME/orizon-release-$VR"; mkdir -p "$RD"
-  SORG=("$OUT/deb/pool/main/${PACCHETTI[0]}" "$OUT/rpm/${PACCHETTI[1]}" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}")
-  NREL=("orizon-desktop_${VR}_amd64.deb" "orizon-desktop-${VR}.x86_64.rpm" "orizon-desktop-${VR}-x86_64.pacman" "orizon-desktop-${VR}.tar.gz")
+  SORG=("$OUT/deb/pool/main/${PACCHETTI[0]}" "$OUT/rpm/${PACCHETTI[1]}" "dist/${PACCHETTI[2]}" "dist/${PACCHETTI[3]}" "dist/${PACCHETTI[4]}")
+  NREL=("orizon-desktop_${VR}_amd64.deb" "orizon-desktop-${VR}.x86_64.rpm" "orizon-desktop-${VR}-x86_64.pacman" "orizon-desktop-${VR}.tar.gz" "orizon-desktop-${VR}-x86_64.AppImage")
   SOMME=$(curl -fsS --max-time 30 "$SITO/dl/SHA256SUMS") || { echo "   non riesco a leggere $SITO/dl/SHA256SUMS"; return 1; }
   : > "$RD/SHA256SUMS.txt"
-  for i in 0 1 2 3; do
+  for i in 0 1 2 3 4; do
     [ -f "${SORG[$i]}" ] || { echo "   non trovo ${SORG[$i]}"; return 1; }
     ln -f "${SORG[$i]}" "$RD/${NREL[$i]}" 2>/dev/null || cp -f "${SORG[$i]}" "$RD/${NREL[$i]}"
     h=$(sha256sum "$RD/${NREL[$i]}" | cut -d' ' -f1)
@@ -523,6 +530,7 @@ p_github() {
     printf -- '- Fedora: sudo dnf install ./%s\n' "${NREL[1]}"
     printf -- '- openSUSE: sudo zypper install ./%s\n' "${NREL[1]}"
     printf -- '- Arch, Manjaro: sudo pacman -U %s\n' "${NREL[2]}"
+    printf -- '- AppImage, su quasi tutte le distribuzioni: chmod +x %s e aprila (si aggiorna da sola)\n' "${NREL[4]}"
     printf -- '- Qualsiasi distribuzione: estrai il .tar.gz e avvia orizon-desktop\n\n'
     printf 'Requisiti: Linux a 64 bit con glibc 2.34 o successiva (Ubuntu 22.04+, Debian 12+, Fedora, Arch).\n'
     printf 'Le impronte SHA256 sono nel file SHA256SUMS.txt e sono le stesse della pagina di download.\n'
@@ -540,7 +548,7 @@ p_github() {
       --title "Orizon $VR per Linux" --notes-file "$RD/note.md" --latest
   fi
   NA=$(gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets | length')
-  [ "$NA" -ge 5 ] || { echo "   sulla release ci sono solo $NA file su 5"; return 1; }
+  [ "$NA" -ge 6 ] || { echo "   sulla release ci sono solo $NA file su 6"; return 1; }
   echo "   $(gh release view "$TAG" --repo "$GH_REPO" --json url --jq .url)"
 }
 
@@ -577,7 +585,7 @@ PY
 }
 
 passo versione "Versione"                                       p_versione
-passo compila  "Compilo deb, rpm, pacman e tar.gz"              p_compila
+passo compila  "Compilo deb, rpm, pacman, tar.gz e AppImage"    p_compila
 passo repo     "Repository deb e rpm firmato"                   p_repo
 passo arch     "Repository pacman firmato (Arch, CachyOS)"      p_arch
 passo flatpak  "Flatpak firmato"                                p_flatpak

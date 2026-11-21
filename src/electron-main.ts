@@ -39,6 +39,7 @@ import Store from "./store.js";
 import { buildMenuTemplate } from "./vectormenu.js";
 import webContentsHandler from "./webcontents-handler.js";
 import * as updater from "./updater.js";
+import * as orizonAppImage from "./orizon-appimage.js";
 import ProtocolHandler from "./protocol.js";
 import { _t, AppLocalization } from "./language-helper.js";
 import { setDisplayMediaCallback } from "./displayMediaCallback.js";
@@ -424,6 +425,8 @@ app.on("ready", async () => {
     // Minimist parses `--no-`-prefixed arguments as booleans with value `false` rather than verbatim.
     if (argv["update"] === false) {
         console.log("Auto update disabled via command line flag");
+    } else if (orizonAppImage.start()) {
+        // Orizon: the AppImage updates itself from 4orizon.eu
     } else if (global.vectorConfig["update_base_url"]) {
         void updater.start(global.vectorConfig["update_base_url"]);
     } else {

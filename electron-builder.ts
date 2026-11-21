@@ -127,7 +127,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         electron_protocol: variant.protocols[0],
     },
     linux: {
-        target: ["tar.gz", "deb", "rpm", "pacman"],
+        target: ["tar.gz", "deb", "rpm", "pacman", "AppImage"],
         category: "Network;InstantMessaging;Chat",
         icon: "icon.png",
         executableName: variant.name, // element-desktop or element-desktop-nightly
@@ -199,6 +199,20 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
     msi: {
         perMachine: true,
     },
+    // Orizon: the AppImage updates itself (src/orizon-appimage.ts) from latest-linux.yml, published with it in /dl.
+    // The new AppImage runtime does not need libfuse2, which recent distributions no longer install.
+    appImage: {
+        artifactName: "${name}-${version}.${ext}",
+    },
+    toolsets: {
+        appimage: "1.0.2",
+    },
+    publish: [
+        {
+            provider: "generic",
+            url: process.env.ORIZON_UPDATE_URL || "https://4orizon.eu/dl/",
+        },
+    ],
     directories: {
         output: "dist",
     },
