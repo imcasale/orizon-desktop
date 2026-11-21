@@ -31,8 +31,8 @@ modules:
     buildsystem: simple
     sources:
       - type: file
-        url: https://4orizon.eu/repo/deb/pool/main/orizon-desktop_1.12.32_amd64.deb
-        sha256: 68a5f90b1bab82bd979912eea0aa643caed4a834aebedb1dadcb5a3a9ec99258
+        url: https://4orizon.eu/repo/deb/pool/main/orizon-desktop_1.12.33_amd64.deb
+        sha256: f8959836ca34646ab0c29f6be10aee62cd595a7592a037bee6b8cafd4bef88ca
         dest-filename: orizon.deb
       - type: file
         path: orizon-avvio.sh
